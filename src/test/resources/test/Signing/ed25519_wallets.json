@@ -1,0 +1,212 @@
+[
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "ed25519",
+      "id": "b04e070c-491c-45c2-9dd5-210e0d1673e1"
+    },
+    "Response": {
+      "id": "b04e070c-491c-45c2-9dd5-210e0d1673e1",
+      "result": {
+        "account_id": "rn4gsh2qp8842mTA5HfwGT3L1XepQCpqiu",
+        "key_type": "ed25519",
+        "master_key": "ANTE TUFT MEG CHEN CRAB DUMB COW OWNS ROOF FRED EDDY FORD",
+        "master_seed": "spqnjaMMxPSvtaD4nevqqdjj4kzie",
+        "master_seed_hex": "09A117434757F90BF0BED6B29F185E4D",
+        "public_key": "aKGGHoqb2C2Xj6qtzikTTdsQdPcnYS8ue4XzXvT2T6fuofFP4zrA",
+        "public_key_hex": "EDC5349AD8114DCDA07A355AA850FABE710CEE8FCBD891F1B919A6F6713C7BABA0"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "ed25519",
+      "id": "7685e62f-0fd9-4661-bd54-2045675cbfb7"
+    },
+    "Response": {
+      "id": "7685e62f-0fd9-4661-bd54-2045675cbfb7",
+      "result": {
+        "account_id": "rayki11yG3rsF3TQqBYyszKEqyzFCuuHwM",
+        "key_type": "ed25519",
+        "master_key": "DUET CLAY WALE GALT LUST UN SALK NECK GOUT CALF MAW HOB",
+        "master_seed": "ssTKNEB2aMu26PJW956jwoeECnMYX",
+        "master_seed_hex": "367842313D5A18D6854E7BC4D9F3EC77",
+        "public_key": "aKGGdRkrjx8FjpDzuudVuv8xffqcXErK2KGm2t6ac3Zq6scLz5gA",
+        "public_key_hex": "EDC5F93A57986EC7A409D858210FA85B3238CFB48C843664C063B748BE768455F0"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "ed25519",
+      "id": "f146af43-b844-4c07-9fff-e7e7512e1b79"
+    },
+    "Response": {
+      "id": "f146af43-b844-4c07-9fff-e7e7512e1b79",
+      "result": {
+        "account_id": "rhrnEF2x2UTJPBPz4R5pd3GEnYhfT95mk7",
+        "key_type": "ed25519",
+        "master_key": "HICK LAUD TONY FORM SCOT DOES ORGY BUOY JUKE GLOB HUGE POE",
+        "master_seed": "shwkykTtd9dM14vmK9jXK3uP8vU5m",
+        "master_seed_hex": "69C269468F0E4CC9E97C9DC2B667B597",
+        "public_key": "aKGraTXMemkJKkVUpgQpYKga6jvpXrZBiA3nHsVn4h197imhqLw1",
+        "public_key_hex": "EDA2B3A9891C6D0AD7993B543CFA02FC2C79339DB500C2F82C64B7DAC9F4159F2F"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "ed25519",
+      "id": "c43586f8-ceac-4a9d-b081-e5b95e334eb6"
+    },
+    "Response": {
+      "id": "c43586f8-ceac-4a9d-b081-e5b95e334eb6",
+      "result": {
+        "account_id": "rNnaZUAMrW5qSPUnkdMXnYt2zKCnzKskFt",
+        "key_type": "ed25519",
+        "master_key": "BOW FIGS FAT TELL LOAD AIR JULY FUNK TIME GOSH SNAG ETC",
+        "master_seed": "ssUQqK9QcS4H5nt2KcA1HZeSnumNY",
+        "master_seed_hex": "24069E47B0EFF0A3020C7B744CFC8F08",
+        "public_key": "aKGgMwy6BGQCadEtaW7onzF5P4k9AffabddsE1HStVaUrSuxBbD2",
+        "public_key_hex": "EDFBD5070674201A4D2DAB39D414CF36EFC3A244721446423415148D0E311804A6"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "ed25519",
+      "id": "c718bc84-c941-4fd9-9bd9-83f63403f0dd"
+    },
+    "Response": {
+      "id": "c718bc84-c941-4fd9-9bd9-83f63403f0dd",
+      "result": {
+        "account_id": "rjJBKmm5EzfwYuvfyfHeR8wU9n51rcK36",
+        "key_type": "ed25519",
+        "master_key": "HAT LOG JUG BIEN LAB CODY GRUB BANG RENA ROBE WALT CAVE",
+        "master_seed": "snVEY3TAGJ97zgHQ8K5qC74N18AY8",
+        "master_seed_hex": "C86C7F683A4BEA90D228D2AB84AC4419",
+        "public_key": "aKGcM1V6GhxxG2No8PonY6Y8dbJECnYvurCVhjGsfsRJJqEWaemF",
+        "public_key_hex": "EDF2C6E94C16DDAC4A97B0967581F8B9B07E87B4465676574C17730CA748A20AA6"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "ed25519",
+      "id": "83d1ebe0-9380-4752-a771-20024ea88233"
+    },
+    "Response": {
+      "id": "83d1ebe0-9380-4752-a771-20024ea88233",
+      "result": {
+        "account_id": "r9Y83GJotBD89Bw6sMkqBpVbYkX4kY1sha",
+        "key_type": "ed25519",
+        "master_key": "REST ROW CUE CITY KIN FINE TOLD BLAB DADE BACK BOAR ABEL",
+        "master_seed": "sh64pUF7krtdDCxaYZzUBBMdx2oUy",
+        "master_seed_hex": "8FA255A8B9192BED012372B33118E7CE",
+        "public_key": "aKESKogCjNCxJ6ioDejrc3xGmwLR6zRuJbc7mmN6YKx8wXrXxV6C",
+        "public_key_hex": "ED584B3713C85A3E95D8B2301480944AE1DC1234DCD084B1B99CD296AE9392394E"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "ed25519",
+      "id": "9a220013-16ca-4e0a-9031-bb8aacabf30b"
+    },
+    "Response": {
+      "id": "9a220013-16ca-4e0a-9031-bb8aacabf30b",
+      "result": {
+        "account_id": "rhXMrTFrPbC1aV6iSyirrLtLeiXNyW2VEP",
+        "key_type": "ed25519",
+        "master_key": "MEW WHO ALVA FIVE TERM KERR BOP RUB LOY ODIN CURB GUY",
+        "master_seed": "ss48pNxyxxVoFrGdob6L1FhJf2nLc",
+        "master_seed_hex": "30DA86E3982067084C95CE402FA56828",
+        "public_key": "aKEL1U6p13mYn7Hsqp9GMCqgsyNGgxqcGZmvEaTp5LWSpLRiykSs",
+        "public_key_hex": "ED4BE632C8094958B9C0C28F18DAF23369C3EA230BBDECA7476E0EF0A58405FF9A"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "ed25519",
+      "id": "46ef49a5-d6dc-4de6-946e-05142d0d6c7a"
+    },
+    "Response": {
+      "id": "46ef49a5-d6dc-4de6-946e-05142d0d6c7a",
+      "result": {
+        "account_id": "rBr73eHWscWo1YcdwoVkRxHwd6DgkWRSNP",
+        "key_type": "ed25519",
+        "master_key": "MITT KIRK FIN WHEE LIED HERO TURN LEAK FACE WAS CAL CAB",
+        "master_seed": "spyyS5CEtCk5UPLojfG1QeT3fHKUd",
+        "master_seed_hex": "14A220A2F28175F12EE36AFD4FDCF4BC",
+        "public_key": "aKELSFhV5qeuCDduRrkSVyDdVLf1JYvXW32eG5zcsAzxyDdX6TfG",
+        "public_key_hex": "ED4AF1C23843309146623187126F65DAAD681F11CBBCD9C51137E33EA03BB2ED46"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "ed25519",
+      "id": "91add14b-49e3-4296-8eb6-151476d60325"
+    },
+    "Response": {
+      "id": "91add14b-49e3-4296-8eb6-151476d60325",
+      "result": {
+        "account_id": "rGqPC7pdJoSCFWB5bRZ5KZxFhFvQnpzUhG",
+        "key_type": "ed25519",
+        "master_key": "FLOW RICE SEAL FONT HULK ART LENS EASE RICH LIE SLOT YEAR",
+        "master_seed": "saG3xy2aLpvjEYGXkqVk3UxceeY4F",
+        "master_seed_hex": "FFF95D923C2FEFAC07C829C25FE31983",
+        "public_key": "aKGh92WCWYdzkbEzFDsABYTBe3CMjPMakJFnujAfLKu3ewLEyLsi",
+        "public_key_hex": "EDA9A2C61C3E7AAD581F5E18337F5211F9489AAACFCD6C1FFA28AB58F24142348A"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "ed25519",
+      "id": "fa3e4b20-601a-445c-b37c-f16f13111a65"
+    },
+    "Response": {
+      "id": "fa3e4b20-601a-445c-b37c-f16f13111a65",
+      "result": {
+        "account_id": "rDVvod7r7saJPgLDZHazu11oURPa2xCrP3",
+        "key_type": "ed25519",
+        "master_key": "TONG GAM AMOS LEAK FAST TEST POP BEAM BONN ABE MORT LACK",
+        "master_seed": "ssiKyKNUowNvDxx9hPYkpz3D3KuVm",
+        "master_seed_hex": "52F31B007191AA34D3E1075632BD82ED",
+        "public_key": "aKEj3KWsdgbqZBFEBNrme4w6TFBQUkJyiX1XQoNE8CFqJ7urnYMb",
+        "public_key_hex": "ED7E71D9DD0C7DF6778864A7666AD913CD4DAAB3A0F4AD56E3F8642E3802194809"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  }
+]

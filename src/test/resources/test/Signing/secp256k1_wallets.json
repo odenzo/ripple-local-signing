@@ -1,0 +1,212 @@
+[
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "secp256k1",
+      "id": "87e1aae7-910f-46e2-88f8-e8ee36cd3d2b"
+    },
+    "Response": {
+      "id": "87e1aae7-910f-46e2-88f8-e8ee36cd3d2b",
+      "result": {
+        "account_id": "rBW1c6SEN2kJKX6KpZjRx6aXz1mhNRg4VA",
+        "key_type": "secp256k1",
+        "master_key": "SUMS SEW FOAM WINE HEN SOFA ME CURD GLUE THY ALEC OTIS",
+        "master_seed": "shkdagkvurEgAqQodQU6nYQX8UHiH",
+        "master_seed_hex": "93AB24A034BACD27C39F017E0E7607E5",
+        "public_key": "aBP25NKvE9zt4ZTavmttWMZ5T4tMoMfG18mrT1DpZwWU8fDyAL6f",
+        "public_key_hex": "02D5EACF650E008C25C43E5AF54C6B91792743F28F9BCB990ED6B8719A03391AEB"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "secp256k1",
+      "id": "7606305b-c372-482c-8de3-dce0d27ad843"
+    },
+    "Response": {
+      "id": "7606305b-c372-482c-8de3-dce0d27ad843",
+      "result": {
+        "account_id": "rD7msKkeBhVstkHueWADKSge2Y2CazumNs",
+        "key_type": "secp256k1",
+        "master_key": "APS DID FRET FEAR FAIL BUSY JOE JIBE KEG BLOB FLAW ROWE",
+        "master_seed": "snrYkbtordQyYXZHgTm4BSvsyWSrW",
+        "master_seed_hex": "A623A82C862CB420C3D037BF19CAC102",
+        "public_key": "aBPydMW3U5KKs4t5EfV8TaYoHHRn4cN6ax6TDKsnXwuW4iZye2sA",
+        "public_key_hex": "0309F35D366B571FD3D6BDFE38F1A2A965B4A794762950D489781CD0B2C808BFA3"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "secp256k1",
+      "id": "0d1c8cc1-1bae-4e61-8d94-ba6daa3477da"
+    },
+    "Response": {
+      "id": "0d1c8cc1-1bae-4e61-8d94-ba6daa3477da",
+      "result": {
+        "account_id": "rB3Sd4u55fijbfDLfgxcJtVF47Q7qMUMUE",
+        "key_type": "secp256k1",
+        "master_key": "UTAH HONK SAT BLEW SHY RAP ELLA CHOU OSLO MAKE NUT RIG",
+        "master_seed": "shEg9id8tAcBAkw2yNgLXY6LyoPZX",
+        "master_seed_hex": "6FD822DB25C72C7B6CBE93ACEA44D3F2",
+        "public_key": "aBQfBwbPvuy6XD7ZPdSQ1wpGyqWihZgkzfjcRe47m3QUpovWBJ1c",
+        "public_key_hex": "031B1723DFA962E15A6976599CAA63D64FCCDDB04CF79DE77C5558861D0B99CAA6"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "secp256k1",
+      "id": "2bac4dc6-9ae1-4670-956d-5b7a6be68291"
+    },
+    "Response": {
+      "id": "2bac4dc6-9ae1-4670-956d-5b7a6be68291",
+      "result": {
+        "account_id": "rBB9esPH5igbguqQ92wBTrRg85Ud1MtHsB",
+        "key_type": "secp256k1",
+        "master_key": "SIGH NOOK ALMA TRAG QUIT ROWS ORAL HAL BACK SEAR DOLL WET",
+        "master_seed": "shdsuJn8Goi1Ep3bkY63cxuYD1bSn",
+        "master_seed_hex": "8A4C17EC421523C9A6AF7CF72CADD8DB",
+        "public_key": "aBQ8a2LaCxuyUeirv3ggczLo3Gw7NDQkHZdMJ38TGMAuHqxDDYHj",
+        "public_key_hex": "0373770652E26B294FFBFC58968CA61F7E816D1612F02886BAC474ADF6A26B3CFB"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "secp256k1",
+      "id": "4216064d-b668-4bdd-a8dc-5d9c7fade3b1"
+    },
+    "Response": {
+      "id": "4216064d-b668-4bdd-a8dc-5d9c7fade3b1",
+      "result": {
+        "account_id": "r3dA8SH8q9ovGQh2DBKbwzuo1GTCo8a8Ja",
+        "key_type": "secp256k1",
+        "master_key": "BERN RISE GREY HEW SNOW TERN RAIN WAY BYTE USER LUSH LOFT",
+        "master_seed": "shhj7XZ4eqvcMWUtMjpmpbU85JTDa",
+        "master_seed_hex": "624D4B79878D08CCD20B1E8D40069A56",
+        "public_key": "aBMxbQV2RT4KpMXX6dbanWSTw36bboi4NPBQZwQMMs5LMwfzt9ks",
+        "public_key_hex": "0200362818C409715CF1AF7F75FF1479194FDAB14BA11C451E822F8BF2B4346606"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "secp256k1",
+      "id": "6e4e662e-1c0a-4cc2-af3f-83f233c9c0bc"
+    },
+    "Response": {
+      "id": "6e4e662e-1c0a-4cc2-af3f-83f233c9c0bc",
+      "result": {
+        "account_id": "r97NuZLVBop4ypXcACHujHzMygoQKu8kq9",
+        "key_type": "secp256k1",
+        "master_key": "DUMB OX BING OFF LEO COLA RON HURL AWE DUEL ADD BLOW",
+        "master_seed": "snByqFuggp1L4UtNEpwDHv59yDpUi",
+        "master_seed_hex": "B30CE0BB12A49338D342521761294678",
+        "public_key": "aBPmq5VHqq6hcyQ9o2sD2SiUHoEKTsuQYtKotErTpdsUWWyi75Hr",
+        "public_key_hex": "02EF2FE736FB39DA69DA8DAD90B956B87B7E213BB069B0CC56834705D7BAFDBE8E"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "secp256k1",
+      "id": "70576706-4129-457f-bd57-f4e6cb428d55"
+    },
+    "Response": {
+      "id": "70576706-4129-457f-bd57-f4e6cb428d55",
+      "result": {
+        "account_id": "r4iYzSL9yw6fZiPNRDf8tBQxpT4oJeqYWs",
+        "key_type": "secp256k1",
+        "master_key": "EVER MART ALMA HIGH WOW CAM PI PAY GET GET NAIR SHAY",
+        "master_seed": "snUq4VmmLpLMq6CT8BzsXafdTjeV8",
+        "master_seed_hex": "B41B6C0B5B50A6331460F4CB2CF9567C",
+        "public_key": "aBRMoh7DpM26ioTKDgLU6gaidSSXWXHYnqicaw9ejhipYf24jW4X",
+        "public_key_hex": "03BFFAFCA2756E6A47DBAA5A9B848692635FCAD7DFA1212127D6D2C9FF8492032C"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "secp256k1",
+      "id": "b5836d25-817d-456f-ac31-f7d699c773e3"
+    },
+    "Response": {
+      "id": "b5836d25-817d-456f-ac31-f7d699c773e3",
+      "result": {
+        "account_id": "rnnZjcheRzS5qDMeYnqxaLWAnNCSVJgZud",
+        "key_type": "secp256k1",
+        "master_key": "AT CLOT LOSS FORE BEST KOCH TRAY TONG TOOK NULL BOOT IS",
+        "master_seed": "ssZEpYD1cWaA1CWn51hiDZg2KXyRX",
+        "master_seed_hex": "3DCE3563B7B33DEF506F75C2CBFE0C04",
+        "public_key": "aBRQsmHX2XFCEdQA65C6i2sbR5cbccmD8AZ3hEV9ncce1voL7WmG",
+        "public_key_hex": "03C518E83306F821373E801C865A8F7B9150A6D1EA5174C6364DABC9CADEA34A05"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "secp256k1",
+      "id": "fcaf5df2-daed-4e17-8e8d-caae9637d909"
+    },
+    "Response": {
+      "id": "fcaf5df2-daed-4e17-8e8d-caae9637d909",
+      "result": {
+        "account_id": "rGpwSerpY1zC6jq1PcaC7FvfdoGaf1E3jv",
+        "key_type": "secp256k1",
+        "master_key": "KERR CENT NAVE HESS CHUB NAB DAYS GIG SHUN OX ROOT BELT",
+        "master_seed": "snaPmdA6ygJgyhWjRnhRJGtMmwEbC",
+        "master_seed_hex": "AC22AD986CDF82705466B6CB089B2CA6",
+        "public_key": "aBQ4ZakYsrmz9Wm2DVNwTq3wRtYi4PPzHAGcRuWFVWnsnjRAEpEk",
+        "public_key_hex": "033E0226B524EF91F3448835737077C14AE6D5A6DD43008D38D96DB92CFBA6D4F3"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "Request": {
+      "command": "wallet_propose",
+      "key_type": "secp256k1",
+      "id": "f4473642-0e6f-415e-a68e-4b23356f3c1d"
+    },
+    "Response": {
+      "id": "f4473642-0e6f-415e-a68e-4b23356f3c1d",
+      "result": {
+        "account_id": "rnzLfU5ei2bsw1fNbqe7h5PdBNjanPX5dQ",
+        "key_type": "secp256k1",
+        "master_key": "BOGY BOO ROAD WHO MOST IRK YEA LIAR PEW DAN LISA WON",
+        "master_seed": "shdehPR4dXF5b1Y2xT3PCEQKSbuuP",
+        "master_seed_hex": "8B06AB86CDB8F5463DF69B22420BE15A",
+        "public_key": "aBQBonhjrhGey8tG8uN78P3m7ykzFT8hQaD7kwYRMqJuFqcouTNE",
+        "public_key_hex": "032594189AE1509EBEE9ABCF8B4E30287CA79E9D9F657AEEF8FC1CF0B9ED19D903"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  }
+]
