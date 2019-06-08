@@ -1,0 +1,287 @@
+[
+    {
+        "rq" : {
+            "command" : "sign_for",
+            "account" : "rUCwgzripA7QLETs34WDRzNSxdQHsVbnNH",
+            "tx_json" : {
+                "TransactionType" : "Payment",
+                "Account" : "rst9Y1krgr3yUKjpjJA84TdLF5wewDXZut",
+                "Amount" : "10000000",
+                "Destination" : "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+                "Sequence" : 2,
+                "Fee" : "50000000",
+                "Flags" : 2147483648,
+                "SigningPubKey" : ""
+            },
+            "seed_hex" : "81F448707669E3D629605D8AF34E33D3",
+            "key_type" : "ed25519",
+            "id" : "5f62235e-84f9-4d93-9eac-221959ed57c4"
+        },
+        "rs" : {
+            "id" : "5f62235e-84f9-4d93-9eac-221959ed57c4",
+            "result" : {
+                "deprecated" : "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+                "tx_blob" : "12000022800000002400000002614000000000989680684000000002FAF080730081141F9C9A3957C78AE5CAE50B5A5EFC5F2B104DC7358314B5F762798A53D543A014CAF8B297CFF8F2F937E8F3E0107321ED15C69519E06E55B68723E95184B49762205F74ED0426B1653E04570060D46D1B7440F42E623A7020FCCBB8D8A5C86065D1D28520E4D64BF28A064DF27E265FEB6458D7C22BE75A7D9EB4450E6E26B99957F28972AF76DACCE7DAB8EEA796E109B10781147FE14747F6959D713291CB0BD50D6C30DAA24898E1F1",
+                "tx_json" : {
+                    "Account" : "rst9Y1krgr3yUKjpjJA84TdLF5wewDXZut",
+                    "Amount" : "10000000",
+                    "Destination" : "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+                    "Fee" : "50000000",
+                    "Flags" : 2147483648,
+                    "Sequence" : 2,
+                    "Signers" : [
+                        {
+                            "Signer" : {
+                                "Account" : "rUCwgzripA7QLETs34WDRzNSxdQHsVbnNH",
+                                "SigningPubKey" : "ED15C69519E06E55B68723E95184B49762205F74ED0426B1653E04570060D46D1B",
+                                "TxnSignature" : "F42E623A7020FCCBB8D8A5C86065D1D28520E4D64BF28A064DF27E265FEB6458D7C22BE75A7D9EB4450E6E26B99957F28972AF76DACCE7DAB8EEA796E109B107"
+                            }
+                        }
+                    ],
+                    "SigningPubKey" : "",
+                    "TransactionType" : "Payment",
+                    "hash" : "3590C8DC26B8E966A560765A604DE456EC5957655248D43ADA8016118F643732"
+                }
+            },
+            "status" : "success",
+            "type" : "response"
+        }
+    },
+    {
+        "rq" : {
+            "command" : "sign_for",
+            "account" : "rNtXSGAt7hHvu4ptX5r5kooHe9A39oWXGf",
+            "tx_json" : {
+                "Account" : "rst9Y1krgr3yUKjpjJA84TdLF5wewDXZut",
+                "Amount" : "10000000",
+                "Destination" : "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+                "Fee" : "50000000",
+                "Flags" : 2147483648,
+                "Sequence" : 2,
+                "Signers" : [
+                    {
+                        "Signer" : {
+                            "Account" : "rUCwgzripA7QLETs34WDRzNSxdQHsVbnNH",
+                            "SigningPubKey" : "ED15C69519E06E55B68723E95184B49762205F74ED0426B1653E04570060D46D1B",
+                            "TxnSignature" : "F42E623A7020FCCBB8D8A5C86065D1D28520E4D64BF28A064DF27E265FEB6458D7C22BE75A7D9EB4450E6E26B99957F28972AF76DACCE7DAB8EEA796E109B107"
+                        }
+                    }
+                ],
+                "SigningPubKey" : "",
+                "TransactionType" : "Payment",
+                "hash" : "3590C8DC26B8E966A560765A604DE456EC5957655248D43ADA8016118F643732"
+            },
+            "seed_hex" : "0CFC8B99A43FE9322FDD05489D8B410C",
+            "key_type" : "ed25519",
+            "id" : "73013422-6c83-4591-a7a4-c0789ab9283d"
+        },
+        "rs" : {
+            "id" : "73013422-6c83-4591-a7a4-c0789ab9283d",
+            "result" : {
+                "deprecated" : "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+                "tx_blob" : "12000022800000002400000002614000000000989680684000000002FAF080730081141F9C9A3957C78AE5CAE50B5A5EFC5F2B104DC7358314B5F762798A53D543A014CAF8B297CFF8F2F937E8F3E0107321ED15C69519E06E55B68723E95184B49762205F74ED0426B1653E04570060D46D1B7440F42E623A7020FCCBB8D8A5C86065D1D28520E4D64BF28A064DF27E265FEB6458D7C22BE75A7D9EB4450E6E26B99957F28972AF76DACCE7DAB8EEA796E109B10781147FE14747F6959D713291CB0BD50D6C30DAA24898E1E0107321ED89490B92E78F919E7ED2975427040F74692A2D437B19310D58BBC417B019080A744056D29E42911F354649674197151E493DBD4F65DAE92D040398F24987739BCE87278E241ACD76E0A08975D2B59BD4C9F93FDEA027BE6931E1AB50408341DA4F0D8114985841788C7F505829B3C7E6A4BEC3E27B9A8868E1F1",
+                "tx_json" : {
+                    "Account" : "rst9Y1krgr3yUKjpjJA84TdLF5wewDXZut",
+                    "Amount" : "10000000",
+                    "Destination" : "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+                    "Fee" : "50000000",
+                    "Flags" : 2147483648,
+                    "Sequence" : 2,
+                    "Signers" : [
+                        {
+                            "Signer" : {
+                                "Account" : "rUCwgzripA7QLETs34WDRzNSxdQHsVbnNH",
+                                "SigningPubKey" : "ED15C69519E06E55B68723E95184B49762205F74ED0426B1653E04570060D46D1B",
+                                "TxnSignature" : "F42E623A7020FCCBB8D8A5C86065D1D28520E4D64BF28A064DF27E265FEB6458D7C22BE75A7D9EB4450E6E26B99957F28972AF76DACCE7DAB8EEA796E109B107"
+                            }
+                        },
+                        {
+                            "Signer" : {
+                                "Account" : "rNtXSGAt7hHvu4ptX5r5kooHe9A39oWXGf",
+                                "SigningPubKey" : "ED89490B92E78F919E7ED2975427040F74692A2D437B19310D58BBC417B019080A",
+                                "TxnSignature" : "56D29E42911F354649674197151E493DBD4F65DAE92D040398F24987739BCE87278E241ACD76E0A08975D2B59BD4C9F93FDEA027BE6931E1AB50408341DA4F0D"
+                            }
+                        }
+                    ],
+                    "SigningPubKey" : "",
+                    "TransactionType" : "Payment",
+                    "hash" : "ED16E2CE824E40E414BD1BE09268EA2D5EB32A035EC9FFA9B125961CB394AF99"
+                }
+            },
+            "status" : "success",
+            "type" : "response"
+        }
+    },
+    {
+        "rq" : {
+            "command" : "sign_for",
+            "account" : "rGXwaPmMxoiddjyWtgnSBCS2SaedReqNf2",
+            "tx_json" : {
+                "Account" : "rst9Y1krgr3yUKjpjJA84TdLF5wewDXZut",
+                "Amount" : "10000000",
+                "Destination" : "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+                "Fee" : "50000000",
+                "Flags" : 2147483648,
+                "Sequence" : 2,
+                "Signers" : [
+                    {
+                        "Signer" : {
+                            "Account" : "rUCwgzripA7QLETs34WDRzNSxdQHsVbnNH",
+                            "SigningPubKey" : "ED15C69519E06E55B68723E95184B49762205F74ED0426B1653E04570060D46D1B",
+                            "TxnSignature" : "F42E623A7020FCCBB8D8A5C86065D1D28520E4D64BF28A064DF27E265FEB6458D7C22BE75A7D9EB4450E6E26B99957F28972AF76DACCE7DAB8EEA796E109B107"
+                        }
+                    },
+                    {
+                        "Signer" : {
+                            "Account" : "rNtXSGAt7hHvu4ptX5r5kooHe9A39oWXGf",
+                            "SigningPubKey" : "ED89490B92E78F919E7ED2975427040F74692A2D437B19310D58BBC417B019080A",
+                            "TxnSignature" : "56D29E42911F354649674197151E493DBD4F65DAE92D040398F24987739BCE87278E241ACD76E0A08975D2B59BD4C9F93FDEA027BE6931E1AB50408341DA4F0D"
+                        }
+                    }
+                ],
+                "SigningPubKey" : "",
+                "TransactionType" : "Payment",
+                "hash" : "ED16E2CE824E40E414BD1BE09268EA2D5EB32A035EC9FFA9B125961CB394AF99"
+            },
+            "seed_hex" : "36EF898A3F6BE63BB4336E9510CA38C6",
+            "key_type" : "ed25519",
+            "id" : "db9e1979-04a0-4ca9-8c1e-be79d9cfc612"
+        },
+        "rs" : {
+            "id" : "db9e1979-04a0-4ca9-8c1e-be79d9cfc612",
+            "result" : {
+                "deprecated" : "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+                "tx_blob" : "12000022800000002400000002614000000000989680684000000002FAF080730081141F9C9A3957C78AE5CAE50B5A5EFC5F2B104DC7358314B5F762798A53D543A014CAF8B297CFF8F2F937E8F3E0107321ED15C69519E06E55B68723E95184B49762205F74ED0426B1653E04570060D46D1B7440F42E623A7020FCCBB8D8A5C86065D1D28520E4D64BF28A064DF27E265FEB6458D7C22BE75A7D9EB4450E6E26B99957F28972AF76DACCE7DAB8EEA796E109B10781147FE14747F6959D713291CB0BD50D6C30DAA24898E1E0107321ED89490B92E78F919E7ED2975427040F74692A2D437B19310D58BBC417B019080A744056D29E42911F354649674197151E493DBD4F65DAE92D040398F24987739BCE87278E241ACD76E0A08975D2B59BD4C9F93FDEA027BE6931E1AB50408341DA4F0D8114985841788C7F505829B3C7E6A4BEC3E27B9A8868E1E0107321EDDFFFDC9FC4601956DC07143CDDA20C5C2D641C50C138256B5FA1B62F3A30704E74404B15BBC4230873454145C6528EF8DE5795E8EFD8D0434F1730B9BAEC4E4AD96FB0E11472EED2DF52C5F7108045D84450BDDA3045D4CF1DB3D996352EFE1052008114AA3DF4BF39A48A857C72D5FC359A3951B5EF6AF6E1F1",
+                "tx_json" : {
+                    "Account" : "rst9Y1krgr3yUKjpjJA84TdLF5wewDXZut",
+                    "Amount" : "10000000",
+                    "Destination" : "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+                    "Fee" : "50000000",
+                    "Flags" : 2147483648,
+                    "Sequence" : 2,
+                    "Signers" : [
+                        {
+                            "Signer" : {
+                                "Account" : "rUCwgzripA7QLETs34WDRzNSxdQHsVbnNH",
+                                "SigningPubKey" : "ED15C69519E06E55B68723E95184B49762205F74ED0426B1653E04570060D46D1B",
+                                "TxnSignature" : "F42E623A7020FCCBB8D8A5C86065D1D28520E4D64BF28A064DF27E265FEB6458D7C22BE75A7D9EB4450E6E26B99957F28972AF76DACCE7DAB8EEA796E109B107"
+                            }
+                        },
+                        {
+                            "Signer" : {
+                                "Account" : "rNtXSGAt7hHvu4ptX5r5kooHe9A39oWXGf",
+                                "SigningPubKey" : "ED89490B92E78F919E7ED2975427040F74692A2D437B19310D58BBC417B019080A",
+                                "TxnSignature" : "56D29E42911F354649674197151E493DBD4F65DAE92D040398F24987739BCE87278E241ACD76E0A08975D2B59BD4C9F93FDEA027BE6931E1AB50408341DA4F0D"
+                            }
+                        },
+                        {
+                            "Signer" : {
+                                "Account" : "rGXwaPmMxoiddjyWtgnSBCS2SaedReqNf2",
+                                "SigningPubKey" : "EDDFFFDC9FC4601956DC07143CDDA20C5C2D641C50C138256B5FA1B62F3A30704E",
+                                "TxnSignature" : "4B15BBC4230873454145C6528EF8DE5795E8EFD8D0434F1730B9BAEC4E4AD96FB0E11472EED2DF52C5F7108045D84450BDDA3045D4CF1DB3D996352EFE105200"
+                            }
+                        }
+                    ],
+                    "SigningPubKey" : "",
+                    "TransactionType" : "Payment",
+                    "hash" : "45770FDC76D172FE5BD93E911396F35881AFAF280BFE4EDEEEF5E0A8E4952710"
+                }
+            },
+            "status" : "success",
+            "type" : "response"
+        }
+    },
+    {
+        "rq" : {
+            "command" : "sign_for",
+            "account" : "rGSBkMNUcUgA8LfYVzQnDMYx4hsK8wD4ib",
+            "tx_json" : {
+                "Account" : "rst9Y1krgr3yUKjpjJA84TdLF5wewDXZut",
+                "Amount" : "10000000",
+                "Destination" : "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+                "Fee" : "50000000",
+                "Flags" : 2147483648,
+                "Sequence" : 2,
+                "Signers" : [
+                    {
+                        "Signer" : {
+                            "Account" : "rUCwgzripA7QLETs34WDRzNSxdQHsVbnNH",
+                            "SigningPubKey" : "ED15C69519E06E55B68723E95184B49762205F74ED0426B1653E04570060D46D1B",
+                            "TxnSignature" : "F42E623A7020FCCBB8D8A5C86065D1D28520E4D64BF28A064DF27E265FEB6458D7C22BE75A7D9EB4450E6E26B99957F28972AF76DACCE7DAB8EEA796E109B107"
+                        }
+                    },
+                    {
+                        "Signer" : {
+                            "Account" : "rNtXSGAt7hHvu4ptX5r5kooHe9A39oWXGf",
+                            "SigningPubKey" : "ED89490B92E78F919E7ED2975427040F74692A2D437B19310D58BBC417B019080A",
+                            "TxnSignature" : "56D29E42911F354649674197151E493DBD4F65DAE92D040398F24987739BCE87278E241ACD76E0A08975D2B59BD4C9F93FDEA027BE6931E1AB50408341DA4F0D"
+                        }
+                    },
+                    {
+                        "Signer" : {
+                            "Account" : "rGXwaPmMxoiddjyWtgnSBCS2SaedReqNf2",
+                            "SigningPubKey" : "EDDFFFDC9FC4601956DC07143CDDA20C5C2D641C50C138256B5FA1B62F3A30704E",
+                            "TxnSignature" : "4B15BBC4230873454145C6528EF8DE5795E8EFD8D0434F1730B9BAEC4E4AD96FB0E11472EED2DF52C5F7108045D84450BDDA3045D4CF1DB3D996352EFE105200"
+                        }
+                    }
+                ],
+                "SigningPubKey" : "",
+                "TransactionType" : "Payment",
+                "hash" : "45770FDC76D172FE5BD93E911396F35881AFAF280BFE4EDEEEF5E0A8E4952710"
+            },
+            "seed_hex" : "4D68DCB54B3C39E3E8367AB839F626C1",
+            "key_type" : "ed25519",
+            "id" : "bb702d9f-7e86-4178-b26a-58442a268c51"
+        },
+        "rs" : {
+            "id" : "bb702d9f-7e86-4178-b26a-58442a268c51",
+            "result" : {
+                "deprecated" : "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+                "tx_blob" : "12000022800000002400000002614000000000989680684000000002FAF080730081141F9C9A3957C78AE5CAE50B5A5EFC5F2B104DC7358314B5F762798A53D543A014CAF8B297CFF8F2F937E8F3E0107321ED15C69519E06E55B68723E95184B49762205F74ED0426B1653E04570060D46D1B7440F42E623A7020FCCBB8D8A5C86065D1D28520E4D64BF28A064DF27E265FEB6458D7C22BE75A7D9EB4450E6E26B99957F28972AF76DACCE7DAB8EEA796E109B10781147FE14747F6959D713291CB0BD50D6C30DAA24898E1E0107321ED89490B92E78F919E7ED2975427040F74692A2D437B19310D58BBC417B019080A744056D29E42911F354649674197151E493DBD4F65DAE92D040398F24987739BCE87278E241ACD76E0A08975D2B59BD4C9F93FDEA027BE6931E1AB50408341DA4F0D8114985841788C7F505829B3C7E6A4BEC3E27B9A8868E1E0107321EDAA9D50655A392443A2027C382E4FD92B6072648CEEE896DFBAE02A890C718A4E7440125FA71D1D692AEDD946970ECE580AA46A80260196E1BA20243965C92226D1604962B24DA8F59B70FD18C3292A888BD0459AC0E340174E11BEEBD1869F921A028114A94D41DC9F00B86EED242C38FE88110B1F21B7C5E1E0107321EDDFFFDC9FC4601956DC07143CDDA20C5C2D641C50C138256B5FA1B62F3A30704E74404B15BBC4230873454145C6528EF8DE5795E8EFD8D0434F1730B9BAEC4E4AD96FB0E11472EED2DF52C5F7108045D84450BDDA3045D4CF1DB3D996352EFE1052008114AA3DF4BF39A48A857C72D5FC359A3951B5EF6AF6E1F1",
+                "tx_json" : {
+                    "Account" : "rst9Y1krgr3yUKjpjJA84TdLF5wewDXZut",
+                    "Amount" : "10000000",
+                    "Destination" : "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+                    "Fee" : "50000000",
+                    "Flags" : 2147483648,
+                    "Sequence" : 2,
+                    "Signers" : [
+                        {
+                            "Signer" : {
+                                "Account" : "rUCwgzripA7QLETs34WDRzNSxdQHsVbnNH",
+                                "SigningPubKey" : "ED15C69519E06E55B68723E95184B49762205F74ED0426B1653E04570060D46D1B",
+                                "TxnSignature" : "F42E623A7020FCCBB8D8A5C86065D1D28520E4D64BF28A064DF27E265FEB6458D7C22BE75A7D9EB4450E6E26B99957F28972AF76DACCE7DAB8EEA796E109B107"
+                            }
+                        },
+                        {
+                            "Signer" : {
+                                "Account" : "rNtXSGAt7hHvu4ptX5r5kooHe9A39oWXGf",
+                                "SigningPubKey" : "ED89490B92E78F919E7ED2975427040F74692A2D437B19310D58BBC417B019080A",
+                                "TxnSignature" : "56D29E42911F354649674197151E493DBD4F65DAE92D040398F24987739BCE87278E241ACD76E0A08975D2B59BD4C9F93FDEA027BE6931E1AB50408341DA4F0D"
+                            }
+                        },
+                        {
+                            "Signer" : {
+                                "Account" : "rGSBkMNUcUgA8LfYVzQnDMYx4hsK8wD4ib",
+                                "SigningPubKey" : "EDAA9D50655A392443A2027C382E4FD92B6072648CEEE896DFBAE02A890C718A4E",
+                                "TxnSignature" : "125FA71D1D692AEDD946970ECE580AA46A80260196E1BA20243965C92226D1604962B24DA8F59B70FD18C3292A888BD0459AC0E340174E11BEEBD1869F921A02"
+                            }
+                        },
+                        {
+                            "Signer" : {
+                                "Account" : "rGXwaPmMxoiddjyWtgnSBCS2SaedReqNf2",
+                                "SigningPubKey" : "EDDFFFDC9FC4601956DC07143CDDA20C5C2D641C50C138256B5FA1B62F3A30704E",
+                                "TxnSignature" : "4B15BBC4230873454145C6528EF8DE5795E8EFD8D0434F1730B9BAEC4E4AD96FB0E11472EED2DF52C5F7108045D84450BDDA3045D4CF1DB3D996352EFE105200"
+                            }
+                        }
+                    ],
+                    "SigningPubKey" : "",
+                    "TransactionType" : "Payment",
+                    "hash" : "1B523105FE16A9741E7B97CE5E0879C8F1FD7AD433996311098C8038FFAFFF87"
+                }
+            },
+            "status" : "success",
+            "type" : "response"
+        }
+    }
+]

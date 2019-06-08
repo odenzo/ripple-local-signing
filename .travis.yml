@@ -1,0 +1,42 @@
+language: scala
+
+
+# Put Tokens in environment variables
+# CODECOV_TOKEN="xxxxxxx-xxxx...."
+
+scala:
+  - 2.12.9
+  - 2.13.0
+
+jdk:
+  - openjdk8
+
+# These directories are cached to a cloud storage provider "close" to the infrastructure the builds run on.
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot
+    - $HOME/.coursier
+
+
+
+# Standard Scala build and test targets with scoverage (codecov)
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION -Dfile.encoding=UTF8 coverage test coverageReport coverageAggregate
+  # See http://www.scala-sbt.org/0.13/docs/Travis-CI-with-sbt.html
+  # Tricks to avoid unnecessary cache updates
+  - find $HOME/.sbt -name "*.lock" | xargs rm
+
+
+# For public repos this is supposed to work without a TOKEN, in fact it seems its not needed?
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+  
+# Deployment to BinTray pending  https://docs.travis-ci.com/user/deployment/bintray/
+#  deploy:
+#    provider: bintray
+#    file: "Path to a descriptor file, containing information for the Bintray upload"
+#    user: "Bintray user"
+#    key: "Bintray API key"
+#    passphrase: "Optional. In case a passphrase is configured on Bintray and GPG signing is used"
+#    skip_cleanup: true # to upload artifacts created during the build
