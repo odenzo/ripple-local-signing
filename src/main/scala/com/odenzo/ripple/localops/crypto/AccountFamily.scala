@@ -43,8 +43,8 @@ object AccountFamily extends StrictLogging with ByteUtils with HashingOps {
 
   /** Rebuild Account Keys from Master Seed */
   def rebuildAccountKeyPairFromSeedB58(masterSeedB58: String): Either[AppError, KeyPair] = {
-    val bytes: Array[Byte] = RBase58.decode(masterSeedB58).drop(1).dropRight(4)
-    rebuildAccountKeyPairFromSeed(bytes)
+    val bytes: Either[AppError, Array[Byte]] = RBase58.decode(masterSeedB58).map(_.drop(1).dropRight(4))
+    bytes.flatMap(rebuildAccountKeyPairFromSeed)
 
   }
 
@@ -150,15 +150,28 @@ object AccountFamily extends StrictLogging with ByteUtils with HashingOps {
     b58
   }
 
+  /** This trims off the first *byte* and the last four checksum bytes from
+    *   Base58 Ripple encoded things. Suitable for master seed and public key
+    * @param rippleB58
+    * @return
+    */
+  def convertRippleBase58toBytes(rippleB58: String): Either[AppError, Array[Byte]] = {
+    AppException.wrap(s"Converting MasterSeed $rippleB58 to MasterSeedHex") {
+      for {
+        bytes   <- RBase58.decode(rippleB58)
+        trimmed = bytes.drop(1).dropRight(4)
+      } yield trimmed
+    }
+  }
+
   /**
     * Dropping the first byte (part of s prefix) and the last 4 checksum bytes
     *
     * @param masterSeedB58 as in the response from WalletPropose (s...).
     */
   def convertMasterSeedB582MasterSeedHex(masterSeedB58: String): Either[AppError, String] = {
-    AppException.wrap("Converting MasterSeed B58 to MasterSeedHex") {
-      val res: String = ByteUtils.bytes2hex(RBase58.decode(masterSeedB58).drop(1).dropRight(4))
-      res.asRight
+    AppException.wrap(s"Converting MasterSeed $masterSeedB58 to MasterSeedHex") {
+      convertRippleBase58toBytes(masterSeedB58).map(ByteUtils.bytes2hex(_))
     }
   }
 
@@ -168,23 +181,9 @@ object AccountFamily extends StrictLogging with ByteUtils with HashingOps {
     * @param pubKeyB58d as in the response from WalletPropose (s...).
     */
   def convertPublicKeyB582PublicKeyHex(pubKeyB58d: String): Either[AppError, String] = {
-    AppException.wrap("Converting PubKey Base58 B58 to PublicKeyHex") {
-
-      val res: String = ByteUtils.bytes2hex(RBase58.decode(pubKeyB58d).drop(1).dropRight(4))
-      res.asRight
+    AppException.wrap(s"Converting PubKey $pubKeyB58d to PublicKeyHex") {
+      convertRippleBase58toBytes(pubKeyB58d).map(ByteUtils.bytes2hex(_))
     }
-  }
-
-  /**
-    * This expects the full secret as in the message. This also looks wrong.
-    * Dropping 2 in Base58????
-    *
-    * @param secret e.g. ss69FdJaSa7Ba4UnMWE87hZxtrStX (secp)  (Base58 master seed)
-    */
-  def convertSecretKey2bigint(secret: String): BigInteger = {
-    val bytes = RBase58.decode(secret.drop(2)) // rightDrop too?
-    bytes2bigint(bytes).bigInteger
-
   }
 
   /**

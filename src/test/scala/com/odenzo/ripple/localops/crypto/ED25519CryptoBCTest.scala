@@ -134,7 +134,7 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
     txnsig.right.value shouldEqual kTxnSig.right.value
   }
 
-  test("Self Signing And Verify") {
+  test("Self txnscenarios And Verify") {
     // This produces repeatable signatures for given private key
     val keyPair = newKeyPar
 

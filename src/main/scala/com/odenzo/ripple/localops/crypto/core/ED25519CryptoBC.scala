@@ -43,7 +43,6 @@ object ED25519CryptoBC extends StrictLogging with ByteUtils {
   val order: BigInteger                = curve.getCurve.getOrder
   val domainParams: ECDomainParameters = new ECDomainParameters(curve.getCurve, curve.getG, curve.getN, curve.getH)
 
-  logger.info(s"Curve Order: $order")
 
   /** Generate signature using Bouncy Castle Directly */
   def edSign(payload: Array[Byte], kp: AsymmetricCipherKeyPair): Array[Byte] = {

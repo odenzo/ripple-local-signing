@@ -11,7 +11,7 @@ import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, FixtureUtils, Js
 
 class SigningTest extends FunSuite with OTestSpec with ByteUtils with FixtureUtils {
 
-  val txnfixtures: List[(JsonObject, JsonObject)] = loadRequestResponses("/test/Signing/secp256k1_txn.json")
+  val txnfixtures: List[(JsonObject, JsonObject)] = loadRequestResponses("/test/myTestData/keysAndTxn/secp256k1_txn.json")
 
   
   // An inactivated account
@@ -60,12 +60,12 @@ class SigningTest extends FunSuite with OTestSpec with ByteUtils with FixtureUti
   val txjson: Json          = getOrLog(CirceUtils.parseAsJson(tx_json))
 
   // Need some complete messages
-  test("Top Level Signing") {
+  test("Top Level txnscenarios") {
 
     logger.debug(s"Account Keys: $acctKeys")
     //val mainHex = getOrLog(BinarySerializerPublic.binarySerialize(json), "All")
     val jobj: JsonObject = getOrLog(JsonUtils.json2object(txjson), "TX_JSON not object")
-    val tx_sig           = getOrLog(RippleLocalAPI.serializeForSigning(jobj), "Signing")
+    val tx_sig           = getOrLog(RippleLocalAPI.serializeForSigning(jobj), "txnscenarios")
     logger.info(s"TXSIGNATURE: $tx_sig")
 
   }

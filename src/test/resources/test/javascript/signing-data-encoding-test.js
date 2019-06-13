@@ -21,7 +21,7 @@ const tx_json = {
     'ED5F5AC8B98974A3CA843326D9B88CEBD0560177B973EE0B149F782CFAA06DC66A'
 };
 
-describe('Signing data', function() {
+describe('txnscenarios data', function() {
   it('can create single signing blobs', function() {
     const actual = encodeForSigning(tx_json);
     assert.equal(actual,

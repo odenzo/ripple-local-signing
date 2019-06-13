@@ -26,7 +26,7 @@ import com.odenzo.ripple.localops.utils.ByteUtils
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, OError}
 
 /**
-  * This is focussed just on getting Secp256k1 Signing and Verification Working.
+  * This is focussed just on getting Secp256k1 txnscenarios and Verification Working.
   **/
 object Secp256K1CryptoBC extends StrictLogging with ByteUtils {
 

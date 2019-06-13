@@ -8,6 +8,8 @@ import io.circe.JsonObject
 
 import com.odenzo.ripple.bincodec.RippleCodecAPI
 import com.odenzo.ripple.bincodec.serializing.BinarySerializer
+import com.odenzo.ripple.localops.crypto.AccountFamily
+import com.odenzo.ripple.localops.utils.RBase58
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 
 object RippleLocalAPI extends StrictLogging {
@@ -23,7 +25,8 @@ object RippleLocalAPI extends StrictLogging {
     * @return The signed TxBlob for inclusion in a SubmitRq
     */
   def sign(tx_json: JsonObject, master_seed: String, keyType:String): Either[AppError, String] = {
-    Signer.sign(tx_json, master_seed, keyType)
+    val seedHex = AccountFamily.convertMasterSeedB582MasterSeedHex(master_seed)
+    seedHex.flatMap(hex ⇒Signer.sign(tx_json, hex, keyType))
   }
 
   def verify(tx_json:JsonObject): Either[AppError, Boolean] = {
@@ -51,7 +54,7 @@ object RippleLocalAPI extends StrictLogging {
     * @param tx_json
     */
   def binarySerializeForSigning(tx_json: JsonObject): Either[AppError, BinarySerializer.NestedEncodedValues] = {
-    logger.trace("Serializing for Signing")
+    logger.trace("Serializing for txnscenarios")
     RippleCodecAPI.binarySerializeForSigning(tx_json).leftMap(AppError.wrapCodecError)
   }
 

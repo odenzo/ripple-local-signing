@@ -15,7 +15,7 @@ import com.odenzo.ripple.localops.{OTestSpec, RippleLocalAPI}
   * */
 class VerificationFixture$Test extends FunSuite with OTestSpec with ByteUtils with FixtureUtils {
 
-  /** See if we can get the correct Signing Public Key and Hash to start */
+  /** See if we can get the correct txnscenarios Public Key and Hash to start */
   def testOne(rs: JsonObject) = {
     logger.debug(s"Response: ${rs.asJson.spaces4}")
 
@@ -27,12 +27,12 @@ class VerificationFixture$Test extends FunSuite with OTestSpec with ByteUtils wi
   }
 
   test("ALL SECP") {
-    val txnFixt: List[(JsonObject, JsonObject)] = loadRequestResponses("/test/Signing/secp256k1_txn.json")
+    val txnFixt: List[(JsonObject, JsonObject)] = loadRequestResponses("/test/myTestData/keysAndTxn/secp256k1_txn.json")
     txnFixt.foreach(v ⇒ testOne(v._2))
   }
 
   test("ALL ED25519"){
-    val txnFixt: List[(JsonObject, JsonObject)] = loadRequestResponses("/test/Signing/ed25519_txn.json")
+    val txnFixt: List[(JsonObject, JsonObject)] = loadRequestResponses("/test/myTestData/keysAndTxn/ed25519_txn.json")
     txnFixt.foreach(v ⇒ testOne(v._2))
   }
 

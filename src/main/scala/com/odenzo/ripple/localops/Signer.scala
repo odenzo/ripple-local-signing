@@ -25,7 +25,7 @@ object Signer extends StrictLogging with JsonUtils with ByteUtils {
   /**
     *
     * @param tx_json     Filled tx_json, including SingingPubKey
-    * @param master_seed Base58 master_seed Key
+    * @param master_seed Master Seed for signer in Hex format
     *
     * @return TxnSignature
     */
@@ -47,7 +47,7 @@ object Signer extends StrictLogging with JsonUtils with ByteUtils {
 
       ans ← keyType match {
              case "ed25519"   ⇒ signEd(master_seed, payload)
-             case "secp256k1" ⇒ signSecp2(master_seed, payload)
+             case "secp256k1" ⇒ signSecp(master_seed, payload)
              case other       ⇒ AppError(s"Unknown Key Type $other").asLeft
 
            }
@@ -55,9 +55,9 @@ object Signer extends StrictLogging with JsonUtils with ByteUtils {
     txnsignature
   }
 
-  def signEd(seedB58: String, payload: Array[Byte]): Either[AppError, String] = {
+  def signEd(seedhex: String, payload: Array[Byte]): Either[AppError, String] = {
     val txnsig = for {
-      kp     <- ED25519CryptoBC.seedHex2keypair(seedB58)
+      kp     <- ED25519CryptoBC.seedHex2keypair(seedhex)
       sig    = ED25519CryptoBC.edSign(payload, kp)
       sigHex = bytes2hex(sig)
     } yield sigHex
@@ -66,13 +66,13 @@ object Signer extends StrictLogging with JsonUtils with ByteUtils {
 
   /** Signs the message and returns the signaure in hex.
     *  Corrsponds to TxnSignature field
-    * @param payload  The Binary Serialized for Signing bytes, with Signature Prefix
-    * @param masterSeedB58
+    * @param payload  The Binary Serialized for txnscenarios bytes, with Signature Prefix
+    * @param seedhex
     * @return
     */
-  def signSecp2(masterSeedB58: String, payload: Array[Byte]): Either[AppError, String] = {
+  def signSecp(seedhex: String, payload: Array[Byte]): Either[AppError, String] = {
     for {
-      kp       <- AccountFamily.rebuildAccountKeyPairFromSeedB58(masterSeedB58)
+      kp       <- AccountFamily.rebuildAccountKeyPairFromSeedHex(seedhex)
       hashed   = HashingOps.sha256Ripple(payload)
       der <- Secp256K1CryptoBC.sign(hashed.toArray, kp)
     } yield der.toHex

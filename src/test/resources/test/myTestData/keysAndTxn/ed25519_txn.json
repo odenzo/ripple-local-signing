@@ -1,6 +1,6 @@
 [
   {
-    "Request": {
+    "request": {
       "command": "sign",
       "tx_json": {
         "TransactionType": "Payment",
@@ -18,7 +18,7 @@
       "key_type": "ed25519",
       "id": "0acbb506-708a-4ba9-9084-e2536b67920d"
     },
-    "Response": {
+    "response": {
       "id": "0acbb506-708a-4ba9-9084-e2536b67920d",
       "result": {
         "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
@@ -41,7 +41,7 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "sign",
       "tx_json": {
         "TransactionType": "Payment",
@@ -59,7 +59,7 @@
       "key_type": "ed25519",
       "id": "174b6326-821c-4077-8b3e-ca06db5bc0c0"
     },
-    "Response": {
+    "response": {
       "id": "174b6326-821c-4077-8b3e-ca06db5bc0c0",
       "result": {
         "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
@@ -82,7 +82,7 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "sign",
       "tx_json": {
         "TransactionType": "Payment",
@@ -100,7 +100,7 @@
       "key_type": "ed25519",
       "id": "8f873ac1-2f0d-43ec-a13f-fdc9bd6433af"
     },
-    "Response": {
+    "response": {
       "id": "8f873ac1-2f0d-43ec-a13f-fdc9bd6433af",
       "result": {
         "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
@@ -123,7 +123,7 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "sign",
       "tx_json": {
         "TransactionType": "Payment",
@@ -141,7 +141,7 @@
       "key_type": "ed25519",
       "id": "3c2cd8e1-5cbe-4a8b-bc50-6f819e80637b"
     },
-    "Response": {
+    "response": {
       "id": "3c2cd8e1-5cbe-4a8b-bc50-6f819e80637b",
       "result": {
         "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
@@ -164,7 +164,7 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "sign",
       "tx_json": {
         "TransactionType": "Payment",
@@ -182,7 +182,7 @@
       "key_type": "ed25519",
       "id": "6ec5455b-cd84-45a2-b89c-a4caa515b932"
     },
-    "Response": {
+    "response": {
       "id": "6ec5455b-cd84-45a2-b89c-a4caa515b932",
       "result": {
         "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
@@ -205,7 +205,7 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "sign",
       "tx_json": {
         "TransactionType": "Payment",
@@ -223,7 +223,7 @@
       "key_type": "ed25519",
       "id": "1391cd96-c33c-424e-86b4-727e6923bd40"
     },
-    "Response": {
+    "response": {
       "id": "1391cd96-c33c-424e-86b4-727e6923bd40",
       "result": {
         "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
@@ -246,7 +246,7 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "sign",
       "tx_json": {
         "TransactionType": "Payment",
@@ -264,7 +264,7 @@
       "key_type": "ed25519",
       "id": "dd0b4ab9-8ec7-4658-a650-0a03e85855cb"
     },
-    "Response": {
+    "response": {
       "id": "dd0b4ab9-8ec7-4658-a650-0a03e85855cb",
       "result": {
         "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
@@ -287,7 +287,7 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "sign",
       "tx_json": {
         "TransactionType": "Payment",
@@ -305,7 +305,7 @@
       "key_type": "ed25519",
       "id": "132031da-99a5-4e7f-bfd2-91b91153aa33"
     },
-    "Response": {
+    "response": {
       "id": "132031da-99a5-4e7f-bfd2-91b91153aa33",
       "result": {
         "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
@@ -328,7 +328,7 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "sign",
       "tx_json": {
         "TransactionType": "Payment",
@@ -346,7 +346,7 @@
       "key_type": "ed25519",
       "id": "0e52da8b-ab0d-4010-8628-5384730fe1b1"
     },
-    "Response": {
+    "response": {
       "id": "0e52da8b-ab0d-4010-8628-5384730fe1b1",
       "result": {
         "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",

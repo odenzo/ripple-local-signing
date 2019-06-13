@@ -134,11 +134,11 @@ class WalletGeneratorTest extends FunSuite with OTestSpec with FixtureUtils with
   }
 
   test("SECP Fixture") {
-    doWalletFixture("/test/Signing/secp256k1_wallets.json")
+    doWalletFixture("/test/myTestData/keysAndTxn/secp256k1_wallets.json")
 
   }
   test("ED Fixture"){
-    doWalletFixture("/test/Signing/ed25519_wallets.json")
+    doWalletFixture("/test/myTestData/keysAndTxn/ed25519_wallets.json")
 
   }
 }

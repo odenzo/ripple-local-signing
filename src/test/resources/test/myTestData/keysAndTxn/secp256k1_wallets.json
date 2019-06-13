@@ -1,11 +1,11 @@
 [
   {
-    "Request": {
+    "request": {
       "command": "wallet_propose",
       "key_type": "secp256k1",
       "id": "87e1aae7-910f-46e2-88f8-e8ee36cd3d2b"
     },
-    "Response": {
+    "response": {
       "id": "87e1aae7-910f-46e2-88f8-e8ee36cd3d2b",
       "result": {
         "account_id": "rBW1c6SEN2kJKX6KpZjRx6aXz1mhNRg4VA",
@@ -21,12 +21,12 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "wallet_propose",
       "key_type": "secp256k1",
       "id": "7606305b-c372-482c-8de3-dce0d27ad843"
     },
-    "Response": {
+    "response": {
       "id": "7606305b-c372-482c-8de3-dce0d27ad843",
       "result": {
         "account_id": "rD7msKkeBhVstkHueWADKSge2Y2CazumNs",
@@ -42,12 +42,12 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "wallet_propose",
       "key_type": "secp256k1",
       "id": "0d1c8cc1-1bae-4e61-8d94-ba6daa3477da"
     },
-    "Response": {
+    "response": {
       "id": "0d1c8cc1-1bae-4e61-8d94-ba6daa3477da",
       "result": {
         "account_id": "rB3Sd4u55fijbfDLfgxcJtVF47Q7qMUMUE",
@@ -63,12 +63,12 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "wallet_propose",
       "key_type": "secp256k1",
       "id": "2bac4dc6-9ae1-4670-956d-5b7a6be68291"
     },
-    "Response": {
+    "response": {
       "id": "2bac4dc6-9ae1-4670-956d-5b7a6be68291",
       "result": {
         "account_id": "rBB9esPH5igbguqQ92wBTrRg85Ud1MtHsB",
@@ -84,12 +84,12 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "wallet_propose",
       "key_type": "secp256k1",
       "id": "4216064d-b668-4bdd-a8dc-5d9c7fade3b1"
     },
-    "Response": {
+    "response": {
       "id": "4216064d-b668-4bdd-a8dc-5d9c7fade3b1",
       "result": {
         "account_id": "r3dA8SH8q9ovGQh2DBKbwzuo1GTCo8a8Ja",
@@ -105,12 +105,12 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "wallet_propose",
       "key_type": "secp256k1",
       "id": "6e4e662e-1c0a-4cc2-af3f-83f233c9c0bc"
     },
-    "Response": {
+    "response": {
       "id": "6e4e662e-1c0a-4cc2-af3f-83f233c9c0bc",
       "result": {
         "account_id": "r97NuZLVBop4ypXcACHujHzMygoQKu8kq9",
@@ -126,12 +126,12 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "wallet_propose",
       "key_type": "secp256k1",
       "id": "70576706-4129-457f-bd57-f4e6cb428d55"
     },
-    "Response": {
+    "response": {
       "id": "70576706-4129-457f-bd57-f4e6cb428d55",
       "result": {
         "account_id": "r4iYzSL9yw6fZiPNRDf8tBQxpT4oJeqYWs",
@@ -147,12 +147,12 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "wallet_propose",
       "key_type": "secp256k1",
       "id": "b5836d25-817d-456f-ac31-f7d699c773e3"
     },
-    "Response": {
+    "response": {
       "id": "b5836d25-817d-456f-ac31-f7d699c773e3",
       "result": {
         "account_id": "rnnZjcheRzS5qDMeYnqxaLWAnNCSVJgZud",
@@ -168,12 +168,12 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "wallet_propose",
       "key_type": "secp256k1",
       "id": "fcaf5df2-daed-4e17-8e8d-caae9637d909"
     },
-    "Response": {
+    "response": {
       "id": "fcaf5df2-daed-4e17-8e8d-caae9637d909",
       "result": {
         "account_id": "rGpwSerpY1zC6jq1PcaC7FvfdoGaf1E3jv",
@@ -189,12 +189,12 @@
     }
   },
   {
-    "Request": {
+    "request": {
       "command": "wallet_propose",
       "key_type": "secp256k1",
       "id": "f4473642-0e6f-415e-a68e-4b23356f3c1d"
     },
-    "Response": {
+    "response": {
       "id": "f4473642-0e6f-415e-a68e-4b23356f3c1d",
       "result": {
         "account_id": "rnzLfU5ei2bsw1fNbqe7h5PdBNjanPX5dQ",

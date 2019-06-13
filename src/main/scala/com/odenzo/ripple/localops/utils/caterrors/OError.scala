@@ -124,7 +124,7 @@ object OError {
     top + sub
   }
 
-  def catchNonFatal[A](f: => A): ErrorOr[A] = {
+  def catchNonFatal[A](msg:String = "Wrapped Exception")(f: => A): ErrorOr[A] = {
     val ex: Either[Throwable, A]     = Either.catchNonFatal(f)
     val res: Either[AppException, A] = ex.leftMap(e ⇒ new AppException("Wrapped Exception", e))
     res
@@ -158,6 +158,17 @@ object AppException extends StackUtils {
       case Failure(exception)              => AppException(msg, exception).asLeft
     }
   }
+
+  def wrapPure[A](msg: String)(fn: ⇒  A): Either[AppError, A] = {
+    Try{
+      val res: A = fn
+      res.asRight
+    } match {
+      case Success(v: Either[AppError, A]) ⇒ v
+      case Failure(exception)              => AppException(msg, exception).asLeft
+    }
+  }
+
 
   def apply(msg: String): AppException = new AppException(err = new RuntimeException(msg))
 

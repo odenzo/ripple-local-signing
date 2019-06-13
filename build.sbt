@@ -58,7 +58,9 @@ val lib_circe = {
     "io.circe" %% "circe-java8"          % circeVersion,
     "io.circe" %% "circe-parser"         % circeVersion,
     "io.circe" %% "circe-generic-extras" % circeVersion,
-  )
+    "io.circe" %% "circe-iteratee" % "0.12.0",
+    "io.iteratee" %% "iteratee-files" % "0.18.0"
+    )
 
 }
 

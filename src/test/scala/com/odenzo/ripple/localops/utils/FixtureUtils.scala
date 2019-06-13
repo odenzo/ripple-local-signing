@@ -39,20 +39,31 @@ trait FixtureUtils extends JsonUtils with OTestSpec {
     getOrLog(asObj)
   }
 
+
+
+  def streamFullAccountKeys() = {
+    import cats.effect.IO
+    import io.circe.iteratee.{byteArrayParser, decoder}
+    import io.iteratee.{Enumeratee, Iteratee}
+    import io.iteratee.files.readBytes
+    import java.io.File
+
+   // val lots = readBytes(new File("data.json")).through(byteArrayParser).through(Decoder[JsonObject])
+  }
   /**
     *
     * @param resource
     *
     * @return List of Json Requests and Responses tupled.
     */
-  def loadRequestResponses(resource: String = "/test/Signing/secptxn.json"): List[(JsonObject, JsonObject)] = {
+  def loadRequestResponses(resource: String): List[(JsonObject, JsonObject)] = {
 
     val txnfixture: Json          = getOrLog(loadJsonResource(resource), s"Loading RR from $resource")
     val fixObjs: List[JsonObject] = getOrLog(CirceUtils.decode(txnfixture, Decoder[List[JsonObject]]))
 
     fixObjs.map { obj ⇒
-      val req = findRequiredObject("Request", obj)
-      val res = findRequiredObject("Response", obj)
+      val req = findRequiredObject("request", obj)
+      val res = findRequiredObject("response", obj)
       (req, res)
     }
 
