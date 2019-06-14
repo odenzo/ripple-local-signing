@@ -14,6 +14,11 @@ import com.odenzo.ripple.localops.utils.caterrors.AppError
 
 object RippleLocalAPI extends StrictLogging {
 
+  type TxnSignature = String
+  type TxBlob       = String
+  type Hex          = String
+  type RippleBase58 = String
+
   /**
     * Mimics a SignRq as much as possible. The SignRs is not returned, instead
     * just the TxBlob for use in the SubmitRq
@@ -24,14 +29,20 @@ object RippleLocalAPI extends StrictLogging {
     *
     * @return The signed TxBlob for inclusion in a SubmitRq
     */
-  def sign(tx_json: JsonObject, master_seed: String, keyType:String): Either[AppError, String] = {
+  def sign(tx_json: JsonObject, master_seed: RippleBase58, keyType: String): Either[AppError, String] = {
     val seedHex = AccountFamily.convertMasterSeedB582MasterSeedHex(master_seed)
-    seedHex.flatMap(hex ⇒Signer.sign(tx_json, hex, keyType))
+    seedHex.flatMap(hex ⇒ Signer.sign(tx_json, hex, keyType))
   }
 
-  def verify(tx_json:JsonObject): Either[AppError, Boolean] = {
+  /**
+    *   Takes a signed tx_json object and verified the TxnSignature usign SigningPubKey
+    * @param tx_json
+    * @return
+    */
+  def verify(tx_json: JsonObject): Either[AppError, Boolean] = {
     Verify.verifySigningResponse(tx_json)
   }
+
   /**
     * Expects a top level JsonObject representing a JSON document
     * that would be sent to rippled server. All isSerializable fields serialized.
@@ -58,17 +69,16 @@ object RippleLocalAPI extends StrictLogging {
     RippleCodecAPI.binarySerializeForSigning(tx_json).leftMap(AppError.wrapCodecError)
   }
 
-
   def serialize(tx_json: JsonObject): Either[AppError, Array[Byte]] = {
     RippleCodecAPI.serializedTxBlob(tx_json).leftMap(AppError.wrapCodecError)
   }
 
   /**
-  *
+    *
     * @param tx_json Fully formed tx_json with all auto-fillable fields etc.
     * @return Byte Array representing the serialized for signing txn. Essentially TxBlob
     */
-  def serializeForSigning(tx_json:JsonObject): Either[AppError, Array[Byte]] = {
+  def serializeForSigning(tx_json: JsonObject): Either[AppError, Array[Byte]] = {
     RippleCodecAPI.signingTxBlob(tx_json).leftMap(AppError.wrapCodecError)
   }
 }

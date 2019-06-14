@@ -1,0 +1,754 @@
+[
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "TransactionType": "Payment",
+        "Account": "rPduVWZ5PfXaRv6bU1X5zeuXPWAqSMEtJM",
+        "Amount": "500",
+        "Destination": "rHgKbc965kGc9N414XuCsLBRj1zGgEy9C",
+        "Sequence": 3,
+        "Fee": "50000000",
+        "Flags": 2147483648,
+        "SigningPubKey": "ED10296AAD1CD1241C30E389644A75FDBBB73A2A016AFD6CC613F8020B7E1FDD83"
+      },
+      "seed": "shY2NWjwVEP7gKVSDTpAWhMFXAT4r",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "4c41e313-4f56-4555-84f5-f612a4a2a3ff"
+    },
+    "response": {
+      "id": "4c41e313-4f56-4555-84f5-f612a4a2a3ff",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "120000228000000024000000036140000000000001F4684000000002FAF0807321ED10296AAD1CD1241C30E389644A75FDBBB73A2A016AFD6CC613F8020B7E1FDD8374400E6878766DE1FE8F990328DB71FEA15A71775EE020E0A7970E00EAE355B59590A34E246194BC375C4D91C27B24F313BDC83D78F964FCBD410ECA300D996DDE0A8114F84D8F423A0F112CAB81F7F7AD69E6B1C9559A1A831403277A857B0D4F7C058789BCE9A45542F0E1581D",
+        "tx_json": {
+          "Account": "rPduVWZ5PfXaRv6bU1X5zeuXPWAqSMEtJM",
+          "Amount": "500",
+          "Destination": "rHgKbc965kGc9N414XuCsLBRj1zGgEy9C",
+          "Fee": "50000000",
+          "Flags": 2147483648,
+          "Sequence": 3,
+          "SigningPubKey": "ED10296AAD1CD1241C30E389644A75FDBBB73A2A016AFD6CC613F8020B7E1FDD83",
+          "TransactionType": "Payment",
+          "TxnSignature": "0E6878766DE1FE8F990328DB71FEA15A71775EE020E0A7970E00EAE355B59590A34E246194BC375C4D91C27B24F313BDC83D78F964FCBD410ECA300D996DDE0A",
+          "hash": "554AAE2D869DBF4B2794EA779B6FC1BF05443E04B9BD1B1EB6F06261454CC411"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "TransactionType": "Payment",
+        "Account": "rn78FCuK1FUizcCH6Q8QCBqxfHpkwBDemh",
+        "Amount": "500",
+        "Destination": "r9tfuMhbaXsEy1Xfw3bRtK9HwAvBNScuxM",
+        "Sequence": 5,
+        "Fee": "50000000",
+        "Flags": 2147483648,
+        "SigningPubKey": "ED120A9A4F3C47DF43762767F8088444F9A544793DC62F8FE131FF8A06582A0864"
+      },
+      "seed": "shuV6DRrr8USy7T8tfezK8uknKk7y",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "870fe28b-9c35-4903-9044-3cc0d51397ff"
+    },
+    "response": {
+      "id": "870fe28b-9c35-4903-9044-3cc0d51397ff",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "120000228000000024000000056140000000000001F4684000000002FAF0807321ED120A9A4F3C47DF43762767F8088444F9A544793DC62F8FE131FF8A06582A0864744037F5521AF2DDC5878EB2C8852C3DA4F954C597FDC698DB4A4B7177C365A4047F61B514EB2608B65DBB0092B884C24D984B0646A60435DE1FC4B0249DD6AB880181143121FBFB88C623698B16D6CB72827ADD1532306D8314616BFB74D01DBC39C241AB26BCFFA4A8DF6C7121",
+        "tx_json": {
+          "Account": "rn78FCuK1FUizcCH6Q8QCBqxfHpkwBDemh",
+          "Amount": "500",
+          "Destination": "r9tfuMhbaXsEy1Xfw3bRtK9HwAvBNScuxM",
+          "Fee": "50000000",
+          "Flags": 2147483648,
+          "Sequence": 5,
+          "SigningPubKey": "ED120A9A4F3C47DF43762767F8088444F9A544793DC62F8FE131FF8A06582A0864",
+          "TransactionType": "Payment",
+          "TxnSignature": "37F5521AF2DDC5878EB2C8852C3DA4F954C597FDC698DB4A4B7177C365A4047F61B514EB2608B65DBB0092B884C24D984B0646A60435DE1FC4B0249DD6AB8801",
+          "hash": "594A219CC120331F4FE8B31411DD651DCB4EF6AD26EBC79ECDFBFBA707D640C0"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "TransactionType": "Payment",
+        "Account": "rPduVWZ5PfXaRv6bU1X5zeuXPWAqSMEtJM",
+        "Amount": "666",
+        "Destination": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+        "Memos": [
+          {
+            "Memo": {
+              "MemoData": "48656C6C6F20576F726C6420323031392D30362D31345430363A30373A32362E3633333931315A",
+              "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+            }
+          }
+        ],
+        "Sequence": 4,
+        "Fee": "50000000",
+        "Flags": 2147483648,
+        "SigningPubKey": "ED10296AAD1CD1241C30E389644A75FDBBB73A2A016AFD6CC613F8020B7E1FDD83"
+      },
+      "seed": "shY2NWjwVEP7gKVSDTpAWhMFXAT4r",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "265109c1-710d-426a-a960-7eecec72ce57"
+    },
+    "response": {
+      "id": "265109c1-710d-426a-a960-7eecec72ce57",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "1200002280000000240000000461400000000000029A684000000002FAF0807321ED10296AAD1CD1241C30E389644A75FDBBB73A2A016AFD6CC613F8020B7E1FDD837440D437D19B7A368B0A6C073BC0B1F10B01D2D72BFE42E9A0A706EF1734EFE26397645B4E9DAE94F599420C4E47C26838B5B2D40951CB6436847F847119534F16058114F84D8F423A0F112CAB81F7F7AD69E6B1C9559A1A8314B5F762798A53D543A014CAF8B297CFF8F2F937E8F9EA7D2748656C6C6F20576F726C6420323031392D30362D31345430363A30373A32362E3633333931315A7E18746578742F706C61696E3B636861727365743D5554462D38E1F1",
+        "tx_json": {
+          "Account": "rPduVWZ5PfXaRv6bU1X5zeuXPWAqSMEtJM",
+          "Amount": "666",
+          "Destination": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+          "Fee": "50000000",
+          "Flags": 2147483648,
+          "Memos": [
+            {
+              "Memo": {
+                "MemoData": "48656C6C6F20576F726C6420323031392D30362D31345430363A30373A32362E3633333931315A",
+                "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+              }
+            }
+          ],
+          "Sequence": 4,
+          "SigningPubKey": "ED10296AAD1CD1241C30E389644A75FDBBB73A2A016AFD6CC613F8020B7E1FDD83",
+          "TransactionType": "Payment",
+          "TxnSignature": "D437D19B7A368B0A6C073BC0B1F10B01D2D72BFE42E9A0A706EF1734EFE26397645B4E9DAE94F599420C4E47C26838B5B2D40951CB6436847F847119534F1605",
+          "hash": "7516120C940F816249B5E05621E08C238D7147811A6C67A8CA9CF6D0300E6A29"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "TransactionType": "Payment",
+        "Account": "rHgKbc965kGc9N414XuCsLBRj1zGgEy9C",
+        "Amount": "666",
+        "Destination": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+        "Memos": [
+          {
+            "Memo": {
+              "MemoData": "48656C6C6F20576F726C6420323031392D30362D31345430363A30373A32362E3633333931315A",
+              "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+            }
+          }
+        ],
+        "Sequence": 5,
+        "Fee": "50000000",
+        "Flags": 2147483648,
+        "SigningPubKey": "ED650C9A330A5771BD4BFEC157166CFDD72D3381169F788FAEC9D3DFEF2470D614"
+      },
+      "seed": "snSfCkj1mm4mj5Gykkanz1ijT9zuW",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "b231a452-988c-4dce-b2e0-6fdee1cfa787"
+    },
+    "response": {
+      "id": "b231a452-988c-4dce-b2e0-6fdee1cfa787",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "1200002280000000240000000561400000000000029A684000000002FAF0807321ED650C9A330A5771BD4BFEC157166CFDD72D3381169F788FAEC9D3DFEF2470D614744013465A750E619AD998335D178F66DE0BFBEE95D87CDC0AA2222C67387391A14CDD164D6457F0314CC39B43ECDC295E3D21F973790A38D703B434A78A58E0BC0A811403277A857B0D4F7C058789BCE9A45542F0E1581D8314B5F762798A53D543A014CAF8B297CFF8F2F937E8F9EA7D2748656C6C6F20576F726C6420323031392D30362D31345430363A30373A32362E3633333931315A7E18746578742F706C61696E3B636861727365743D5554462D38E1F1",
+        "tx_json": {
+          "Account": "rHgKbc965kGc9N414XuCsLBRj1zGgEy9C",
+          "Amount": "666",
+          "Destination": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+          "Fee": "50000000",
+          "Flags": 2147483648,
+          "Memos": [
+            {
+              "Memo": {
+                "MemoData": "48656C6C6F20576F726C6420323031392D30362D31345430363A30373A32362E3633333931315A",
+                "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+              }
+            }
+          ],
+          "Sequence": 5,
+          "SigningPubKey": "ED650C9A330A5771BD4BFEC157166CFDD72D3381169F788FAEC9D3DFEF2470D614",
+          "TransactionType": "Payment",
+          "TxnSignature": "13465A750E619AD998335D178F66DE0BFBEE95D87CDC0AA2222C67387391A14CDD164D6457F0314CC39B43ECDC295E3D21F973790A38D703B434A78A58E0BC0A",
+          "hash": "210E22171F22E749F9F6A154659DFAA4F20E3E824EA2C9154AEA7D69A41E44E0"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "Memos": [
+          {
+            "Memo": {
+              "MemoData": "54657374205472616E73616374696F6E",
+              "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+            }
+          }
+        ],
+        "Fee": "100000000",
+        "TransactionType": "TrustSet",
+        "Account": "rHgKbc965kGc9N414XuCsLBRj1zGgEy9C",
+        "LimitAmount": {
+          "value": "555.666",
+          "currency": "NZD",
+          "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi"
+        }
+      },
+      "seed": "snSfCkj1mm4mj5Gykkanz1ijT9zuW",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "9a66ed08-a02a-4eb0-85ae-461e7c5d68d4"
+    },
+    "response": {
+      "id": "9a66ed08-a02a-4eb0-85ae-461e7c5d68d4",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "1200142280000000240000000263D513BDC0B97008000000000000000000000000004E5A4400000000006AB84425D74974DC1BBBE29F302C567FFBF55BE0684000000005F5E1007321ED650C9A330A5771BD4BFEC157166CFDD72D3381169F788FAEC9D3DFEF2470D61474403F506E7348D13F735833F02BAE3A6D843149820D12C9383558EF94A8F71D2FE04D3DCA6EE40CC90E725F29874E313A7D54CBC7F284B1E2668443FAE863A55405811403277A857B0D4F7C058789BCE9A45542F0E1581DF9EA7D1054657374205472616E73616374696F6E7E18746578742F706C61696E3B636861727365743D5554462D38E1F1",
+        "tx_json": {
+          "Account": "rHgKbc965kGc9N414XuCsLBRj1zGgEy9C",
+          "Fee": "100000000",
+          "Flags": 2147483648,
+          "LimitAmount": {
+            "currency": "NZD",
+            "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi",
+            "value": "555.666"
+          },
+          "Memos": [
+            {
+              "Memo": {
+                "MemoData": "54657374205472616E73616374696F6E",
+                "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+              }
+            }
+          ],
+          "Sequence": 2,
+          "SigningPubKey": "ED650C9A330A5771BD4BFEC157166CFDD72D3381169F788FAEC9D3DFEF2470D614",
+          "TransactionType": "TrustSet",
+          "TxnSignature": "3F506E7348D13F735833F02BAE3A6D843149820D12C9383558EF94A8F71D2FE04D3DCA6EE40CC90E725F29874E313A7D54CBC7F284B1E2668443FAE863A55405",
+          "hash": "E77536B2B74DBFA5B006E6881016FD760DAE52DCC65FC95BA2E7869673623900"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "Memos": [
+          {
+            "Memo": {
+              "MemoData": "54657374205472616E73616374696F6E",
+              "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+            }
+          }
+        ],
+        "Fee": "100000000",
+        "TransactionType": "TrustSet",
+        "Account": "rn78FCuK1FUizcCH6Q8QCBqxfHpkwBDemh",
+        "LimitAmount": {
+          "value": "555.666",
+          "currency": "NZD",
+          "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi"
+        }
+      },
+      "seed": "shuV6DRrr8USy7T8tfezK8uknKk7y",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "35366498-ed42-4c93-ad8e-1cd933e7da72"
+    },
+    "response": {
+      "id": "35366498-ed42-4c93-ad8e-1cd933e7da72",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "1200142280000000240000000263D513BDC0B97008000000000000000000000000004E5A4400000000006AB84425D74974DC1BBBE29F302C567FFBF55BE0684000000005F5E1007321ED120A9A4F3C47DF43762767F8088444F9A544793DC62F8FE131FF8A06582A0864744070E6634BA0910BC541EF1654E7FB74E7685B63421455AA0137C7AE815774590EF217A14379E671716FCF3B0283594C4362A230CB2B88972C104C0B7ED85D710781143121FBFB88C623698B16D6CB72827ADD1532306DF9EA7D1054657374205472616E73616374696F6E7E18746578742F706C61696E3B636861727365743D5554462D38E1F1",
+        "tx_json": {
+          "Account": "rn78FCuK1FUizcCH6Q8QCBqxfHpkwBDemh",
+          "Fee": "100000000",
+          "Flags": 2147483648,
+          "LimitAmount": {
+            "currency": "NZD",
+            "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi",
+            "value": "555.666"
+          },
+          "Memos": [
+            {
+              "Memo": {
+                "MemoData": "54657374205472616E73616374696F6E",
+                "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+              }
+            }
+          ],
+          "Sequence": 2,
+          "SigningPubKey": "ED120A9A4F3C47DF43762767F8088444F9A544793DC62F8FE131FF8A06582A0864",
+          "TransactionType": "TrustSet",
+          "TxnSignature": "70E6634BA0910BC541EF1654E7FB74E7685B63421455AA0137C7AE815774590EF217A14379E671716FCF3B0283594C4362A230CB2B88972C104C0B7ED85D7107",
+          "hash": "93866E2844A80EE93BBDA96DACF3C95AD6746B3CA68249DA5DD6DD6A3A7D3B62"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "Memos": [
+          {
+            "Memo": {
+              "MemoData": "54657374205472616E73616374696F6E",
+              "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+            }
+          }
+        ],
+        "Fee": "100000000",
+        "TransactionType": "TrustSet",
+        "Account": "r9tfuMhbaXsEy1Xfw3bRtK9HwAvBNScuxM",
+        "LimitAmount": {
+          "value": "555.666",
+          "currency": "NZD",
+          "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi"
+        }
+      },
+      "seed": "shohicfiryjZfZxbmhjPPLgfchSDS",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "d7e4066e-0ef1-4f88-a659-6222adaf8a8d"
+    },
+    "response": {
+      "id": "d7e4066e-0ef1-4f88-a659-6222adaf8a8d",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "1200142280000000240000000263D513BDC0B97008000000000000000000000000004E5A4400000000006AB84425D74974DC1BBBE29F302C567FFBF55BE0684000000005F5E1007321EDF2C7D1768799A4A9761F1A64B052160EFB422E3F0ED3A3192658129EB8C25B8B74407A8934D43EE209948813FDF749DD40EE6AAE8C2425B5E04962B66CF41363363B64B8A33E4C310FDFBC3274E0B5ED6986F6632727448D7D16763F8AF7F055F0068114616BFB74D01DBC39C241AB26BCFFA4A8DF6C7121F9EA7D1054657374205472616E73616374696F6E7E18746578742F706C61696E3B636861727365743D5554462D38E1F1",
+        "tx_json": {
+          "Account": "r9tfuMhbaXsEy1Xfw3bRtK9HwAvBNScuxM",
+          "Fee": "100000000",
+          "Flags": 2147483648,
+          "LimitAmount": {
+            "currency": "NZD",
+            "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi",
+            "value": "555.666"
+          },
+          "Memos": [
+            {
+              "Memo": {
+                "MemoData": "54657374205472616E73616374696F6E",
+                "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+              }
+            }
+          ],
+          "Sequence": 2,
+          "SigningPubKey": "EDF2C7D1768799A4A9761F1A64B052160EFB422E3F0ED3A3192658129EB8C25B8B",
+          "TransactionType": "TrustSet",
+          "TxnSignature": "7A8934D43EE209948813FDF749DD40EE6AAE8C2425B5E04962B66CF41363363B64B8A33E4C310FDFBC3274E0B5ED6986F6632727448D7D16763F8AF7F055F006",
+          "hash": "3A5CEC499C3AF8D56C9A7D9B0CF7B6692BBB5E7AC799F09897F68A27C0350537"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "Memos": [
+          {
+            "Memo": {
+              "MemoData": "54657374205472616E73616374696F6E",
+              "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+            }
+          }
+        ],
+        "Fee": "100000000",
+        "TransactionType": "TrustSet",
+        "Account": "rHgKbc965kGc9N414XuCsLBRj1zGgEy9C",
+        "LimitAmount": {
+          "value": "555.666",
+          "currency": "NZD",
+          "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi"
+        }
+      },
+      "seed": "snSfCkj1mm4mj5Gykkanz1ijT9zuW",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "f273dd42-7f48-4c53-84ea-b40054444047"
+    },
+    "response": {
+      "id": "f273dd42-7f48-4c53-84ea-b40054444047",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "1200142280000000240000000363D513BDC0B97008000000000000000000000000004E5A4400000000006AB84425D74974DC1BBBE29F302C567FFBF55BE0684000000005F5E1007321ED650C9A330A5771BD4BFEC157166CFDD72D3381169F788FAEC9D3DFEF2470D6147440B4B4C10B54BEA1217BC8689CC85347D736F04C73F7ED85EA9853EC819F68E17B934B466B863A5194D9852893013213281CFFB6DB165E98FAC301E4187A2DF006811403277A857B0D4F7C058789BCE9A45542F0E1581DF9EA7D1054657374205472616E73616374696F6E7E18746578742F706C61696E3B636861727365743D5554462D38E1F1",
+        "tx_json": {
+          "Account": "rHgKbc965kGc9N414XuCsLBRj1zGgEy9C",
+          "Fee": "100000000",
+          "Flags": 2147483648,
+          "LimitAmount": {
+            "currency": "NZD",
+            "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi",
+            "value": "555.666"
+          },
+          "Memos": [
+            {
+              "Memo": {
+                "MemoData": "54657374205472616E73616374696F6E",
+                "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+              }
+            }
+          ],
+          "Sequence": 3,
+          "SigningPubKey": "ED650C9A330A5771BD4BFEC157166CFDD72D3381169F788FAEC9D3DFEF2470D614",
+          "TransactionType": "TrustSet",
+          "TxnSignature": "B4B4C10B54BEA1217BC8689CC85347D736F04C73F7ED85EA9853EC819F68E17B934B466B863A5194D9852893013213281CFFB6DB165E98FAC301E4187A2DF006",
+          "hash": "9E44F82AC0C7B3775FA18D9D1B86039A7597289D80A4670552A7059D20732022"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "Memos": [
+          {
+            "Memo": {
+              "MemoData": "54657374205472616E73616374696F6E",
+              "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+            }
+          }
+        ],
+        "Fee": "100000000",
+        "TransactionType": "TrustSet",
+        "Account": "rn78FCuK1FUizcCH6Q8QCBqxfHpkwBDemh",
+        "LimitAmount": {
+          "value": "555.666",
+          "currency": "NZD",
+          "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi"
+        }
+      },
+      "seed": "shuV6DRrr8USy7T8tfezK8uknKk7y",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "ea4047d3-65e6-4741-9bd9-091d07bb21b0"
+    },
+    "response": {
+      "id": "ea4047d3-65e6-4741-9bd9-091d07bb21b0",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "1200142280000000240000000363D513BDC0B97008000000000000000000000000004E5A4400000000006AB84425D74974DC1BBBE29F302C567FFBF55BE0684000000005F5E1007321ED120A9A4F3C47DF43762767F8088444F9A544793DC62F8FE131FF8A06582A086474405C7C9AFD6E75F1AF9D4AACEF9C1E1CEFA005549BE2DF812FB94AE0B068EAB2670F73CD01FEECFA5A3E33847817E1FD2B5283AF7331B8A87880DF8E6F96B3630981143121FBFB88C623698B16D6CB72827ADD1532306DF9EA7D1054657374205472616E73616374696F6E7E18746578742F706C61696E3B636861727365743D5554462D38E1F1",
+        "tx_json": {
+          "Account": "rn78FCuK1FUizcCH6Q8QCBqxfHpkwBDemh",
+          "Fee": "100000000",
+          "Flags": 2147483648,
+          "LimitAmount": {
+            "currency": "NZD",
+            "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi",
+            "value": "555.666"
+          },
+          "Memos": [
+            {
+              "Memo": {
+                "MemoData": "54657374205472616E73616374696F6E",
+                "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+              }
+            }
+          ],
+          "Sequence": 3,
+          "SigningPubKey": "ED120A9A4F3C47DF43762767F8088444F9A544793DC62F8FE131FF8A06582A0864",
+          "TransactionType": "TrustSet",
+          "TxnSignature": "5C7C9AFD6E75F1AF9D4AACEF9C1E1CEFA005549BE2DF812FB94AE0B068EAB2670F73CD01FEECFA5A3E33847817E1FD2B5283AF7331B8A87880DF8E6F96B36309",
+          "hash": "FAFBB1ABE7C6042B5746EC14CC8432990750FA6B12DF05549A2335C6F138602D"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "Memos": [
+          {
+            "Memo": {
+              "MemoData": "54657374205472616E73616374696F6E",
+              "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+            }
+          }
+        ],
+        "Fee": "100000000",
+        "TransactionType": "TrustSet",
+        "Account": "r9tfuMhbaXsEy1Xfw3bRtK9HwAvBNScuxM",
+        "LimitAmount": {
+          "value": "555.666",
+          "currency": "NZD",
+          "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi"
+        }
+      },
+      "seed": "shohicfiryjZfZxbmhjPPLgfchSDS",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "f502881e-0c01-4db1-a7dd-82ff78cabed9"
+    },
+    "response": {
+      "id": "f502881e-0c01-4db1-a7dd-82ff78cabed9",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "1200142280000000240000000363D513BDC0B97008000000000000000000000000004E5A4400000000006AB84425D74974DC1BBBE29F302C567FFBF55BE0684000000005F5E1007321EDF2C7D1768799A4A9761F1A64B052160EFB422E3F0ED3A3192658129EB8C25B8B7440D7CC8563E296BD485EFABAB3A763186D1DC25C64615040A1E50FF922628619D1B169F8DCF954847A594F19560AD6D5D136A60C60E98D1B1CD78264DD43967A008114616BFB74D01DBC39C241AB26BCFFA4A8DF6C7121F9EA7D1054657374205472616E73616374696F6E7E18746578742F706C61696E3B636861727365743D5554462D38E1F1",
+        "tx_json": {
+          "Account": "r9tfuMhbaXsEy1Xfw3bRtK9HwAvBNScuxM",
+          "Fee": "100000000",
+          "Flags": 2147483648,
+          "LimitAmount": {
+            "currency": "NZD",
+            "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi",
+            "value": "555.666"
+          },
+          "Memos": [
+            {
+              "Memo": {
+                "MemoData": "54657374205472616E73616374696F6E",
+                "MemoFormat": "746578742F706C61696E3B636861727365743D5554462D38"
+              }
+            }
+          ],
+          "Sequence": 3,
+          "SigningPubKey": "EDF2C7D1768799A4A9761F1A64B052160EFB422E3F0ED3A3192658129EB8C25B8B",
+          "TransactionType": "TrustSet",
+          "TxnSignature": "D7CC8563E296BD485EFABAB3A763186D1DC25C64615040A1E50FF922628619D1B169F8DCF954847A594F19560AD6D5D136A60C60E98D1B1CD78264DD43967A00",
+          "hash": "382D01A8D1BB85477E0F46067789412773C96167DDB12D5DFB8569CD19BF8F37"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "TransactionType": "OfferCreate",
+        "Account": "rPduVWZ5PfXaRv6bU1X5zeuXPWAqSMEtJM",
+        "Expiration": 613814843,
+        "TakerGets": "10000000",
+        "TakerPays": {
+          "value": "10",
+          "currency": "NZD",
+          "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi"
+        },
+        "Fee": "10000000",
+        "Flags": 2147483648
+      },
+      "seed": "shY2NWjwVEP7gKVSDTpAWhMFXAT4r",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "527d16fe-6bb7-41ff-8bcd-a115a4495dac"
+    },
+    "response": {
+      "id": "527d16fe-6bb7-41ff-8bcd-a115a4495dac",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "120007228000000024000000022A2496123B64D4C38D7EA4C680000000000000000000000000004E5A4400000000006AB84425D74974DC1BBBE29F302C567FFBF55BE06540000000009896806840000000009896807321ED10296AAD1CD1241C30E389644A75FDBBB73A2A016AFD6CC613F8020B7E1FDD837440B260B6DD5269A7BF9420F6EBFDE282DA1E7F15C9D34084EC88E07C0BD0126BBC205C9DA3984A865A366EA7565205DC352F8C246AFB4E28727D277094C0AEDC088114F84D8F423A0F112CAB81F7F7AD69E6B1C9559A1A",
+        "tx_json": {
+          "Account": "rPduVWZ5PfXaRv6bU1X5zeuXPWAqSMEtJM",
+          "Expiration": 613814843,
+          "Fee": "10000000",
+          "Flags": 2147483648,
+          "Sequence": 2,
+          "SigningPubKey": "ED10296AAD1CD1241C30E389644A75FDBBB73A2A016AFD6CC613F8020B7E1FDD83",
+          "TakerGets": "10000000",
+          "TakerPays": {
+            "currency": "NZD",
+            "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi",
+            "value": "10"
+          },
+          "TransactionType": "OfferCreate",
+          "TxnSignature": "B260B6DD5269A7BF9420F6EBFDE282DA1E7F15C9D34084EC88E07C0BD0126BBC205C9DA3984A865A366EA7565205DC352F8C246AFB4E28727D277094C0AEDC08",
+          "hash": "78781276B5ED136215CDB5E7E3BC123A31BD3E3043EF540B6077BD083FA575AC"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "TransactionType": "OfferCreate",
+        "Account": "rHgKbc965kGc9N414XuCsLBRj1zGgEy9C",
+        "Expiration": 613814843,
+        "TakerGets": "10000000",
+        "TakerPays": {
+          "value": "10",
+          "currency": "NZD",
+          "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi"
+        },
+        "Fee": "10000000",
+        "Flags": 2147483648
+      },
+      "seed": "snSfCkj1mm4mj5Gykkanz1ijT9zuW",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "a9f44116-5206-4349-8e36-60ef1927a10c"
+    },
+    "response": {
+      "id": "a9f44116-5206-4349-8e36-60ef1927a10c",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "120007228000000024000000042A2496123B64D4C38D7EA4C680000000000000000000000000004E5A4400000000006AB84425D74974DC1BBBE29F302C567FFBF55BE06540000000009896806840000000009896807321ED650C9A330A5771BD4BFEC157166CFDD72D3381169F788FAEC9D3DFEF2470D61474408F66E8A079630232023BE08FB73940377A5658513E20B1608949C9B435C68CBFD06A882AC4165C4C932F0FD7231E95E40E8695CB2A542395890D620F276F5F04811403277A857B0D4F7C058789BCE9A45542F0E1581D",
+        "tx_json": {
+          "Account": "rHgKbc965kGc9N414XuCsLBRj1zGgEy9C",
+          "Expiration": 613814843,
+          "Fee": "10000000",
+          "Flags": 2147483648,
+          "Sequence": 4,
+          "SigningPubKey": "ED650C9A330A5771BD4BFEC157166CFDD72D3381169F788FAEC9D3DFEF2470D614",
+          "TakerGets": "10000000",
+          "TakerPays": {
+            "currency": "NZD",
+            "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi",
+            "value": "10"
+          },
+          "TransactionType": "OfferCreate",
+          "TxnSignature": "8F66E8A079630232023BE08FB73940377A5658513E20B1608949C9B435C68CBFD06A882AC4165C4C932F0FD7231E95E40E8695CB2A542395890D620F276F5F04",
+          "hash": "D237706ED3D23F067056C67DAC7ED71ECF2C1958BB987B8AC189270F2184B704"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "TransactionType": "OfferCreate",
+        "Account": "rn78FCuK1FUizcCH6Q8QCBqxfHpkwBDemh",
+        "Expiration": 613814844,
+        "TakerGets": "10000000",
+        "TakerPays": {
+          "value": "10",
+          "currency": "NZD",
+          "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi"
+        },
+        "Fee": "10000000",
+        "Flags": 2147483648
+      },
+      "seed": "shuV6DRrr8USy7T8tfezK8uknKk7y",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "ee7d5690-f4d6-4859-b595-48293113327a"
+    },
+    "response": {
+      "id": "ee7d5690-f4d6-4859-b595-48293113327a",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "120007228000000024000000042A2496123C64D4C38D7EA4C680000000000000000000000000004E5A4400000000006AB84425D74974DC1BBBE29F302C567FFBF55BE06540000000009896806840000000009896807321ED120A9A4F3C47DF43762767F8088444F9A544793DC62F8FE131FF8A06582A08647440A552AA8D9492DC9398AF0C243809C76CD7CF37B07FF18C8BEFF7979D9ABDECA51E93246B0582C2D0CE508CF59F3AD730B19C21317154764291CD8F575F624E0081143121FBFB88C623698B16D6CB72827ADD1532306D",
+        "tx_json": {
+          "Account": "rn78FCuK1FUizcCH6Q8QCBqxfHpkwBDemh",
+          "Expiration": 613814844,
+          "Fee": "10000000",
+          "Flags": 2147483648,
+          "Sequence": 4,
+          "SigningPubKey": "ED120A9A4F3C47DF43762767F8088444F9A544793DC62F8FE131FF8A06582A0864",
+          "TakerGets": "10000000",
+          "TakerPays": {
+            "currency": "NZD",
+            "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi",
+            "value": "10"
+          },
+          "TransactionType": "OfferCreate",
+          "TxnSignature": "A552AA8D9492DC9398AF0C243809C76CD7CF37B07FF18C8BEFF7979D9ABDECA51E93246B0582C2D0CE508CF59F3AD730B19C21317154764291CD8F575F624E00",
+          "hash": "2B79C9A21B2C6FD3C5B550CBCE261D0B76434E07DC9C25DAC57B3B43411506CB"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "request": {
+      "command": "sign",
+      "tx_json": {
+        "TransactionType": "OfferCreate",
+        "Account": "r9tfuMhbaXsEy1Xfw3bRtK9HwAvBNScuxM",
+        "Expiration": 613814844,
+        "TakerGets": "10000000",
+        "TakerPays": {
+          "value": "10",
+          "currency": "NZD",
+          "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi"
+        },
+        "Fee": "10000000",
+        "Flags": 2147483648
+      },
+      "seed": "shohicfiryjZfZxbmhjPPLgfchSDS",
+      "offline": false,
+      "fee_multi_max": 1000,
+      "key_type": "ed25519",
+      "id": "50596c69-3887-41c1-9a86-7f766d2abce6"
+    },
+    "response": {
+      "id": "50596c69-3887-41c1-9a86-7f766d2abce6",
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "120007228000000024000000042A2496123C64D4C38D7EA4C680000000000000000000000000004E5A4400000000006AB84425D74974DC1BBBE29F302C567FFBF55BE06540000000009896806840000000009896807321EDF2C7D1768799A4A9761F1A64B052160EFB422E3F0ED3A3192658129EB8C25B8B7440A5526C8BA24D745B0A9498855DC38D2DA6BDB9D462E35F0000579B5ECDD714B119B9BA4E034CD4040ECB00A5928ADF525896225D61F4AB21C98ACED89929BC078114616BFB74D01DBC39C241AB26BCFFA4A8DF6C7121",
+        "tx_json": {
+          "Account": "r9tfuMhbaXsEy1Xfw3bRtK9HwAvBNScuxM",
+          "Expiration": 613814844,
+          "Fee": "10000000",
+          "Flags": 2147483648,
+          "Sequence": 4,
+          "SigningPubKey": "EDF2C7D1768799A4A9761F1A64B052160EFB422E3F0ED3A3192658129EB8C25B8B",
+          "TakerGets": "10000000",
+          "TakerPays": {
+            "currency": "NZD",
+            "issuer": "rwjH4461qQTa4fksY8doTLRdqKxDyd5nsi",
+            "value": "10"
+          },
+          "TransactionType": "OfferCreate",
+          "TxnSignature": "A5526C8BA24D745B0A9498855DC38D2DA6BDB9D462E35F0000579B5ECDD714B119B9BA4E034CD4040ECB00A5928ADF525896225D61F4AB21C98ACED89929BC07",
+          "hash": "75B613C20C570672A535D74BCCBFF6D75AAE5AFCCBD511431D594E795F80490B"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  }
+]

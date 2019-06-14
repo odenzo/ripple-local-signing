@@ -10,6 +10,7 @@ import io.circe.{Json, JsonObject}
 
 import com.odenzo.ripple.bincodec.serializing.BinarySerializer
 import com.odenzo.ripple.bincodec.serializing.DebuggingShows._
+import com.odenzo.ripple.localops.RippleLocalAPI.{Hex, TxnSignature}
 import com.odenzo.ripple.localops.Verify.{edVerify, secpVerify}
 import com.odenzo.ripple.localops.crypto.core.{ED25519CryptoBC, HashingOps, Secp256K1CryptoBC}
 import com.odenzo.ripple.localops.crypto.AccountFamily
@@ -29,7 +30,7 @@ object Signer extends StrictLogging with JsonUtils with ByteUtils {
     *
     * @return TxnSignature
     */
-  def sign(tx_json: JsonObject, master_seed: String, keyType: String): Either[AppError, String] = {
+  def sign(tx_json: JsonObject, master_seed: Hex, keyType: String): Either[AppError, String] = {
 
     // Basic Approach....
     // 1. Serialize txblob style
@@ -55,7 +56,7 @@ object Signer extends StrictLogging with JsonUtils with ByteUtils {
     txnsignature
   }
 
-  def signEd(seedhex: String, payload: Array[Byte]): Either[AppError, String] = {
+  def signEd(seedhex: String, payload: Array[Byte]): Either[AppError, TxnSignature] = {
     val txnsig = for {
       kp     <- ED25519CryptoBC.seedHex2keypair(seedhex)
       sig    = ED25519CryptoBC.edSign(payload, kp)
@@ -70,7 +71,7 @@ object Signer extends StrictLogging with JsonUtils with ByteUtils {
     * @param seedhex
     * @return
     */
-  def signSecp(seedhex: String, payload: Array[Byte]): Either[AppError, String] = {
+  def signSecp(seedhex: String, payload: Array[Byte]): Either[AppError, TxnSignature] = {
     for {
       kp       <- AccountFamily.rebuildAccountKeyPairFromSeedHex(seedhex)
       hashed   = HashingOps.sha256Ripple(payload)

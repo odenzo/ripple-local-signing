@@ -25,7 +25,7 @@
     <logger name="com.odenzo.ripple.core.com.odenzo.ripple.testkit.coms.OneOffWebSocket" level="INFO"/>
     <logger name="application" level="DEBUG"/>
 
-    <root level="TRACE">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </root>

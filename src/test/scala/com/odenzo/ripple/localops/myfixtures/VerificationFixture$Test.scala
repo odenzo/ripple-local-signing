@@ -31,9 +31,13 @@ class VerificationFixture$Test extends FunSuite with OTestSpec with ByteUtils wi
     txnFixt.foreach(v ⇒ testOne(v._2))
   }
 
-  test("ALL ED25519"){
+  test("ALL ED25519") {
     val txnFixt: List[(JsonObject, JsonObject)] = loadRequestResponses("/test/myTestData/keysAndTxn/ed25519_txn.json")
     txnFixt.foreach(v ⇒ testOne(v._2))
   }
 
+  test("mixed_txn") {
+    val txnFixt: List[(JsonObject, JsonObject)] = loadRequestResponses("/test/myTestData/txnscenarios/all_txns.json")
+    txnFixt.foreach(v ⇒ testOne(v._2))
+  }
 }
