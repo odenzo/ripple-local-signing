@@ -3,7 +3,7 @@ import sbt.Keys.resolvers
 
 ThisBuild / organization := "com.odenzo"
 ThisBuild / scalaVersion := "2.12.8"
-ThisBuild / version := "0.0.1"
+ThisBuild / version := "0.0.2"
 
 name := "rippled-signing"
 
