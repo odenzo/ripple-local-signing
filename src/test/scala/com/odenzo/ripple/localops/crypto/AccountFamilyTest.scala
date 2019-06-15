@@ -1,12 +1,15 @@
 package com.odenzo.ripple.localops.crypto
 
+import java.security.KeyPair
+
 import org.scalatest.FunSuite
 
 import com.odenzo.ripple.localops._
 import com.odenzo.ripple.localops.crypto.core.Secp256K1CryptoBC
+import com.odenzo.ripple.localops.utils.caterrors.AppError
 import com.odenzo.ripple.localops.utils.{ByteUtils, HexData}
 
-class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils {
+class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils with RippleFormatConverters {
 
   test("Genesis") { //masterpassphrase
     val json =
@@ -40,25 +43,6 @@ class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils {
 
   }
 
-  test("Generator to Account KeyPair") {
-    val passphrase                               = "masterpassphrase"
-    val seed: Seq[Byte]                          = AccountFamily.passphase2seed(passphrase)
-    val generator: AccountFamily.FamilyGenerator = AccountFamily.seed2FamilyGeneratorSecp(seed)
-
-    val expectedPrivate = "1ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7"
-    val expectedPublic  = "0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020"
-
-    logger.info("Checking Calculated Account Public Key to ")
-    val keypair: AccountFamily.AccountKeyPair = AccountFamily.familygenerator2accountKeyPair(generator)
-    val pubHex                                = bytes2hex(keypair.publicKey)
-    val privHex                               = bytes2hex(keypair.privateKey)
-
-    logger.debug(s"Account Pub/Priv Keys: \n $pubHex \n $privHex")
-
-    pubHex.toUpperCase shouldEqual expectedPublic
-    privHex.toUpperCase shouldEqual expectedPrivate
-  }
-
   test("Making a KeyPair") {
     // ANd also if I can just use a private key!
     val masterSeedHex = "559EDD35041D3C11F9BBCED912F4DE6A" // Ripple master seed is different than Private Key?
@@ -74,7 +58,7 @@ class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils {
     val pub                  = "0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020"
     val acct                 = "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh"
     val sepBytes: List[Byte] = getOrLog(hex2Bytes(pub))
-    val csepAddr             = AccountFamily.accountpubkey2address(sepBytes)
+    val csepAddr             = accountpubkey2address(sepBytes)
 
     csepAddr shouldEqual acct
 
@@ -82,7 +66,7 @@ class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils {
     val edAddr: String     = "rDTXLQ7ZKZVKz33zJbHjgVShjsBnqMBhmN"
     val eBytes: List[Byte] = getOrLog(hex2Bytes(edPubKey))
 
-    val cedAddr = AccountFamily.accountpubkey2address(eBytes)
+    val cedAddr = accountpubkey2address(eBytes)
 
     cedAddr shouldEqual edAddr
   }
@@ -97,11 +81,8 @@ class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils {
     val public_key_hex = "02ADBA6E42BCC1CEF0DA5CF2AC82A374C72ED7A78527976225D8AF49B82137934B"
 
 
-    AccountFamily.convertMasterSeedB582MasterSeedHex(master_seed).right.value shouldEqual master_seed_hex
-    val kp = getOrLog(AccountFamily.convertMasterSeedB58ToKeyPair(master_seed))
-
-    logger.info(s"Seed KeyPair: ${kp.getPublic}")
-    
+    convertMasterSeedB582MasterSeedHex(master_seed).right.value shouldEqual master_seed_hex
+        
 
 
     val accountKeys = getOrLog(AccountFamily.rebuildAccountKeyPairFromSeedHex(master_seed_hex))

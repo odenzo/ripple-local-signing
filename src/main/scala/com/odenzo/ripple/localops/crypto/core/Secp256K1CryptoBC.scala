@@ -23,7 +23,7 @@ import org.bouncycastle.math.ec.{ECFieldElement, ECPoint}
 
 import com.odenzo.ripple.localops.crypto.DERSignature
 import com.odenzo.ripple.localops.utils.ByteUtils
-import com.odenzo.ripple.localops.utils.caterrors.{AppError, OError}
+import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException, OError}
 
 /**
   * This is focussed just on getting Secp256k1 txnscenarios and Verification Working.
@@ -53,36 +53,36 @@ object Secp256K1CryptoBC extends StrictLogging with ByteUtils {
     * @param message This is the Hash value to sign, for Ripple the (HashPrefix ++ SerializedForSigning(tx_json))
     *                applied to SHA512Half (I am pretty sure)
     **/
-  def verify(message: Array[Byte], sig: DERSignature, pubKey: PublicKey): Boolean = {
-    val bcecKey: BCECPublicKey = pubKey.asInstanceOf[BCECPublicKey]
+  def verify(message: Array[Byte], sig: DERSignature, pubKey: PublicKey): Either[AppError, Boolean] = {
+    AppException.wrapPure("SECP Verify") {
+      val bcecKey: BCECPublicKey = pubKey.asInstanceOf[BCECPublicKey]
 
-    val signer = new ECDSASigner
-    val pubPoint = bcecKey.getQ
-    val params: ECPublicKeyParameters = new ECPublicKeyParameters(pubPoint, domainParams)
-    signer.init(false, params)
-    signer.verifySignature(message, sig.r.asBigInteger, sig.s.asBigInteger)
-
+      val signer                        = new ECDSASigner
+      val pubPoint                      = bcecKey.getQ
+      val params: ECPublicKeyParameters = new ECPublicKeyParameters(pubPoint, domainParams)
+      signer.init(false, params)
+      signer.verifySignature(message, sig.r.asBigInteger, sig.s.asBigInteger)
+    }
   }
 
   /** Currently using this, slightly painful to extract D, from the ripple-lib Java */
   def sign(hash: Array[Byte], secret: KeyPair): Either[AppError, DERSignature] = {
-    val kCalc: HMacDSAKCalculator = new HMacDSAKCalculator(new SHA256Digest)
-    val signer                    = new ECDSASigner(kCalc)
+    AppException.wrap("SECP SIGN") {
+      val kCalc: HMacDSAKCalculator = new HMacDSAKCalculator(new SHA256Digest)
+      val signer                    = new ECDSASigner(kCalc)
 
-    privateKey2D(secret.getPrivate).flatMap { d ⇒
-      val privKeyParam = new ECPrivateKeyParameters(d, domainParams)
-      signer.init(true, privKeyParam)
-      val sigs   = signer.generateSignature(hash)
-      val r      = sigs(0)
-      val s      = sigs(1)
-      val otherS = secp256k1Order.subtract(s)
-      val finalS = if (s.compareTo(otherS) == 1) otherS else s
-      DERSignature.fromRandS(r, finalS)
+      privateKey2D(secret.getPrivate).flatMap { d ⇒
+        val privKeyParam = new ECPrivateKeyParameters(d, domainParams)
+        signer.init(true, privKeyParam)
+        val sigs   = signer.generateSignature(hash)
+        val r      = sigs(0)
+        val s      = sigs(1)
+        val otherS = secp256k1Order.subtract(s)
+        val finalS = if (s.compareTo(otherS) == 1) otherS else s
+        DERSignature.fromRandS(r, finalS)
+      }
     }
-
   }
-
- 
 
   /**
     *
@@ -97,7 +97,6 @@ object Secp256K1CryptoBC extends StrictLogging with ByteUtils {
     pair
   }
 
-  
   /**
     * @param privateKey
     * @param compress
@@ -274,7 +273,6 @@ object Secp256K1CryptoBC extends StrictLogging with ByteUtils {
     }
     pub.getEncoded.drop(24).take(32)
   }
-
 
   /**
     * Dangling Example of Encoding KeyPairs. Somewhere theres a way to specific public key is compressed or not.

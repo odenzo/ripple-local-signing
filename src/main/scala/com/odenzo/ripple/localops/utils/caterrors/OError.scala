@@ -26,7 +26,6 @@ object CatsErrorTypes {}
 object ShowHack {
   implicit val showBaseError: Show[AppError] = Show.show[AppError] {
     case err: AppJsonError         => err.show
-    case err: AppErrorRestCall     => err.show
     case err: AppJsonDecodingError => err.show
     case err: AppException         => err.show
     case err: OError          => "\n --- " + err.show
@@ -118,7 +117,7 @@ class OError(val msg: String = "No Message", val cause: Option[AppError] = None)
 object OError {
 
   /** Ignore the compimle error in IntelliJ, but not the crappy coding needs redo */
-  lazy implicit val showOError: Show[OError] = Show.show[OError] { (failure: OError) =>
+  lazy implicit val showOError: Show[OError] = Show.show[OError] { failure: OError =>
     val top = s"OError -> ${failure.msg}"
     val sub = failure.cause.map((x: AppError) ⇒ x.show)
     top + sub
@@ -150,6 +149,7 @@ object AppException extends StackUtils {
 
   }
 
+  /** Catches thrown (non-fatal) exceptions from wrapped function */
   def wrap[A](msg: String)(fn: ⇒ Either[AppError, A]): Either[AppError, A] = {
     Try {
       fn
@@ -159,12 +159,13 @@ object AppException extends StackUtils {
     }
   }
 
+  /**  Catches thrown (non-fatal) exceptons */
   def wrapPure[A](msg: String)(fn: ⇒  A): Either[AppError, A] = {
     Try{
       val res: A = fn
-      res.asRight
+      res.asRight[AppError]
     } match {
-      case Success(v: Either[AppError, A]) ⇒ v
+      case Success(v) ⇒ v
       case Failure(exception)              => AppException(msg, exception).asLeft
     }
   }
@@ -188,17 +189,6 @@ class AppJsonParsingError(val msg: String, val raw: String, val parser: ParsingF
   val cause: Option[AppError] = new AppException(parser.message, parser).some
 }
 
-
-
-/**
-  * Special OError for JSON request / response errors which are generally wrapped.
-  * Could just make a Throwable to suit but...
-  */
-class AppErrorRestCall(val msg: String,
-                       val rawRq: Option[Json],
-                       val rawRs: Option[Json],
-                       val cause: Option[AppError] = None)
-    extends AppError
 
 /**
   *   Represents a error in Circe Json decoding (Json => Model)
@@ -258,21 +248,3 @@ object AppJsonError {
     new AppJsonError(msg, json, cause)
   }
 }
-
-object AppErrorRestCall {
-
-  implicit val show: Show[AppErrorRestCall] = Show.show { failure =>
-    s"""
-       | Error:   ${failure.msg}
-       | JSON RQ: ${failure.rawRq.getOrElse(Json.Null).spaces2}
-       | JSON RS: ${failure.rawRs.getOrElse(Json.Null).spaces2}
-       | CAUSE:   ${failure.cause
-         .map(v => v.show)
-         .getOrElse("<Nothing>")}""".stripMargin
-  }
-}
-
-// Why not just make the apply methods?
-trait OErrorOps {}
-
-object OErrorOps extends OErrorOps

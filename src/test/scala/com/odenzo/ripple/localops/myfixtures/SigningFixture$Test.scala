@@ -11,7 +11,7 @@ import com.odenzo.ripple.bincodec.RippleCodecAPI
 import com.odenzo.ripple.bincodec.serializing.BinarySerializer
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 import com.odenzo.ripple.localops.utils.{ByteUtils, FixtureUtils, JsonUtils}
-import com.odenzo.ripple.localops.{OTestSpec, RippleLocalAPI}
+import com.odenzo.ripple.localops.{OTestSpec, RippleLocalAPI, TxnSignature}
 
 /**
   *  Goes through some server signed txn and results and does local signing to check correct
@@ -28,22 +28,21 @@ class SigningFixture$Test extends FunSuite with OTestSpec with ByteUtils with Fi
     val seed: String    = findRequiredStringField("seed", rq)
     val keyType: String = findRequiredStringField("key_type", rq)
 
-
-
     val result: JsonObject = findRequiredObject("result", rs)
     val kTxJson            = findRequiredObject("tx_json", result)
     val kTxSig: String     = findRequiredStringField("TxnSignature", kTxJson)
     val kTxBlob            = findRequiredStringField("tx_blob", result) // This has SigningPubKey in it?
 
-   // val txnsigFromRq: String = getOrLog(RippleLocalAPI.sign(tx_jsonRq, seed, keyType))
-    val txnsigFromRs: String = getOrLog(RippleLocalAPI.sign(kTxJson, seed, keyType))
+    // val txnsigFromRq: String = getOrLog(RippleLocalAPI.sign(tx_jsonRq, seed, keyType))
+    val key                                           = getOrLog(RippleLocalAPI.packSigningKeyFromB58(seed, keyType))
+    val txnsigFromRs: TxnSignature = getOrLog(RippleLocalAPI.sign(kTxJson, key))
     val cTxBlob: BinarySerializer.NestedEncodedValues = RippleCodecAPI.binarySerialize(kTxJson).right.value
 
     logger.info(s"=====\nGot/Excpted TxBlob: \n ${cTxBlob.toHex} \n $kTxBlob\n\n")
     cTxBlob.toHex shouldEqual kTxBlob
 
-    txnsigFromRs shouldEqual kTxSig
-   // txnsigFromRq shouldEqual txnsigFromRs   // If not then probably a field not populated (like SigningPubKey!)s
+    txnsigFromRs.hex shouldEqual kTxSig
+    // txnsigFromRq shouldEqual txnsigFromRs   // If not then probably a field not populated (like SigningPubKey!)s
 
     ()
   }

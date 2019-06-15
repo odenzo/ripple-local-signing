@@ -4,7 +4,7 @@ import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 import org.bouncycastle.crypto.params.{AsymmetricKeyParameter, Ed25519PublicKeyParameters}
 import org.scalatest.FunSuite
 
-import com.odenzo.ripple.localops.crypto.core.{ED25519CryptoBC, HashingOps}
+import com.odenzo.ripple.localops.crypto.core.{ED25519CryptoBC, HashOps}
 import com.odenzo.ripple.localops.reference.HashPrefix
 import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, FixtureUtils, JsonUtils}
 import com.odenzo.ripple.localops.{OTestSpec, RippleLocalAPI}
@@ -43,7 +43,7 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
       | }
       |
     """.stripMargin
-                                  
+
   val walletResult = CirceUtils.parseAsJsonObject(wallet)
   val txjsonResult = CirceUtils.parseAsJsonObject(txjson)
   val secretkey    = "ANTE TUFT MEG CHEN CRAB DUMB COW OWNS ROOF FRED EDDY FORD"
@@ -58,18 +58,6 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
 
   val newKeyPar: AsymmetricCipherKeyPair = ED25519CryptoBC.nativeGenerateKeyPair()
 
-  test("PubKey to Address") {
-    val pub: List[Byte] = getOrLog(hex2Bytes(signPubKey))
-    val account         = AccountFamily.accountpubkey2address(pub)
-    logger.debug(s"Calculated Account/Account \n $account \n $sender")
-    account shouldEqual sender
-  }
-
-  test("RFC Words") {
-    val masterhex = AccountFamily.convertMasterKey2masterSeedHex(secretkey)
-    logger.info(s"Secret Key $secretkey \nMaster Hex: $masterhex")
-    masterhex shouldEqual seedHex
-  }
 
 
   test("Private Key KeyPair") {
@@ -88,7 +76,7 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
     for {
       tx_json    ← txjsonResult
       all        <- RippleLocalAPI.binarySerialize(tx_json)
-      allHash    = HashingOps.sha512Half((HashPrefix.transactionID.v ::: all.rawBytes).map(_.toByte))
+      allHash    = HashOps.sha512Half((HashPrefix.transactionID.v ::: all.rawBytes).map(_.toByte))
       allHashHex = ByteUtils.bytes2hex(allHash)
       _          = logger.info(s"All Fields ${all.fieldsInOrder}")
       _          = logger.info(s"AllHash ${ByteUtils.bytes2hex(allHash)}")
@@ -99,10 +87,10 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
 
   test("Verification") {
     val ok = for {
-      tx_json  ← txjsonResult
-      keyPair  <- ED25519CryptoBC.seedHex2keypair(seedHex)
-      pubHex   ← ED25519CryptoBC.publicKey2Hex(keyPair.getPublic)
-      calcPub  ← ED25519CryptoBC.signingPubKey2KeyParameter(signPubKey)
+      tx_json ← txjsonResult
+      keyPair <- ED25519CryptoBC.seedHex2keypair(seedHex)
+      pubHex  ← ED25519CryptoBC.publicKey2Hex(keyPair.getPublic)
+      calcPub ← ED25519CryptoBC.signingPubKey2KeyParameter(signPubKey)
 
       _        = pubHex shouldEqual signPubKey
       binBytes <- RippleLocalAPI.serializeForSigning(tx_json)
@@ -110,9 +98,9 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
 
       sig      ← kTxnSig
       sigBytes <- hex2Bytes(sig)
-      pubKey  = keyPair.getPublic.asInstanceOf[Ed25519PublicKeyParameters]
-      _ = calcPub.getEncoded shouldEqual pubKey.getEncoded
-      verfied  = ED25519CryptoBC.edVerify(toHash, sigBytes.toArray,calcPub )
+      pubKey   = keyPair.getPublic.asInstanceOf[Ed25519PublicKeyParameters]
+      _        = calcPub.getEncoded shouldEqual pubKey.getEncoded
+      verfied  <- ED25519CryptoBC.edVerify(toHash, sigBytes.toArray, calcPub)
     } yield verfied
     val passed: Boolean = getOrLog(ok)
     passed shouldEqual true
@@ -126,7 +114,7 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
       binBytes <- RippleLocalAPI.serializeForSigning(tx_json)
       toHash   = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction! 0x53545800L
 
-      sigBytes = ED25519CryptoBC.edSign(toHash, keyPair)
+      sigBytes <- ED25519CryptoBC.edSign(toHash, keyPair)
       sigHex   = bytes2hex(sigBytes)
       _        = logger.info(s"EDSignature Len: ${sigBytes.length}")
     } yield sigHex
@@ -143,23 +131,20 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
 
       binBytes <- RippleLocalAPI.serializeForSigning(tx_json)
       toHash   = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction! 0x53545800L
-      hashed   = HashingOps.sha256Ripple(toHash.toSeq).toArray
-      sigBytes = ED25519CryptoBC.edSign(hashed, keyPair)
-      sign2    = ED25519CryptoBC.edSign(hashed, keyPair)
+      hashed   = HashOps.sha512Half(toHash.toSeq).toArray
+      sigBytes <- ED25519CryptoBC.edSign(hashed, keyPair)
+      sign2    <- ED25519CryptoBC.edSign(hashed, keyPair)
       sigHex   = bytes2hex(sigBytes)
       sig2Hex  = bytes2hex(sign2)
-      _        = logger.info(s"Signs \n $sigHex \n $sig2Hex")
-      _        = logger.info(s"Equal = ${sigHex === sig2Hex}")
-      _        = logger.info(s"EDSignature Len: ${sigBytes.length}")
+      _        = assert(sig2Hex === sigHex)
       pubKey   = keyPair.getPublic.asInstanceOf[Ed25519PublicKeyParameters]
-      verfied = ED25519CryptoBC.edVerify(hashed, sigBytes, pubKey)
-      _       = assert(verfied == true)
+      verfied  <- ED25519CryptoBC.edVerify(hashed, sigBytes, pubKey)
+      _        = assert(verfied)
     } yield (sigHex, verfied)
     val (sig, ok) = getOrLog(sigVerified)
     logger.info(s"Verified; $ok")
     logger.info(s"Signature: $sig")
   }
-
 
   test("BC") {
     import java.nio.charset.StandardCharsets
@@ -178,7 +163,6 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
     // Expect Length 16
     // Prefix Expected:  var VER_K256: Array[Byte] = Array[Byte](B58IdentiferCodecs.VER_FAMILY_SEED.toByte)
     var VER_ED25519: Array[Byte] = Array[Byte](0x1.toByte, 0xe1.toByte, 0x4b.toByte)
-    
 
     val privateKey = new Ed25519PrivateKeyParameters(privateKeyBytes, 0)
     val publicKey  = new Ed25519PublicKeyParameters(publicKeyBytes, 0)

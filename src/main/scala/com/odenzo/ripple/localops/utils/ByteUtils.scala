@@ -1,5 +1,6 @@
 package com.odenzo.ripple.localops.utils
 
+import java.math.BigInteger
 import java.util.Locale
 import scala.util.Try
 
@@ -13,7 +14,6 @@ import spire.math.{UByte, UInt, ULong}
 
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException, OError}
 import com.odenzo.ripple.localops.utils.caterrors.CatsTransformers.ErrorOr
-
 import spire._
 import spire.syntax._
 import spire.implicits._
@@ -44,6 +44,7 @@ trait ByteUtils extends StrictLogging {
   }
 
   def bytes2bigint(a: Array[Byte]): BigInt = BigInt(1, a)
+
 
   /**
     * @return Formats unsigned byte as two hex characters, padding on left as needed (lowercase btw)

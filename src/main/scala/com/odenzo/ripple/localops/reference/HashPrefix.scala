@@ -19,8 +19,6 @@ case class HashPrefix(v: List[UByte]) {
 /** These are all Four Bytes Long with bottom byte 00  */
 object HashPrefix extends StrictLogging {
 
-  val raw: HashPrefix = toHashPrefix("54584E00")
-
   // Unsigned Transaction is "53545800 + TxBlob sha512half
   // Unsigned Multisigned
   // Signed "54584E00 (both kinds I think)

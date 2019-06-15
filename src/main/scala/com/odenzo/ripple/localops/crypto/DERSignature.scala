@@ -135,17 +135,6 @@ object DERSignature extends StrictLogging with ByteUtils {
 
   }
 
-  def derSignature2bytes(der: DERSignature): Array[Byte] = {
-    val (r, s) = derSignature2RandS(der)
-    derBytes(r, s)
-  }
-
-  def derSignature2RandS(der: DERSignature): (BigInteger, BigInteger) = {
-    val s = der.s.asBigInteger
-    val r = der.r.asBigInteger
-    logger.info(s"Signature R/S $r / $s ")
-    (r, s)
-  }
 
   protected def derBytes(r: BigInteger, s: BigInteger): Array[Byte] = { // Usually 70-72 bytes.
     val bos = new ByteArrayOutputStream(72)
@@ -161,7 +150,7 @@ object DERSignature extends StrictLogging with ByteUtils {
     * @param bytes
     * @return
     */
-  def decodeFromDER(bytes: Array[Byte]): (BigInteger, BigInteger) = {
+  def decodeFromDERBytes(bytes: Array[Byte]): (BigInteger, BigInteger) = {
 
     val decoder = new ASN1InputStream(bytes)
     val seq     = decoder.readObject.asInstanceOf[DLSequence]
@@ -171,8 +160,7 @@ object DERSignature extends StrictLogging with ByteUtils {
       val s = seq.getObjectAt(1).asInstanceOf[ASN1Integer]
       (r.getPositiveValue, s.getPositiveValue)
     } catch {
-      case e: ClassCastException ⇒
-        return null
+      case e: ClassCastException ⇒         null
     } finally decoder.close()
     // OpenSSL deviates from the DER spec by interpreting these values as unsigned, though they should not be
     // Thus, we always use the positive versions. See: http://r6.ca/blog/20111119T211504Z.html
