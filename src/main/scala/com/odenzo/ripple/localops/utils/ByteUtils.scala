@@ -27,7 +27,7 @@ trait ByteUtils extends StrictLogging {
 
   val bytezero: Byte = 0.toByte
   
-  def hex2Bytes(hex: String): Either[AppError, List[Byte]] =  Nested(hex2ubytes(hex)).map(_.toByte).value
+  def hex2bytes(hex: String): Either[AppError, List[Byte]] = Nested(hex2ubytes(hex)).map(_.toByte).value
 
   
 
@@ -90,6 +90,7 @@ trait ByteUtils extends StrictLogging {
       java.lang.Long.parseLong(v, 16).toByte.asRight
     }
   }
+
 
   // FIXME: 32 bits instead of 8
   def ubyte2bitStr(v: UByte): String = zeroPadLeft(v.toInt.toBinaryString, 8)
@@ -176,14 +177,12 @@ trait ByteUtils extends StrictLogging {
     val ints  = bytes.map(v ⇒ UInt(v.toLong))
     val shift = Seq(24, 16, 8, 0)
 
-    (ints(0) << 24) + (ints(1) << 16) + (ints(2) << 8) + ints(3)
+    (ints.head << 24) + (ints(1) << 16) + (ints(2) << 8) + ints(3)
   }
 
   def bytes2ulong(bytes: Seq[Byte]): UInt = {
     val ints  = bytes.map(v ⇒ UInt(v.toLong))
-    val shift = Seq(24, 16, 8, 0)
-
-    (ints(0) << 24) + (ints(1) << 16) + (ints(2) << 8) + ints(3)
+    (ints.head << 24) + (ints(1) << 16) + (ints(2) << 8) + ints(3)
   }
 
   def uint2bytes(v: UInt): List[Byte] = {

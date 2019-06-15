@@ -11,7 +11,7 @@ import com.odenzo.ripple.localops.{OTestSpec, RippleLocalAPI}
 
 class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with JsonUtils with ByteUtils {
 
-  val wallet =
+  private val wallet =
     """
     {
       |        "account_id": "rn4gsh2qp8842mTA5HfwGT3L1XepQCpqiu",
@@ -24,10 +24,10 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
       |      }
     """.stripMargin
 
-  val txblob =
+  private val txblob =
     "1200002280000000240000000961400000002114A0C0684000000002FAF0807321EDC5349AD8114DCDA07A355AA850FABE710CEE8FCBD891F1B919A6F6713C7BABA07440D67DE7CA3BECBBC941BD1ED5B8EAC77DC7E2FB8E6C64B58B570065E6C2B8B2323077131578A7D4E6F19B07B35E3E22E06CE1AA1DCE877F60F2EC324102F0E80381142FF9D2D54B6D7E744EF5DEC5A27D3471D6AB690A8314891A11D1ABD6C7010B29E60EF411F586690EC18E"
 
-  val txjson =
+  private val txjson: String =
     """
       | {
       |          "Account": "rn4gsh2qp8842mTA5HfwGT3L1XepQCpqiu",
@@ -97,7 +97,7 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
       toHash   = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction! 0x53545800L
 
       sig      ← kTxnSig
-      sigBytes <- hex2Bytes(sig)
+      sigBytes <- hex2bytes(sig)
       pubKey   = keyPair.getPublic.asInstanceOf[Ed25519PublicKeyParameters]
       _        = calcPub.getEncoded shouldEqual pubKey.getEncoded
       verfied  <- ED25519CryptoBC.edVerify(toHash, sigBytes.toArray, calcPub)

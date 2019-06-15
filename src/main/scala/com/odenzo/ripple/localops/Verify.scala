@@ -49,7 +49,7 @@ object Verify extends StrictLogging with JsonUtils with ByteUtils {
   def edVerify(signature: String, pubkeyraw: String, payload: Seq[Byte]): Either[AppError, Boolean] = {
     for {
       pubkey   <- ED25519CryptoBC.signingPubKey2KeyParameter(pubkeyraw)
-      sig      <- ByteUtils.hex2Bytes(signature)
+      sig      <- ByteUtils.hex2bytes(signature)
       verified <- ED25519CryptoBC.edVerify(payload.toArray, sig.toArray, pubkey)
     } yield verified
 
@@ -58,7 +58,7 @@ object Verify extends StrictLogging with JsonUtils with ByteUtils {
   def secpVerify(signature: String, pubkeyraw: String, payload: Seq[Byte]): Either[AppError, Boolean] = {
     val hash = HashOps.sha512Half(payload)
     for {
-      pubkey <- hex2Bytes(pubkeyraw).map(v => Secp256K1CryptoBC.decompressPublicKey(v.toArray))
+      pubkey <- hex2bytes(pubkeyraw).map(v => Secp256K1CryptoBC.decompressPublicKey(v.toArray))
       sig    <- DERSignature.fromHex(signature)
       valid  <- Secp256K1CryptoBC.verify(hash.toArray, sig, pubkey)
     } yield valid

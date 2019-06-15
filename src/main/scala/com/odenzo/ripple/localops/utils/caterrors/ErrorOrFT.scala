@@ -33,9 +33,7 @@ object CatsTransformers extends  StrictLogging {
 }
 
 trait CatsTransformerOps {
-  def notImplemented(implicit ec: ExecutionContext): ErrorOrFT[Nothing] = {
-    fromEither(OError("Not Implemented").asLeft)
-  }
+
 
   def pure[B](b: B)(implicit ec: ExecutionContext): ErrorOrFT[B] = {
     EitherT.pure[Future, AppError](b)
@@ -55,7 +53,7 @@ trait CatsTransformerOps {
   )(implicit ec: ExecutionContext): ErrorOrFT[B] = {
     b match {
       case Some(v) ⇒ pure[B](v)
-      case None    ⇒ fromError(OError(msg))
+      case None    ⇒ fromError(AppError(msg))
     }
   }
 

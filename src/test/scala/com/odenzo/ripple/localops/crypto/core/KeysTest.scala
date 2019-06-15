@@ -40,7 +40,7 @@ class KeysTest extends FunSuite with OTestSpec {
     val derSigBytes: Array[Byte] = getOrLog(derSig.toByteList).toArray
 
     // Encode the public key the hard way
-    val seed                        = getOrLog(ByteUtils.hex2Bytes(kMasterSeedHex))
+    val seed                        = getOrLog(ByteUtils.hex2bytes(kMasterSeedHex))
     val accountKeys                   = AccountFamily.rebuildAccountKeyPairFromSeedHex(kMasterSeedHex)
 //
 //

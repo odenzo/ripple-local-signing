@@ -16,11 +16,9 @@ import com.odenzo.ripple.localops.crypto.core.Secp256K1CryptoBC
 /** This is used just for DER encoding of ECDSA Signature for Secp256k1 Ripple stuff. */
 case class DERSignature(thirty: String, zlen: String, r: DERField, s: DERField, ht: Option[String]) {
 
-
   def toByteList: Either[AppError, List[Byte]] = DERSignature.toByteList(this)
-
-  def toBytes: Either[AppError, Array[Byte]] = DERSignature.toByteList(this).map(_.toArray)
-  def toHex: String                          = thirty + zlen + r.toHex + s.toHex
+  def toBytes: Either[AppError, Array[Byte]]   = DERSignature.toByteList(this).map(_.toArray)
+  def toHex: String                            = thirty + zlen + r.toHex + s.toHex
 }
 
 case class DERField(twoPad: String, len: String, value: String) {
@@ -35,10 +33,9 @@ case class DERField(twoPad: String, len: String, value: String) {
 
 object DERField extends StrictLogging with ByteUtils {
 
-  
   def toByteList(field: DERField): Either[AppError, List[Byte]] = {
     val parts: List[String]               = List(field.twoPad, field.len, field.value)
-    val ans: Either[AppError, List[Byte]] = parts.flatTraverse(p ⇒ hex2Bytes(p))
+    val ans: Either[AppError, List[Byte]] = parts.flatTraverse(p ⇒ hex2bytes(p))
     ans
   }
 
@@ -50,8 +47,8 @@ object DERSignature extends StrictLogging with ByteUtils {
   //TODO:  Add Validate
   def toByteList(sig: DERSignature): Either[AppError, List[Byte]] = {
     for {
-      t <- hex2Bytes(sig.thirty)
-      z <- hex2Bytes(sig.zlen)
+      t <- hex2bytes(sig.thirty)
+      z <- hex2bytes(sig.zlen)
       r <- DERField.toByteList(sig.r)
       s ← DERField.toByteList(sig.s)
     } yield List(t, z, r, s).flatten
@@ -70,7 +67,7 @@ object DERSignature extends StrictLogging with ByteUtils {
   }
 
   /** This should work staight on TxnSignature field */
-  def fromHex(hex: String): Either[AppError, DERSignature] = hex2Bytes(hex).flatMap(fromBytes)
+  def fromHex(hex: String): Either[AppError, DERSignature] = hex2bytes(hex).flatMap(fromBytes)
 
   /** To check if in "standard" format
     *
@@ -122,9 +119,9 @@ object DERSignature extends StrictLogging with ByteUtils {
     // ht is hashtype, really, WTF Forgot where this came from It is not in TxnSignature
     // I think this is a bitcoin only thing.
     val ans: Either[AppError, List[Byte]] = for {
-      thirty   <- ByteUtils.hex2Bytes("30")
-      two      ← ByteUtils.hex2Bytes("02")
-      ht       ← ByteUtils.hex2Bytes("6D")
+      thirty   <- ByteUtils.hex2bytes("30")
+      two      ← ByteUtils.hex2bytes("02")
+      ht       ← ByteUtils.hex2bytes("6D")
       backPart = two ++ rLen ++ rBytes ++ two ++ sLen ++ sBytes
       zLen     = List(backPart.length.toByte)
       all      = thirty ++ zLen ++ backPart
@@ -134,7 +131,6 @@ object DERSignature extends StrictLogging with ByteUtils {
     ans.flatMap(DERSignature.fromBytes)
 
   }
-
 
   protected def derBytes(r: BigInteger, s: BigInteger): Array[Byte] = { // Usually 70-72 bytes.
     val bos = new ByteArrayOutputStream(72)
@@ -160,7 +156,7 @@ object DERSignature extends StrictLogging with ByteUtils {
       val s = seq.getObjectAt(1).asInstanceOf[ASN1Integer]
       (r.getPositiveValue, s.getPositiveValue)
     } catch {
-      case e: ClassCastException ⇒         null
+      case e: ClassCastException ⇒ null
     } finally decoder.close()
     // OpenSSL deviates from the DER spec by interpreting these values as unsigned, though they should not be
     // Thus, we always use the positive versions. See: http://r6.ca/blog/20111119T211504Z.html

@@ -11,7 +11,7 @@ import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
 import spire.math.UInt
 
-import com.odenzo.jjutils.RFC1751Java
+
 import com.odenzo.ripple.localops.crypto.core.{ED25519CryptoBC, HashOps, Secp256K1CryptoBC}
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
 import com.odenzo.ripple.localops.utils.{ByteUtils, RBase58}
@@ -37,7 +37,7 @@ trait AccountFamily extends StrictLogging with ByteUtils with HashOps {
   /** Rebuild Account Keys from Master Seed  - How to determine what keytype? */
   def rebuildAccountKeyPairFromSeedHex(mastSeedHex: String): Either[AppError, KeyPair] = {
     for {
-      bytes          <- hex2Bytes(mastSeedHex)
+      bytes          <- hex2bytes(mastSeedHex)
       generator      = seed2FamilyGenerator(bytes)
       d              = familygenerator2accountKeyPair(generator)
       accountKeyPair = Secp256K1CryptoBC.dToKeyPair(d)

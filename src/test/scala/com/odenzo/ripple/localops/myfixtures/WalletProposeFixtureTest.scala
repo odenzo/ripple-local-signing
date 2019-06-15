@@ -22,6 +22,7 @@ class WalletProposeFixtureTest
     with JsonUtils
     with RippleFormatConverters {
 
+  /** This is used to test a variety of RippleFormat things */
   def testKeyAgnostic(w: JsonObject): Unit = {
     val kMaster       = findRequiredStringField("master_key", w)
     val kSeed         = findRequiredStringField("master_seed", w)
@@ -33,14 +34,11 @@ class WalletProposeFixtureTest
 
     getOrLog(convertMasterKey2masterSeedHex(kMaster)) shouldEqual kSeedHex
 
-    val rSeedHex =
-      getOrLog(convertBase58Check2hex(kSeed), s"Converting MasterSeed 2 Hex $kSeed")
-    rSeedHex shouldEqual kSeedHex
+    getOrLog(convertBase58Check2hex(kSeed), s" MasterSeed 2 Hex $kSeed") shouldEqual kSeedHex
 
-    val pub58Hex = getOrLog(convertBase58Check2hex(kPublicKey))
-    pub58Hex shouldEqual kPublicKeyHex
+    getOrLog(convertBase58Check2hex(kPublicKey)) shouldEqual kPublicKeyHex
 
-    val pubKeyBytes = getOrLog(ByteUtils.hex2Bytes(kPublicKeyHex))
+    val pubKeyBytes = getOrLog(ByteUtils.hex2bytes(kPublicKeyHex))
     accountpubkey2address(pubKeyBytes) shouldEqual kAccount
 
     // Now it is keytype dependant to derive the public AccountKey from the Family Private Key / Generator

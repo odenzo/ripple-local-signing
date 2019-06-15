@@ -21,8 +21,6 @@ sealed trait AppError extends Throwable { // Note this is not sealed and some sh
   def asErrorOr[A]: ErrorOr[A] = this.asLeft[A]
 }
 
-object CatsErrorTypes {}
-
 object ShowHack {
   implicit val showBaseError: Show[AppError] = Show.show[AppError] {
     case err: AppJsonError         => err.show
@@ -79,7 +77,7 @@ object AppError extends StrictLogging {
   lazy implicit val showThrowables: Show[Throwable] = Show.show[Throwable] { t =>
     s"Showing Throwable ${t.getMessage}" + Option(t.getCause).map((v: Throwable) => v.toString).getOrElse("<No Cause>")
   }
-  val NOT_IMPLEMENTED_ERROR: ErrorOr[Nothing] = Left(OError("Not Implemented"))
+  val NOT_IMPLEMENTED_ERROR: ErrorOr[Nothing] = Left(AppError("Not Implemented"))
 
   def apply(json: Json): AppError = AppJsonError("Invalid Json", json)
 
@@ -87,7 +85,7 @@ object AppError extends StrictLogging {
 
   def apply(m: String, json: Json, e: AppError): AppError = AppJsonError(m, json, Some(e))
 
-  def apply(m: String): OError = OError(m, None)
+  def apply(m: String): OError = new OError(m, None)
 
   def apply(m: String, ex: Throwable): AppException = new AppException(m, ex)
 
@@ -122,16 +120,6 @@ object OError {
     val sub = failure.cause.map((x: AppError) ⇒ x.show)
     top + sub
   }
-
-  def catchNonFatal[A](msg:String = "Wrapped Exception")(f: => A): ErrorOr[A] = {
-    val ex: Either[Throwable, A]     = Either.catchNonFatal(f)
-    val res: Either[AppException, A] = ex.leftMap(e ⇒ new AppException("Wrapped Exception", e))
-    res
-  }
-
-  def apply(m: String, e: AppError)                = new OError(m, Some(e))
-  def apply(m: String, e: Option[AppError] = None) = new OError(m, e)
-
 }
 
 /** This should be terminal node only */
@@ -169,11 +157,6 @@ object AppException extends StackUtils {
       case Failure(exception)              => AppException(msg, exception).asLeft
     }
   }
-
-
-  def apply(msg: String): AppException = new AppException(err = new RuntimeException(msg))
-
-  def apply(ex: Throwable): AppException = new AppException(err = ex)
 
   def apply(msg: String, err: Throwable) = new AppException(msg, err)
 }

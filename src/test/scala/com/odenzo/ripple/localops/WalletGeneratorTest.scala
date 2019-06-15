@@ -18,7 +18,7 @@ import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, FixtureUtils, Js
   */
 class WalletGeneratorTest extends FunSuite with OTestSpec with FixtureUtils with JsonUtils with RippleFormatConverters {
 
-  val edWallet =
+  private val edWallet: String =
     """
     {
       |        "account_id": "rn4gsh2qp8842mTA5HfwGT3L1XepQCpqiu",
@@ -31,7 +31,7 @@ class WalletGeneratorTest extends FunSuite with OTestSpec with FixtureUtils with
       |      }
     """.stripMargin
 
-  val secpWallet = """{
+ private  val secpWallet: String = """{
                      |        "account_id": "rnnZjcheRzS5qDMeYnqxaLWAnNCSVJgZud",
                      |        "key_type": "secp256k1",
                      |        "master_key": "AT CLOT LOSS FORE BEST KOCH TRAY TONG TOOK NULL BOOT IS",
@@ -41,8 +41,8 @@ class WalletGeneratorTest extends FunSuite with OTestSpec with FixtureUtils with
                      |        "public_key_hex": "03C518E83306F821373E801C865A8F7B9150A6D1EA5174C6364DABC9CADEA34A05"
                      |      }""".stripMargin
 
-  val ed: ErrorOr[JsonObject]   = CirceUtils.parseAsJsonObject(edWallet)
-  val secp: ErrorOr[JsonObject] = CirceUtils.parseAsJsonObject(secpWallet)
+  private  val ed: ErrorOr[JsonObject]   = CirceUtils.parseAsJsonObject(edWallet)
+  private val secp: ErrorOr[JsonObject] = CirceUtils.parseAsJsonObject(secpWallet)
 
   def testKeyAgnostic(w: JsonObject): Unit = {
     val kMaster       = findRequiredStringField("master_key", w)
@@ -62,7 +62,7 @@ class WalletGeneratorTest extends FunSuite with OTestSpec with FixtureUtils with
     val pub58Hex = getOrLog(convertBase58Check2hex(kPublicKey))
     pub58Hex shouldEqual kPublicKeyHex
 
-    val pubKeyBytes = getOrLog(ByteUtils.hex2Bytes(kPublicKeyHex))
+    val pubKeyBytes = getOrLog(ByteUtils.hex2bytes(kPublicKeyHex))
     accountpubkey2address(pubKeyBytes) shouldEqual kAccount
 
     // Now it is keytype dependant to derive the public AccountKey from the Family Private Key / Generator

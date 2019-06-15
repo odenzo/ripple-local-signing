@@ -76,7 +76,7 @@ object ED25519CryptoBC extends StrictLogging with ByteUtils {
     * @return A KeyPair but not class related to general ECKeyPair or KeyPair
     */
   def seedHex2keypair(seedHex: String): Either[AppError, AsymmetricCipherKeyPair] = {
-    hex2Bytes(seedHex).map(_.toArray).map(privateKey2keypair)
+    hex2bytes(seedHex).map(_.toArray).map(privateKey2keypair)
   }
 
   /**
@@ -96,7 +96,7 @@ object ED25519CryptoBC extends StrictLogging with ByteUtils {
   }
 
   def signingPubKey2KeyParameter(pubKeyHex: String): Either[AppError, Ed25519PublicKeyParameters] = {
-    hex2Bytes(pubKeyHex.drop(2)).map(b ⇒ new Ed25519PublicKeyParameters(b.toArray, 0))
+    hex2bytes(pubKeyHex.drop(2)).map(b ⇒ new Ed25519PublicKeyParameters(b.toArray, 0))
   }
 
   /**
