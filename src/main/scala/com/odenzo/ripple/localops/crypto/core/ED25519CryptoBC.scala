@@ -31,14 +31,9 @@ object ED25519CryptoBC extends StrictLogging with ByteUtils {
 
   Security.addProvider(new BouncyCastleProvider)
 
-  private final val curveName = "Ed25519"
-  private final val keyType   = "Ed25519"
-
-  private val algo: AlgorithmIdentifier = new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519)
-
   private val curve: X9ECParameters = CustomNamedCurves.getByName("curve25519")
 
-  val order: BigInteger     = curve.getCurve.getOrder
+  val order: BigInteger = curve.getCurve.getOrder
 
   private val domainParams: ECDomainParameters =
     new ECDomainParameters(curve.getCurve, curve.getG, curve.getN, curve.getH)
@@ -55,12 +50,14 @@ object ED25519CryptoBC extends StrictLogging with ByteUtils {
   }
 
   // 64 byte signatures are compressed versions, 64 bytes are output
-  def edVerify(payload: Array[Byte], sig: Array[Byte], pubKey: Ed25519PublicKeyParameters): Either[AppError, Boolean] = {
-    AppException.wrapPure("ED25519 Verify"){
-    val edSigner: Ed25519Signer = new Ed25519Signer()
-    edSigner.init(false, pubKey)
-    edSigner.update(payload, 0, payload.length)
-    edSigner.verifySignature(sig)
+  def edVerify(payload: Array[Byte],
+               sig: Array[Byte],
+               pubKey: Ed25519PublicKeyParameters): Either[AppError, Boolean] = {
+    AppException.wrapPure("ED25519 Verify") {
+      val edSigner: Ed25519Signer = new Ed25519Signer()
+      edSigner.init(false, pubKey)
+      edSigner.update(payload, 0, payload.length)
+      edSigner.verifySignature(sig)
     }
   }
 
@@ -79,13 +76,7 @@ object ED25519CryptoBC extends StrictLogging with ByteUtils {
     * @return A KeyPair but not class related to general ECKeyPair or KeyPair
     */
   def seedHex2keypair(seedHex: String): Either[AppError, AsymmetricCipherKeyPair] = {
-    hex2Bytes(seedHex).map(_.toArray).map { bytes ⇒
-      val uppedTo32Bytes                          = HashOps.sha512Half(bytes)
-      val privateKey: Ed25519PrivateKeyParameters = new Ed25519PrivateKeyParameters(uppedTo32Bytes.toArray, 0)
-      val publicKey: Ed25519PublicKeyParameters   = privateKey.generatePublicKey()
-      val kp                                      = new AsymmetricCipherKeyPair(publicKey, privateKey)
-      kp
-    }
+    hex2Bytes(seedHex).map(_.toArray).map(privateKey2keypair)
   }
 
   /**
@@ -93,14 +84,15 @@ object ED25519CryptoBC extends StrictLogging with ByteUtils {
     * @param pubParams This must be the public key, to save external casting take more generic type
     * @return   THe public key, 33 bytes with ED prefix like Ripple does it
     */
-  def publicKey2Hex(pubParams: AsymmetricKeyParameter): Either[OError, String] = {
-    val key = pubParams.asInstanceOf[Ed25519PublicKeyParameters]
-    if (key.isPrivate) {
-      Left(AppError("Expected PublicKey but was Private"))
-    } else {
-      Right("ED" + ByteUtils.bytes2hex(key.getEncoded))
+  def publicKey2Hex(pubParams: AsymmetricKeyParameter): Either[AppError, String] = {
+    AppException.wrap("ed publickey to hex") {
+      val key = pubParams.asInstanceOf[Ed25519PublicKeyParameters]
+      if (key.isPrivate) {
+        Left(AppError("Expected PublicKey but was Private"))
+      } else {
+        Right("ED" + ByteUtils.bytes2hex(key.getEncoded))
+      }
     }
-
   }
 
   def signingPubKey2KeyParameter(pubKeyHex: String): Either[AppError, Ed25519PublicKeyParameters] = {
@@ -112,27 +104,11 @@ object ED25519CryptoBC extends StrictLogging with ByteUtils {
     * @param priv
     */
   def privateKey2keypair(priv: Array[Byte]): AsymmetricCipherKeyPair = {
-    val keyFactory                              = KeyFactory.getInstance("Ed25519")
     val uppedTo32Bytes                          = HashOps.sha512Half(priv)
     val privateKey: Ed25519PrivateKeyParameters = new Ed25519PrivateKeyParameters(uppedTo32Bytes.toArray, 0)
     val publicKey: Ed25519PublicKeyParameters   = privateKey.generatePublicKey()
     val kp                                      = new AsymmetricCipherKeyPair(publicKey, privateKey)
     kp
-  }
-
-  def privateKey2publicKey(priv: Array[Byte]): Array[Byte] = {
-    logger.info(s"Private Key Length: ${priv.length}")
-    // If its 32 go on, else if 16 then up it by hashing
-    val normalizedBytes: Array[Byte] = priv.length match {
-      case 16    ⇒ HashOps.sha512Half(priv).toArray
-      case 32    ⇒ priv
-      case other ⇒ throw new IllegalArgumentException(s"ED25519 Private Key Len 16 or 32 was $other")
-    }
-
-    val privateKey: Ed25519PrivateKeyParameters = new Ed25519PrivateKeyParameters(normalizedBytes, 0)
-    val publicKey: Ed25519PublicKeyParameters   = privateKey.generatePublicKey()
-    publicKey.getEncoded
-
   }
 
 }

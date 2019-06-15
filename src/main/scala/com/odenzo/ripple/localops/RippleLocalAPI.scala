@@ -10,7 +10,7 @@ import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 import com.odenzo.ripple.bincodec.RippleCodecAPI
 import com.odenzo.ripple.bincodec.serializing.BinarySerializer
 import com.odenzo.ripple.localops.crypto.{AccountFamily, RippleFormatConverters}
-import com.odenzo.ripple.localops.utils.RBase58
+import com.odenzo.ripple.localops.utils.{ByteUtils, RBase58}
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 
 object RippleLocalAPI extends StrictLogging {
@@ -23,16 +23,17 @@ object RippleLocalAPI extends StrictLogging {
   /** Pack a key into internal format. Parameters per WalletProposeRs */
   def packSigningKeyFromB58(master_seed: String, key_type: String): Either[AppError, SigningKey] = {
     RippleFormatConverters
-    .convertMasterSeedB582MasterSeedHex(master_seed)
-    .flatMap(packSigningKey(_, key_type))
+      .convertBase58Check2hex(master_seed)
+      .flatMap(packSigningKey(_, key_type))
   }
 
   /** Pack a key into internal format. Parameters per WalletProposeRs */
   def packSigningKeyFromRFC1751(master_key: String, key_type: String): Either[AppError, SigningKey] = {
     RippleFormatConverters
-    .convertMasterKey2masterSeedHex(master_key)
-    .flatMap(packSigningKey(_, key_type))
+      .convertMasterKey2masterSeedHex(master_key)
+      .flatMap(packSigningKey(_, key_type))
   }
+
   /**
     * Mimics a SignRq as much as possible. The SignRs is not returned, instead
     * just the TxBlob for use in the SubmitRq

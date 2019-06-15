@@ -44,12 +44,13 @@ trait RippleFormatConverters {
     *
     * @return
     */
-  def convertBase58Check2bytes(rippleB58: String): Either[AppError, Array[Byte]] = {
+  def convertBase58Check2hex(rippleB58: String): Either[AppError, String] = {
     AppException.wrap(s"Converting MasterSeed $rippleB58 to MasterSeedHex"){
       for {
         bytes <- RBase58.decode(rippleB58)
         trimmed = bytes.drop(1).dropRight(4)
-      } yield trimmed
+        hex  = ByteUtils.bytes2hex(trimmed)
+      } yield hex
     }
   }
 

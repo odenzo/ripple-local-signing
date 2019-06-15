@@ -56,10 +56,10 @@ class WalletGeneratorTest extends FunSuite with OTestSpec with FixtureUtils with
     convertMasterKey2masterSeedHex(kMaster).right.value shouldEqual kSeedHex
 
     val rSeedHex =
-      getOrLog(convertMasterSeedB582MasterSeedHex(kSeed), s"Converting MasterSeed 2 Hex $kSeed")
+      getOrLog(convertBase58Check2hex(kSeed), s"Converting MasterSeed 2 Hex $kSeed")
     rSeedHex shouldEqual kSeedHex
 
-    val pub58Hex = getOrLog(convertPublicKeyB582PublicKeyHex(kPublicKey))
+    val pub58Hex = getOrLog(convertBase58Check2hex(kPublicKey))
     pub58Hex shouldEqual kPublicKeyHex
 
     val pubKeyBytes = getOrLog(ByteUtils.hex2Bytes(kPublicKeyHex))

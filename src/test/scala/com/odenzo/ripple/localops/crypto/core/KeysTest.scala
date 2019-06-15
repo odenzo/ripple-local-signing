@@ -5,7 +5,7 @@ import java.security.{KeyPair, PublicKey}
 import org.scalatest.FunSuite
 
 import com.odenzo.ripple.localops.OTestSpec
-import com.odenzo.ripple.localops.crypto.AccountFamily.AccountKeyPair
+
 import com.odenzo.ripple.localops.crypto.{AccountFamily, DERSignature, core}
 import com.odenzo.ripple.localops.utils.{ByteUtils, RBase58}
 

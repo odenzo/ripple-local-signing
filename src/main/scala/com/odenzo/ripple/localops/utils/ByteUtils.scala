@@ -1,22 +1,15 @@
 package com.odenzo.ripple.localops.utils
 
-import java.math.BigInteger
 import java.util.Locale
-import scala.util.Try
 
 import cats._
 import cats.data._
 import cats.implicits._
-import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
-import org.bouncycastle.util.BigIntegers
+import spire.implicits._
 import spire.math.{UByte, UInt, ULong}
 
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException, OError}
-import com.odenzo.ripple.localops.utils.caterrors.CatsTransformers.ErrorOr
-import spire._
-import spire.syntax._
-import spire.implicits._
 
 
 /**
@@ -76,8 +69,6 @@ trait ByteUtils extends StrictLogging {
     }
   }
 
-  def hex2bitStr(v: String): Either[AppError, String] = hex2ubyte(v).map(ubyte2bitStr).map(_.mkString)
-
   /**
     *   Note for speed
     * @param v Must be a one or two character hex string not enforced
@@ -130,23 +121,14 @@ trait ByteUtils extends StrictLogging {
     else trimLeftZeroBytes(a.tail)
   }
 
-  /** List of four unsigned bytes representing unsigned long get converted */
-  def ubytes2ulong(bytes: Seq[UByte]): Either[OError, ULong] = {
-    if (bytes.length != 8) AppError("ulong requires exactly 4 ubytes").asLeft
-    else {
-      val ul: List[ULong]      = bytes.map(ub ⇒ ULong(ub.toLong)).toList.reverse
-      val shifted: List[ULong] = ul.mapWithIndex((v: ULong, i: Int) ⇒ v << (i * 8))
-      val res: ULong           = shifted.fold(ULong(0))(_ | _)
-      res.asRight
-    }
-  }
+
 
   def ulong2bitStr(v: ULong): String = {
     val str = v.toLong.toBinaryString
     zeroPadLeft(str, 64)
   }
 
-  def uLong2hex(v: ULong): String = v.toHexString()
+ 
 
   /** Quicky to take 16 hex chars and turn into ULong. Hex prefixed with 0x if missing */
   def hex2ulong(hex: String): Either[AppError, ULong] = {
@@ -174,15 +156,7 @@ trait ByteUtils extends StrictLogging {
     }
   }
 
-  def byteToBitString(a: Int): String = {
-    // "%02x
-    // Byte is a signed Short I guess.
-    val locale   = Locale.US
-    val toString = a.toInt
-    //val hex = String.format(locale,"%02x", a.t)
 
-    s"Hex: ${a.toHexString} or  ${a.toBinaryString}"
-  }
 
   def ensureMaxLength(l: List[UByte], len: Int): Either[AppError, List[UByte]] = {
     if (l.length > len) AppError(s"Byte List length ${l.length} > $len").asLeft

@@ -81,7 +81,7 @@ class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils with Ripp
     val public_key_hex = "02ADBA6E42BCC1CEF0DA5CF2AC82A374C72ED7A78527976225D8AF49B82137934B"
 
 
-    convertMasterSeedB582MasterSeedHex(master_seed).right.value shouldEqual master_seed_hex
+    convertBase58Check2hex(master_seed).right.value shouldEqual master_seed_hex
         
 
 

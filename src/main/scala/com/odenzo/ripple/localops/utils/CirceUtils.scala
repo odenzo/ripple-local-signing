@@ -39,13 +39,11 @@ trait CirceUtils extends StrictLogging {
     * Now recurses */
   def pruneNullFields(obj: JsonObject): JsonObject = {
     obj
-      .filter {
-        case (field, value) ⇒ !value.isNull
-      }
+      .filter { case (_, value) ⇒ !value.isNull }
       .mapValues { js: Json ⇒
         js.asObject match {
-          case Some(obj) ⇒ pruneNullFields(obj).asJson
-          case None      ⇒ js
+          case Some(v) ⇒ pruneNullFields(v).asJson
+          case None    ⇒ js
         }
       }
       .asJsonObject
@@ -64,6 +62,13 @@ trait CirceUtils extends StrictLogging {
     }
   }
 
+  def parseAsJson(f: File): ErrorOr[Json] = {
+    logger.info(s"Parsing File $f")
+    new JawnParser().parseFile(f).leftMap { pf ⇒
+      new AppException(s"Error Parsing File $f to Json", pf)
+    }
+  }
+
   def parseAsJsonObject(m: String): ErrorOr[JsonObject] = {
     parseAsJson(m).flatMap(json2jsonObject)
   }
@@ -72,33 +77,10 @@ trait CirceUtils extends StrictLogging {
     Either.fromOption(json.asObject, AppError("JSON was not a JSonObject"))
   }
 
-  def parseAsJson(f: File): ErrorOr[Json] = {
-    logger.info(s"Parsing FIle $f")
-    new JawnParser().parseFile(f).leftMap { pf ⇒
-      new AppException(s"Error Parsing File $f to Json", pf)
-    }
-  }
-
   /** Monoid/Semigroup for Circe Json Object so we can add them togeher. */
   implicit val jsonObjectMonoid: Monoid[JsonObject] = new Monoid[JsonObject] {
     def empty: JsonObject                                 = JsonObject.empty
     def combine(x: JsonObject, y: JsonObject): JsonObject = JsonObject.fromIterable(x.toVector |+| y.toVector)
-  }
-
-  /**
-    *  {{{
-    *    CirceUtils.decode(json.as[List[Foo]], json, "Decoding all Foo in the Bar")
-    *  }}}
-    * @param v
-    * @param json
-    * @param note
-    * @tparam T
-    * @return
-    */
-  def decode[T](v: Result[T], json: Json, note: String = "No Clues"): ErrorOr[T] = {
-    v.leftMap { err: DecodingFailure ⇒
-      new AppJsonDecodingError(json, err, note)
-    }
   }
 
   def decode[T](json: Json, decoder: Decoder[T]): ErrorOr[T] = {
