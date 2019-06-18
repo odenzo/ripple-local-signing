@@ -346,7 +346,7 @@ object RFC1751Keys {
   protected def insert(s: ArrayBuffer[Byte], x: Int, start: Int, length: Int): ArrayBuffer[Byte] = {
 
     val shift: Int = (8 - ((start + length) % 8)) % 8
-    val y: Long    = x << shift
+    val y: Long    =(x << shift).toLong
     val cl         = (y >> 16) & 0xff
     val cc         = (y >> 8) & 0xff
     val cr         = y & 0xff

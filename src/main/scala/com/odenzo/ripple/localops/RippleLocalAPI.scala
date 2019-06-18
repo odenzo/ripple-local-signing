@@ -10,7 +10,7 @@ import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 import com.odenzo.ripple.bincodec.RippleCodecAPI
 import com.odenzo.ripple.bincodec.serializing.BinarySerializer
 import com.odenzo.ripple.localops.crypto.{AccountFamily, RippleFormatConverters}
-import com.odenzo.ripple.localops.utils.{ByteUtils, RBase58}
+import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils, RBase58}
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 
 object RippleLocalAPI extends StrictLogging {
@@ -39,12 +39,28 @@ object RippleLocalAPI extends StrictLogging {
     * just the TxBlob for use in the SubmitRq
     * Note that the Fee should already be specified, also all the paths.
     *
-    * @param tx_json TxJson with all default and autofillable fields (Fee/paths etc). Including SigningPubKey
-    * @param signingKey Precomputed keypair for the actual signer (i.e. Account Key)    *
-    * @return The signed TxBlob for inclusion in a SubmitRq
+    * This is for backward compatiability, signToTxnBlob is preferred method for speed
+    * 
     */
-  def sign(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, TxnSignature] = {
+  def sign(signRq: JsonObject): JsonObject = {
+
+    SignRqRsHandler.processSignRequest(signRq) match {
+      case Left(v) ⇒ v
+      case Right(v) ⇒ v
+    }
+
+  }
+
+
+  def signToTxnSignature(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, TxnSignature] = {
     Signer.signToTxnSignature(tx_json, signingKey)
+  }
+
+  def signToTxnBlob(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, String] = {
+    Signer
+      .signToTxnSignature(tx_json, signingKey)
+      .flatMap(sig ⇒ Signer.createSignedTxBlob(tx_json, sig))
+      .map(v ⇒ ByteUtils.bytes2hex(v))
   }
 
   /**

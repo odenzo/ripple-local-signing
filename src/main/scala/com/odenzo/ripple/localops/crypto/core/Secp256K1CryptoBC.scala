@@ -189,6 +189,10 @@ object Secp256K1CryptoBC extends StrictLogging with ByteUtils {
     pub.getEncoded.slice(24, 56)
   }
 
+
+  def publicKey2hex(pub:PublicKey): String = {
+    bytes2hex(compressPublicKey(pub))
+  }
   /**
     * Dangling Example of Encoding KeyPairs. Somewhere theres a way to specific public key is compressed or not.
     */

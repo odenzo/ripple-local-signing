@@ -50,6 +50,24 @@ trait CirceUtils extends StrictLogging {
 
   }
 
+
+  /** Does top level sorting of fields in this object alphanumeric with capital before lowercase  */
+  def sortFields(jsonObject: JsonObject): JsonObject = {
+    val sortedList = jsonObject.toList.sortBy(_._1) // Want Capital letters sorted before lower case
+    JsonObject.fromIterable(sortedList)
+  }
+
+  /** Sorts top level object and all nested fields */
+  def sortDeepFields(jsonObject: JsonObject): JsonObject = {
+    val deep =  jsonObject.mapValues { iv: Json ⇒
+          iv.asObject match {
+            case None ⇒ iv
+            case Some(obj) ⇒ sortDeepFields(obj).asJson
+          }
+      }
+    sortFields(deep)
+  }
+
   /** Caution: Uses BigDecimal and BigInt in parsing.
     *
     *  @param m The text, in this case the response message text from websocket.

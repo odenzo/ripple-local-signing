@@ -1,16 +1,15 @@
 package com.odenzo.ripple.localops.crypto
 
-import java.security.KeyPair
+import cats._
+import cats.data._
+import cats.implicits._
 
-import com.odenzo.ripple.localops.crypto.AccountFamily.{hex2ulong, ripemd160, sha256, sha512}
-import com.odenzo.ripple.localops.crypto.core.Secp256K1CryptoBC
-import com.odenzo.ripple.localops.utils.{ByteUtils, RBase58}
+import com.odenzo.ripple.localops.crypto.AccountFamily.{ripemd160, sha256, sha512}
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
+import com.odenzo.ripple.localops.utils.{ByteUtils, RBase58}
 
 trait RippleFormatConverters {
 
-  /** This is Base16 format - Doesn't matter key_type */
-  def passphase2seed(password: String): Seq[Byte] = sha512(password.getBytes("UTF-8")).take(16)
 
   /**
     * @param publicKey secp265k or ed25519 keys key, if ed25519 padded with 0xED
@@ -32,6 +31,12 @@ trait RippleFormatConverters {
     val bytes: Seq[Byte] = payload ++ checksum
     val b58: String      = RBase58.encode(bytes)
     b58
+  }
+
+
+  /** TODO: Check this. */
+  def convertPassphrase2hex(password: String): Either[AppError, String] = {
+    ByteUtils.bytes2hex(sha512(password.getBytes("UTF-8")).take(16)).asRight[AppError]
   }
 
   /** This trims off the first *byte* and the last four checksum bytes from
