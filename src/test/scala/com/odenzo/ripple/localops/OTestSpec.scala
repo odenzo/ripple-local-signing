@@ -44,7 +44,7 @@ trait OTestSpec extends StrictLogging with Matchers with EitherValues {
     }
   }
 
-  def getOrLog[T](ee: ErrorOr[T], msg: String = "Error: ", loggger: Logger = logger): T = {
+  def getOrLog[T](ee: Either[AppError,T], msg: String = "Error: ", loggger: Logger = logger): T = {
     if (ee.isLeft) {
       dump(ee) match {
         case None       ⇒ loggger.debug("No Errors Found")

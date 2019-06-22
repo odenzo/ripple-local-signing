@@ -9,6 +9,7 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.2.2")
 
 
 
+
 //     https://github.com/sbt/sbt-bintray
 // ~/.bintray/.credentials
 // bintrayWhoami
@@ -29,12 +30,24 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0")
 //addSbtPlugin("com.github.xuwei-k" % "sbt-class-diagram" % "0.2.1")
 
 
+//
+// ----------- Publishing ---------------
+//
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.4")
+addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.0")
+
+
+//     https://github.com/sbt/sbt-bintray
+// ~/.bintray/.credentials
+// bintrayWhoami
+//addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.4")
+
 
 
 // ---------- Code Coverage Goodies ---------------
 // [[https://github.com/scoverage/sbt-scoverage]]
 // sbt coverageAggregate to merge multi-module
-//addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
 
 
 // Open Source 

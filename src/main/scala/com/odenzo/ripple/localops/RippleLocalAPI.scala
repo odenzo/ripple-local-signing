@@ -7,8 +7,8 @@ import com.typesafe.scalalogging.StrictLogging
 import io.circe.JsonObject
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 
-import com.odenzo.ripple.bincodec.RippleCodecAPI
-import com.odenzo.ripple.bincodec.serializing.BinarySerializer
+import com.odenzo.ripple.bincodec.{EncodedNestedVals, RippleCodecAPI}
+import com.odenzo.ripple.bincodec.encoding.BinarySerializer
 import com.odenzo.ripple.localops.crypto.{AccountFamily, RippleFormatConverters}
 import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils, RBase58}
 import com.odenzo.ripple.localops.utils.caterrors.AppError
@@ -80,7 +80,7 @@ object RippleLocalAPI extends StrictLogging {
     *
     * @return Hex string representing the serialization in total.
     */
-  def binarySerialize(jsonObject: JsonObject): Either[AppError, BinarySerializer.NestedEncodedValues] = {
+  def binarySerialize(jsonObject: JsonObject): Either[AppError, EncodedNestedVals] = {
     RippleCodecAPI.binarySerialize(jsonObject).leftMap(AppError.wrapCodecError)
   }
 
@@ -93,7 +93,7 @@ object RippleLocalAPI extends StrictLogging {
     *
     * @param tx_json
     */
-  def binarySerializeForSigning(tx_json: JsonObject): Either[AppError, BinarySerializer.NestedEncodedValues] = {
+  def binarySerializeForSigning(tx_json: JsonObject): Either[AppError, EncodedNestedVals] = {
     logger.trace("Serializing for txnscenarios")
     RippleCodecAPI.binarySerializeForSigning(tx_json).leftMap(AppError.wrapCodecError)
   }

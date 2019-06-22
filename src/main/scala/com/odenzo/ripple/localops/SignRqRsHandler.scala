@@ -33,8 +33,7 @@ object SignRqRsHandler extends StrictLogging with JsonUtils with RippleFormatCon
   def processSignRequest(rq: JsonObject): Either[JsonObject, JsonObject] = {
 
     //validateRequest(rq)
-
-    // FIXME: Generate the SigningPubKey and add to success response.
+        
     val ok: Either[ResponseError, JsonObject] = for {
       valid   ← validateRequest(rq)
       key     <- extractKey(rq)
@@ -137,6 +136,7 @@ object SignRqRsHandler extends StrictLogging with JsonUtils with RippleFormatCon
     params.get("key_type") match {
       case None ⇒ ResponseError.kNoSecret.asLeft // Mimicing Ripple even if there are seed, seed_hex passphrase
       case Some(kt) ⇒
+        logger.info(s"Explicit Key Type $kt from $params")
         List(
           params.get("passphrase").map(convertPassphrase2hex),
           params.get("seed").map(convertBase58Check2hex),

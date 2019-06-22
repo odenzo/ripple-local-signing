@@ -20,11 +20,10 @@
         </encoder>
     </appender>
 
+    <logger name="com.odenzo.ripple.localops" level="DEBUG"/>
     <logger name="com.odenzo.ripple.bincodec" level="INFO" />
     <logger name="com.odenzo.ripple.signing.reference.Definitions$" level="WARN" />
     <logger name="odenzo" level="TRACE"/>
-    <logger name="com.odenzo.ripple.core.com.odenzo.ripple.testkit.coms.OneOffWebSocket" level="INFO"/>
-    <logger name="application" level="DEBUG"/>
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>

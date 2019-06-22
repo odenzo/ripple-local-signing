@@ -7,8 +7,7 @@ import io.circe.JsonObject
 import io.circe.syntax._
 import org.scalatest.{Assertion, FunSuite}
 
-import com.odenzo.ripple.bincodec.RippleCodecAPI
-import com.odenzo.ripple.bincodec.serializing.BinarySerializer
+import com.odenzo.ripple.bincodec.{EncodedNestedVals, RippleCodecAPI}
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 import com.odenzo.ripple.localops.utils.{ByteUtils, FixtureUtils, JsonUtils}
 import com.odenzo.ripple.localops.{OTestSpec, ResponseError, RippleLocalAPI, SignRqRsHandler, SigningKey, TxnSignature}
@@ -40,7 +39,7 @@ class SigningFixture$Test extends FunSuite with OTestSpec with ByteUtils with Fi
 
     val txnsigFromRs: TxnSignature                    = getOrLog(RippleLocalAPI.signToTxnSignature(kTxJson, key))
     val txblobFromRs                                  = getOrLog(RippleLocalAPI.signToTxnBlob(kTxJson, key))
-    val cTxBlob: BinarySerializer.NestedEncodedValues = RippleCodecAPI.binarySerialize(kTxJson).right.value
+    val cTxBlob: EncodedNestedVals = RippleCodecAPI.binarySerialize(kTxJson).right.value
 
     logger.info(s"=====\nGot/Excpted TxBlob: \n ${cTxBlob.toHex} \n $kTxBlob\n\n")
     cTxBlob.toHex shouldEqual kTxBlob

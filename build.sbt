@@ -22,7 +22,7 @@ lazy val signing = (project in file("."))
   )
 
 lazy val commonSettings = Seq(
-  libraryDependencies ++= mylibs ++ libs ++ lib_circe ++ lib_cats ++ lib_spire ++ lib_bouncycastle,
+  libraryDependencies ++= mylibs ++ libs ++ lib_circe ++ lib_cats ++ lib_spire ++ lib_bouncycastle ++ lib_scribe,
   resolvers ++= Seq(
     Resolver.bintrayIvyRepo("odenzo", "rippled-signing"),
     Resolver.defaultLocal, // Usual I pulishLocal to Ivy not maven
@@ -35,14 +35,13 @@ val devSettings = Seq(
 )
 
 val mylibs = {
-  Seq("com.odenzo" %% "ripple-binary-codec" % "0.0.2")
+  Seq("com.odenzo" %% "ripple-binary-codec" % "0.2.1")
 }
 
 val libs = {
   Seq(
-    "org.scalatest"              %% "scalatest"      % "3.0.7" % Test,
+    "org.scalatest"              %% "scalatest"      % "3.0.8" % Test,
     "org.scalacheck"             %% "scalacheck"     % "1.14.0" % Test,
-    "com.typesafe"               % "config"          % "1.3.4", //  https://github.com/typesafehub/config
     "com.typesafe.scala-logging" %% "scala-logging"  % "3.9.2",
     "ch.qos.logback"             % "logback-classic" % "1.2.3"
   )
@@ -59,7 +58,6 @@ val lib_circe = {
     "io.circe" %% "circe-parser"         % circeVersion,
     "io.circe" %% "circe-generic-extras" % circeVersion,
     "io.circe" %% "circe-iteratee" % "0.12.0",
-    "io.iteratee" %% "iteratee-files" % "0.18.0"
     )
 
 }
@@ -77,6 +75,13 @@ val lib_spire = {
     "org.typelevel" %% "spire" % "0.16.2"
   )
 }
+
+
+
+val lib_scribe = {
+  Seq("com.outr" %% "scribe" % "2.7.7")
+}
+
 
 val lib_bouncycastle = {
   val version = "1.62"

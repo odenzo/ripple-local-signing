@@ -135,7 +135,7 @@ object Secp256K1CryptoBC extends StrictLogging with ByteUtils {
     val exPublicKey: PublicKey         = eckf.generatePublic(publicKeySpec)
     val encoded: Array[Byte]           = exPrivateKey.getEncoded
     val privateEndoded                 = ByteUtils.bytes2hex(encoded)
-    logger.info("Private Encoded: " + privateEndoded)
+  
 
     new KeyPair(exPublicKey, exPrivateKey)
   }
@@ -183,9 +183,9 @@ object Secp256K1CryptoBC extends StrictLogging with ByteUtils {
     * @return
     */
   def compressPublicKey(pub: PublicKey): Array[Byte] = {
-    val params = pub match {
-      case p: ECPublicKey => p.getParameters
-    }
+//    val params = pub match {
+//      case p: ECPublicKey => p.getParameters
+//    }
     pub.getEncoded.slice(24, 56)
   }
 

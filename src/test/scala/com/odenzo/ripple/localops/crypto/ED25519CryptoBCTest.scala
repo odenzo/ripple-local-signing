@@ -78,7 +78,6 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
       all        <- RippleLocalAPI.binarySerialize(tx_json)
       allHash    = HashOps.sha512Half((HashPrefix.transactionID.v ::: all.rawBytes).map(_.toByte))
       allHashHex = ByteUtils.bytes2hex(allHash)
-      _          = logger.info(s"All Fields ${all.fieldsInOrder}")
       _          = logger.info(s"AllHash ${ByteUtils.bytes2hex(allHash)}")
       _          = allHashHex shouldEqual kHash.right.value
     } yield all

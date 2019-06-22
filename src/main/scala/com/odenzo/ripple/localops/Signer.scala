@@ -12,7 +12,7 @@ import com.odenzo.ripple.localops.crypto.core.{ED25519CryptoBC, HashOps, Secp256
 import com.odenzo.ripple.localops.reference.HashPrefix
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
- import com.odenzo.ripple.bincodec.serializing.DebuggingShows._
+
 /** This takes a message and signs it. Returning the TxBlob
   *
   */
@@ -45,8 +45,6 @@ object Signer extends StrictLogging with JsonUtils with ByteUtils {
 
     for {
       encoded <- RippleLocalAPI.binarySerializeForSigning(tx_json)
-      _ = logger.info(s"Signing Serialization Order: ${encoded.fieldsInOrder}")
-      _ = logger.info(s"Fields: ${encoded.show}")
       binBytes = encoded.toBytes
       payload  = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction
 

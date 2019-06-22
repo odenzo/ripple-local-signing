@@ -41,7 +41,6 @@ class VerifyTest extends FunSuite with OTestSpec with JsonUtils with FixtureUtil
       all        <- RippleLocalAPI.binarySerialize(tx)
       allHash    = hashOp((HashPrefix.transactionID.v ::: all.rawBytes).map(_.toByte))
       allHashHex = ByteUtils.bytes2hex(allHash)
-      _          = logger.info(s"All Fields ${all.fieldsInOrder}")
       _          = logger.info(s"AllHash ${ByteUtils.bytes2hex(allHash)}")
       _          = allHashHex shouldEqual kHash
     } yield all
