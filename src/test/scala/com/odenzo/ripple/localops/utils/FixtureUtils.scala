@@ -41,15 +41,6 @@ trait FixtureUtils extends JsonUtils with OTestSpec {
 
 
 
-  def streamFullAccountKeys() = {
-    import cats.effect.IO
-    import io.circe.iteratee.{byteArrayParser, decoder}
-    import io.iteratee.{Enumeratee, Iteratee}
-    import io.iteratee.files.readBytes
-    import java.io.File
-
-   // val lots = readBytes(new File("data.json")).through(byteArrayParser).through(Decoder[JsonObject])
-  }
   /**
     *
     * @param resource

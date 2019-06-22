@@ -2,9 +2,8 @@ package com.odenzo.ripple.localops.verifying
 
 import io.circe.JsonObject
 import org.scalatest.FunSuite
-import spire.math.UByte
 
-import com.odenzo.ripple.localops.crypto.core.HashingOps
+import com.odenzo.ripple.localops.crypto.core.HashOps
 import com.odenzo.ripple.localops.reference.HashPrefix
 import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, FixtureUtils, JsonUtils}
 import com.odenzo.ripple.localops.{OTestSpec, RippleLocalAPI, Verify}
@@ -35,14 +34,13 @@ class VerifyTest extends FunSuite with OTestSpec with JsonUtils with FixtureUtil
     val kHash          = findRequiredStringField("hash", tx)
     val kSigningPubKey = findRequiredStringField("SigningPubKey", tx)
 
-    val hashOp: Seq[Byte] ⇒ Seq[Byte] = HashingOps.sha512Half
+    val hashOp: Seq[Byte] ⇒ Seq[Byte] = HashOps.sha512Half
 
     // First lets see if we can get the hash
     for {
       all        <- RippleLocalAPI.binarySerialize(tx)
       allHash    = hashOp((HashPrefix.transactionID.v ::: all.rawBytes).map(_.toByte))
       allHashHex = ByteUtils.bytes2hex(allHash)
-      _          = logger.info(s"All Fields ${all.fieldsInOrder}")
       _          = logger.info(s"AllHash ${ByteUtils.bytes2hex(allHash)}")
       _          = allHashHex shouldEqual kHash
     } yield all

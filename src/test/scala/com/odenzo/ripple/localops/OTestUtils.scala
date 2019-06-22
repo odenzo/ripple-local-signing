@@ -1,13 +1,13 @@
 package com.odenzo.ripple.localops
 
 import cats.implicits._
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 import spire.math.{UByte, ULong}
 
 import com.odenzo.ripple.localops.utils.ByteUtils
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 
-trait OTestUtils extends StrictLogging {
+trait OTestUtils extends Logging {
 
   /**
     *

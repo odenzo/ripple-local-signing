@@ -4,9 +4,9 @@ import scala.util.{Failure, Success, Try}
 
 import cats._
 import cats.implicits._
-import com.typesafe.scalalogging.{Logger, StrictLogging}
 import io.circe.Decoder.Result
 import io.circe.{DecodingFailure, Json, ParsingFailure}
+import scribe.{Logger, Logging}
 
 import com.odenzo.ripple.bincodec.utils.caterrors.RippleCodecError
 import com.odenzo.ripple.localops.utils.caterrors.CatsTransformers.ErrorOr
@@ -21,12 +21,9 @@ sealed trait AppError extends Throwable { // Note this is not sealed and some sh
   def asErrorOr[A]: ErrorOr[A] = this.asLeft[A]
 }
 
-object CatsErrorTypes {}
-
 object ShowHack {
   implicit val showBaseError: Show[AppError] = Show.show[AppError] {
     case err: AppJsonError         => err.show
-    case err: AppErrorRestCall     => err.show
     case err: AppJsonDecodingError => err.show
     case err: AppException         => err.show
     case err: OError          => "\n --- " + err.show
@@ -38,7 +35,7 @@ object ShowHack {
   * Base Error is never instanciated, but the apply is up here as convenience
   * and delegates down. These will go away soon.
   */
-object AppError extends StrictLogging {
+object AppError extends Logging {
 
   type MonadAppError[F[_]] = MonadError[F, AppError]
 
@@ -65,12 +62,12 @@ object AppError extends StrictLogging {
   *
     * @param ee
     * @param msg
-    * @param loggger
+    * @param mylog
     */
-  def log(ee: ErrorOr[_], msg: String = "Error: ", loggger: Logger = logger): Unit = {
+  def log(ee: ErrorOr[_], msg: String = "Error: ", mylog: Logger = logger): Unit = {
     dump(ee) match {
-      case None       ⇒ loggger.debug("No Errors Found")
-      case Some(emsg) ⇒ loggger.error(s"$msg\t=> $emsg ")
+      case None       ⇒ mylog.debug("No Errors Found")
+      case Some(emsg) ⇒ mylog.error(s"$msg\t=> $emsg ")
     }
   }
 
@@ -80,7 +77,7 @@ object AppError extends StrictLogging {
   lazy implicit val showThrowables: Show[Throwable] = Show.show[Throwable] { t =>
     s"Showing Throwable ${t.getMessage}" + Option(t.getCause).map((v: Throwable) => v.toString).getOrElse("<No Cause>")
   }
-  val NOT_IMPLEMENTED_ERROR: ErrorOr[Nothing] = Left(OError("Not Implemented"))
+  val NOT_IMPLEMENTED_ERROR: ErrorOr[Nothing] = Left(AppError("Not Implemented"))
 
   def apply(json: Json): AppError = AppJsonError("Invalid Json", json)
 
@@ -88,7 +85,7 @@ object AppError extends StrictLogging {
 
   def apply(m: String, json: Json, e: AppError): AppError = AppJsonError(m, json, Some(e))
 
-  def apply(m: String): OError = OError(m, None)
+  def apply(m: String): OError = new OError(m, None)
 
   def apply(m: String, ex: Throwable): AppException = new AppException(m, ex)
 
@@ -118,21 +115,11 @@ class OError(val msg: String = "No Message", val cause: Option[AppError] = None)
 object OError {
 
   /** Ignore the compimle error in IntelliJ, but not the crappy coding needs redo */
-  lazy implicit val showOError: Show[OError] = Show.show[OError] { (failure: OError) =>
+  lazy implicit val showOError: Show[OError] = Show.show[OError] { failure: OError =>
     val top = s"OError -> ${failure.msg}"
     val sub = failure.cause.map((x: AppError) ⇒ x.show)
     top + sub
   }
-
-  def catchNonFatal[A](msg:String = "Wrapped Exception")(f: => A): ErrorOr[A] = {
-    val ex: Either[Throwable, A]     = Either.catchNonFatal(f)
-    val res: Either[AppException, A] = ex.leftMap(e ⇒ new AppException("Wrapped Exception", e))
-    res
-  }
-
-  def apply(m: String, e: AppError)                = new OError(m, Some(e))
-  def apply(m: String, e: Option[AppError] = None) = new OError(m, e)
-
 }
 
 /** This should be terminal node only */
@@ -150,6 +137,7 @@ object AppException extends StackUtils {
 
   }
 
+  /** Catches thrown (non-fatal) exceptions from wrapped function */
   def wrap[A](msg: String)(fn: ⇒ Either[AppError, A]): Either[AppError, A] = {
     Try {
       fn
@@ -159,20 +147,16 @@ object AppException extends StackUtils {
     }
   }
 
+  /**  Catches thrown (non-fatal) exceptons */
   def wrapPure[A](msg: String)(fn: ⇒  A): Either[AppError, A] = {
     Try{
       val res: A = fn
-      res.asRight
+      res.asRight[AppError]
     } match {
-      case Success(v: Either[AppError, A]) ⇒ v
+      case Success(v) ⇒ v
       case Failure(exception)              => AppException(msg, exception).asLeft
     }
   }
-
-
-  def apply(msg: String): AppException = new AppException(err = new RuntimeException(msg))
-
-  def apply(ex: Throwable): AppException = new AppException(err = ex)
 
   def apply(msg: String, err: Throwable) = new AppException(msg, err)
 }
@@ -188,17 +172,6 @@ class AppJsonParsingError(val msg: String, val raw: String, val parser: ParsingF
   val cause: Option[AppError] = new AppException(parser.message, parser).some
 }
 
-
-
-/**
-  * Special OError for JSON request / response errors which are generally wrapped.
-  * Could just make a Throwable to suit but...
-  */
-class AppErrorRestCall(val msg: String,
-                       val rawRq: Option[Json],
-                       val rawRs: Option[Json],
-                       val cause: Option[AppError] = None)
-    extends AppError
 
 /**
   *   Represents a error in Circe Json decoding (Json => Model)
@@ -258,21 +231,3 @@ object AppJsonError {
     new AppJsonError(msg, json, cause)
   }
 }
-
-object AppErrorRestCall {
-
-  implicit val show: Show[AppErrorRestCall] = Show.show { failure =>
-    s"""
-       | Error:   ${failure.msg}
-       | JSON RQ: ${failure.rawRq.getOrElse(Json.Null).spaces2}
-       | JSON RS: ${failure.rawRs.getOrElse(Json.Null).spaces2}
-       | CAUSE:   ${failure.cause
-         .map(v => v.show)
-         .getOrElse("<Nothing>")}""".stripMargin
-  }
-}
-
-// Why not just make the apply methods?
-trait OErrorOps {}
-
-object OErrorOps extends OErrorOps

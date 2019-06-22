@@ -1,6 +1,9 @@
 
 # ripple-local-signing
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+
 Scala 12.x implementation of secp256k1 and ed25519 transaction signing for Ripple WebSocket API transactions.
 Also does verification of transaction signatures.
 

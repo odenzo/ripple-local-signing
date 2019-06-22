@@ -1,12 +1,15 @@
 package com.odenzo.ripple.localops.crypto
 
+import java.security.KeyPair
+
 import org.scalatest.FunSuite
 
 import com.odenzo.ripple.localops._
 import com.odenzo.ripple.localops.crypto.core.Secp256K1CryptoBC
+import com.odenzo.ripple.localops.utils.caterrors.AppError
 import com.odenzo.ripple.localops.utils.{ByteUtils, HexData}
 
-class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils {
+class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils with RippleFormatConverters {
 
   test("Genesis") { //masterpassphrase
     val json =
@@ -36,27 +39,7 @@ class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils {
         |  }
         |}
     """.stripMargin
-  
 
-  }
-
-  test("Generator to Account KeyPair") {
-    val passphrase                               = "masterpassphrase"
-    val seed: Seq[Byte]                          = AccountFamily.passphase2seed(passphrase)
-    val generator: AccountFamily.FamilyGenerator = AccountFamily.seed2FamilyGeneratorSecp(seed)
-
-    val expectedPrivate = "1ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7"
-    val expectedPublic  = "0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020"
-
-    logger.info("Checking Calculated Account Public Key to ")
-    val keypair: AccountFamily.AccountKeyPair = AccountFamily.familygenerator2accountKeyPair(generator)
-    val pubHex                                = bytes2hex(keypair.publicKey)
-    val privHex                               = bytes2hex(keypair.privateKey)
-
-    logger.debug(s"Account Pub/Priv Keys: \n $pubHex \n $privHex")
-
-    pubHex.toUpperCase shouldEqual expectedPublic
-    privHex.toUpperCase shouldEqual expectedPrivate
   }
 
   test("Making a KeyPair") {
@@ -73,43 +56,38 @@ class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils {
   test("Account Public Key to Address") {
     val pub                  = "0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020"
     val acct                 = "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh"
-    val sepBytes: List[Byte] = getOrLog(hex2Bytes(pub))
-    val csepAddr             = AccountFamily.accountpubkey2address(sepBytes)
+    val sepBytes: List[Byte] = getOrLog(hex2bytes(pub))
+    val csepAddr             = accountpubkey2address(sepBytes)
 
     csepAddr shouldEqual acct
 
     val edPubKey: String   = "ED9434799226374926EDA3B54B1B461B4ABF7237962EAE18528FEA67595397FA32"
     val edAddr: String     = "rDTXLQ7ZKZVKz33zJbHjgVShjsBnqMBhmN"
-    val eBytes: List[Byte] = getOrLog(hex2Bytes(edPubKey))
+    val eBytes: List[Byte] = getOrLog(hex2bytes(edPubKey))
 
-    val cedAddr = AccountFamily.accountpubkey2address(eBytes)
+    val cedAddr = accountpubkey2address(eBytes)
 
     cedAddr shouldEqual edAddr
   }
 
   test("Wallet Shuffle") {
-    val account_id = "r49pwNZibgeK83BeEuHYFKBpJE5Tt4USsQ"
-    val key_type   = "secp256k1"
-    val master_key = "TILE TAKE WELD CASK NEWT TIRE WIND SOFA SHED HELL TOOK FAR"
-    val master_seed = "ssDtFWc75geBLkzYcSYJ3nFbpRkaX"
+    val account_id      = "r49pwNZibgeK83BeEuHYFKBpJE5Tt4USsQ"
+    val key_type        = "secp256k1"
+    val master_key      = "TILE TAKE WELD CASK NEWT TIRE WIND SOFA SHED HELL TOOK FAR"
+    val master_seed     = "ssDtFWc75geBLkzYcSYJ3nFbpRkaX"
     val master_seed_hex = "25DC4E4B6933FCFBD93F1CB2E6E3BCEB"
-    val public_key = "aBPHrChJfFe7MtwyPtpf82CsseoW2X22M8dS4eAjWdrWGBX48gk5"
-    val public_key_hex = "02ADBA6E42BCC1CEF0DA5CF2AC82A374C72ED7A78527976225D8AF49B82137934B"
+    val public_key      = "aBPHrChJfFe7MtwyPtpf82CsseoW2X22M8dS4eAjWdrWGBX48gk5"
+    val public_key_hex  = "02ADBA6E42BCC1CEF0DA5CF2AC82A374C72ED7A78527976225D8AF49B82137934B"
 
-
-    AccountFamily.convertMasterSeedB582MasterSeedHex(master_seed).right.value shouldEqual master_seed_hex
-    val kp = getOrLog(AccountFamily.convertMasterSeedB58ToKeyPair(master_seed))
-
-    logger.info(s"Seed KeyPair: ${kp.getPublic}")
-    
-
+    convertBase58Check2hex(master_seed).right.value shouldEqual master_seed_hex
 
     val accountKeys = getOrLog(AccountFamily.rebuildAccountKeyPairFromSeedHex(master_seed_hex))
     logger.info(s"Account KeyPair: ${accountKeys.getPublic}")
     val pubKeyBytesSmall: Array[Byte] = Secp256K1CryptoBC.compressPublicKey(accountKeys.getPublic)
-    val compressedHex = bytes2hex(pubKeyBytesSmall)
-    val compPubKey = Secp256K1CryptoBC.compressPublicKey(accountKeys.getPublic)
-    val compPubKeyHex: String = bytes2hex(compPubKey)
-     compressedHex shouldEqual public_key_hex.drop(2) // Minus the 02 prefix in this case?
+    val compressedHex                 = bytes2hex(pubKeyBytesSmall)
+    val compPubKey                    = Secp256K1CryptoBC.compressPublicKey(accountKeys.getPublic)
+    val compPubKeyHex: String         = bytes2hex(compPubKey)
+    compressedHex shouldEqual public_key_hex // Minus the 02 prefix in this case?
+    compPubKeyHex shouldEqual public_key_hex
   }
 }

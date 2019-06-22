@@ -4,7 +4,7 @@ import java.io.File
 
 import cats._
 import cats.implicits._
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 import io.circe.Decoder.Result
 import io.circe._
 import io.circe.jawn.JawnParser
@@ -22,7 +22,7 @@ import com.odenzo.ripple.localops.utils.caterrors.{
 /**
   *  Traits for working with Circe DOM [[io.circe.Json]]
   */
-trait CirceUtils extends StrictLogging {
+trait CirceUtils extends Logging {
 
   /** Ripled doesn't like objects like { x=null } */
   val droppingNullsPrinter: Printer = Printer.spaces2.copy(dropNullValues = true)
@@ -39,17 +39,33 @@ trait CirceUtils extends StrictLogging {
     * Now recurses */
   def pruneNullFields(obj: JsonObject): JsonObject = {
     obj
-      .filter {
-        case (field, value) ⇒ !value.isNull
-      }
+      .filter { case (_, value) ⇒ !value.isNull }
       .mapValues { js: Json ⇒
         js.asObject match {
-          case Some(obj) ⇒ pruneNullFields(obj).asJson
-          case None      ⇒ js
+          case Some(v) ⇒ pruneNullFields(v).asJson
+          case None    ⇒ js
         }
       }
       .asJsonObject
 
+  }
+
+
+  /** Does top level sorting of fields in this object alphanumeric with capital before lowercase  */
+  def sortFields(jsonObject: JsonObject): JsonObject = {
+    val sortedList = jsonObject.toList.sortBy(_._1) // Want Capital letters sorted before lower case
+    JsonObject.fromIterable(sortedList)
+  }
+
+  /** Sorts top level object and all nested fields */
+  def sortDeepFields(jsonObject: JsonObject): JsonObject = {
+    val deep =  jsonObject.mapValues { iv: Json ⇒
+          iv.asObject match {
+            case None ⇒ iv
+            case Some(obj) ⇒ sortDeepFields(obj).asJson
+          }
+      }
+    sortFields(deep)
   }
 
   /** Caution: Uses BigDecimal and BigInt in parsing.
@@ -64,6 +80,13 @@ trait CirceUtils extends StrictLogging {
     }
   }
 
+  def parseAsJson(f: File): ErrorOr[Json] = {
+    logger.info(s"Parsing File $f")
+    new JawnParser().parseFile(f).leftMap { pf ⇒
+      new AppException(s"Error Parsing File $f to Json", pf)
+    }
+  }
+
   def parseAsJsonObject(m: String): ErrorOr[JsonObject] = {
     parseAsJson(m).flatMap(json2jsonObject)
   }
@@ -72,33 +95,10 @@ trait CirceUtils extends StrictLogging {
     Either.fromOption(json.asObject, AppError("JSON was not a JSonObject"))
   }
 
-  def parseAsJson(f: File): ErrorOr[Json] = {
-    logger.info(s"Parsing FIle $f")
-    new JawnParser().parseFile(f).leftMap { pf ⇒
-      new AppException(s"Error Parsing File $f to Json", pf)
-    }
-  }
-
   /** Monoid/Semigroup for Circe Json Object so we can add them togeher. */
   implicit val jsonObjectMonoid: Monoid[JsonObject] = new Monoid[JsonObject] {
     def empty: JsonObject                                 = JsonObject.empty
     def combine(x: JsonObject, y: JsonObject): JsonObject = JsonObject.fromIterable(x.toVector |+| y.toVector)
-  }
-
-  /**
-    *  {{{
-    *    CirceUtils.decode(json.as[List[Foo]], json, "Decoding all Foo in the Bar")
-    *  }}}
-    * @param v
-    * @param json
-    * @param note
-    * @tparam T
-    * @return
-    */
-  def decode[T](v: Result[T], json: Json, note: String = "No Clues"): ErrorOr[T] = {
-    v.leftMap { err: DecodingFailure ⇒
-      new AppJsonDecodingError(json, err, note)
-    }
   }
 
   def decode[T](json: Json, decoder: Decoder[T]): ErrorOr[T] = {

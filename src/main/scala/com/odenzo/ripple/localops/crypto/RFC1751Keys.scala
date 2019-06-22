@@ -1,15 +1,21 @@
-package com.odenzo.jjutils;
+package com.odenzo.ripple.localops.crypto;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import scala.collection.mutable.ArrayBuffer
+
+import cats._
+import cats.data._
+import cats.implicits._
+import scribe.Logging
+
+import com.odenzo.ripple.localops.utils.ByteUtils
+import com.odenzo.ripple.localops.utils.caterrors.AppError
 
 /**
- * Convert to Scala when bored.
- */
-public class RFC1751Java {
-
-    private static final String[] WORDLIST = new String[]{"A", "ABE", "ACE", "ACT", "AD", "ADA", "ADD",
+  * Converting to Scala
+  */
+object RFC1751Keys {
+  // format: off
+    private val WORDLIST =  Array ("A", "ABE", "ACE", "ACT", "AD", "ADA", "ADD",
             "AGO", "AID", "AIM", "AIR", "ALL", "ALP", "AM", "AMY", "AN", "ANA",
             "AND", "ANN", "ANT", "ANY", "APE", "APS", "APT", "ARC", "ARE", "ARK",
             "ARM", "ART", "AS", "ASH", "ASK", "AT", "ATE", "AUG", "AUK", "AVE",
@@ -251,203 +257,160 @@ public class RFC1751Java {
             "WISE", "WISH", "WITH", "WOLF", "WONT", "WOOD", "WOOL", "WORD",
             "WORE", "WORK", "WORM", "WORN", "WOVE", "WRIT", "WYNN", "YALE",
             "YANG", "YANK", "YARD", "YARN", "YAWL", "YAWN", "YEAH", "YEAR",
-            "YELL", "YOGA", "YOKE"};
+            "YELL", "YOGA", "YOKE")
 
-    static Long extract(byte[] s, int start, int length) {
-        int cl;
-        int cc;
-        int cr;
-        long x;
+  // format: on
 
-        assert (length <= 11);
-        assert (start >= 0);
-        assert (length >= 0);
-        assert (start + length <= 66);
+  def extract(s: Array[Byte], start: Int, length: Int): Long = {
 
-        cl = s[start / 8] & 0xFF;                      // get components
-        cc = s[start / 8 + 1] & 0xFF;
-        cr = s[start / 8 + 2] & 0xFF;
+    // s(start/8) is a byte, why anding?
+    val cl: Int = s(start / 8) & 0xFF // get components
+    val cc: Int = s(start / 8 + 1) & 0xFF
+    val cr: Int = s(start / 8 + 2) & 0xFF
 
-        x = ((long) (cl << 8 | cc) << 8 | cr); // Put bits together
-        x = x >> (24 - (length + (start % 8))); // Right justify number
-        x = (x & (0xffff >> (16 - length))); // Trim extra bits.
+    val x = (cl << 8 | cc).toLong << 8 | cr // Put bytes together
 
-        return x;
+    val y: Long = x >> (24 - (length + (start % 8))) // Right justify number
+    val z: Long = y & (0xffff >> (16 - length)) // Trim extra bits.
+
+    z
+  }
+
+  /** Bytes to English String */
+  def btoe(strData: Array[Byte]): String = {
+    val caBuffer: Array[Byte] = strData.take(8) // add in room for the parity 2 bits
+
+    val parity: Long     = computeParity(caBuffer) // compute parity: merely add groups of two bits.
+    val parityByte: Long = parity << 6
+    val withParity       = caBuffer ++ caBuffer
+
+    val human = Seq(0, 11, 22, 33, 44, 55).map(start ⇒ WORDLIST(extract(caBuffer, start, 11).toInt))
+    human.mkString(" ")
+  }
+
+  /**
+    *
+    * @param bytes Not sure the prerequisites on length
+    * @return
+    */
+  def computeParity(bytes: Array[Byte]): Long = {
+    Range(0, 64, 2).map(i ⇒ extract(bytes, i, 2)).sum
+  }
+
+  /** Six Words to Binary in some tortured Scala mutable code */
+  def etob(vsHuman: List[String]): Either[AppError, Array[Byte]] = {
+
+    assert(vsHuman.length == 6)
+
+    /* These bytes will be mutated in the array itself */
+    val bytes: ArrayBuffer[Byte] = Seq.fill[Byte](11)(0.toByte).to[ArrayBuffer]
+
+    val binary: Either[AppError, ArrayBuffer[Byte]] = vsHuman.zipWithIndex
+      .traverse {
+        case (strWord, indx) ⇒
+          val l = strWord.length
+          if (l > 4 || l < 1) {
+            AppError(s"Word $strWord not 1...4 characters").asLeft
+          } else {
+            val stdWord = standard(strWord)
+            val v       = indexOf(WORDLIST, stdWord, 0)
+            if (v < 0) Left(AppError(s"Word $stdWord not in dictionay"))
+
+            // Our nasty side effect will update the mutable bytes
+            insert(bytes, v, indx * 11, 11)
+            bytes.asRight
+          }
+      }
+      .map(_ ⇒ bytes)
+
+    binary.flatMap { b ⇒
+      val ab     = b.toArray
+      val parity = computeParity(ab)
+      if ((parity & 3) != extract(ab, 64, 2)) {
+        Left(AppError(s"Parity Check Failed"))
+      } else {
+        ab.take(8).asRight
+      }
+
     }
+  }
 
-    static String btoe(byte[] strData) {
-        byte[] caBuffer = new byte[10];     /* add in room for the parity 2 bits*/
-        int p, i;
-        System.arraycopy(strData, 0, caBuffer, 0, 8);
-        // compute parity: merely add groups of two bits.
-        for (p = 0, i = 0; i < 64; i += 2)
-            p += extract(caBuffer, i, 2);
+  /**
+    *
+    * @param s
+    * @param x
+    * @param start  Start and length to not overlap it seems
+    * @param length
+    * @return Mutated s, incoming bytes are also mutated
+    */
+  protected def insert(s: ArrayBuffer[Byte], x: Int, start: Int, length: Int): ArrayBuffer[Byte] = {
 
-        caBuffer[8] = (byte) (p << 6);
+    val shift: Int = (8 - ((start + length) % 8)) % 8
+    val y: Long    =(x << shift).toLong
+    val cl         = (y >> 16) & 0xff
+    val cc         = (y >> 8) & 0xff
+    val cr         = y & 0xff
 
-        String human = ""
-                + WORDLIST[extract(caBuffer, 0, 11).intValue()] + " "
-                + WORDLIST[extract(caBuffer, 11, 11).intValue()] + " "
-                + WORDLIST[extract(caBuffer, 22, 11).intValue()] + " "
-                + WORDLIST[extract(caBuffer, 33, 11).intValue()] + " "
-                + WORDLIST[extract(caBuffer, 44, 11).intValue()] + " "
-                + WORDLIST[extract(caBuffer, 55, 11).intValue()];
-        return human;
+    val baseIndx: Int = start / 8
+
+    if (shift + length > 16) {
+      s(baseIndx) = (s(baseIndx) | cl).toByte
+      s(baseIndx + 1) = (s(baseIndx + 1) | cc).toByte
+      s(baseIndx + 2) = (s(baseIndx + 2) | cr).toByte
+    } else if (shift + length > 8) {
+      s(baseIndx) = (s(baseIndx) | cc).toByte
+      s(baseIndx + 1) = (s(baseIndx + 1) | cr).toByte
+    } else {
+      s(baseIndx) = (s(baseIndx) | cr).toByte
     }
+    s
+  }
 
-    static String etob(Collection<String> vsHuman) {
-        int i, p, v, l;
-        byte[] bytes = new byte[11];
-
-        if (6 != vsHuman.size())
-            return null;
-
-        for (int j = 0; j < bytes.length; j++) {
-            bytes[j] = 0;
-        }
-
-        p = 0;
-        for (String strWord : vsHuman) {
-            l = strWord.length();
-
-            if (l > 4 || l < 1)
-                return null;
-
-            strWord = standard(strWord);
-
-            v = indexOf(WORDLIST, strWord, 0);
-
-            if (v < 0)
-                return null;
-
-            bytes = insert(bytes, v, p, 11);
-            p += 11;
-        }
-
-        /* now check the parity of what we got */
-        for (p = 0, i = 0; i < 64; i += 2)
-            p += extract(bytes, i, 2);
-
-        if ((p & 3) != extract(bytes, 64, 2))
-            return null;
-
-
-        String strData = bytesToHex(Arrays.copyOf(bytes, 8));
-
-        return strData;
+  /** Just cleans up a word before processing */
+  def standard(strWord: String): String = {
+    strWord.toUpperCase.map { letter: Char ⇒
+      letter match {
+        case '1'   ⇒ 'L'
+        case '0'   ⇒ 'O'
+        case '5'   ⇒ 'S'
+        case other ⇒ other
+      }
     }
+  }
 
+  def key2English(seedHexAsBytes: Array[Byte]): String = {
+    val bytes = seedHexAsBytes.reverse
+    val upper = btoe(org.bouncycastle.util.Arrays.copyOf(bytes, 8))
+    val lower = btoe(org.bouncycastle.util.Arrays.copyOfRange(bytes, 8, 16))
+    upper + lower
+  }
 
-    static byte[] insert(byte[] s, int x, int start, int length) {
-        int cl;
-        int cc;
-        int cr;
-        long y;
-        int shift;
+  def getKeyFromTwelveWords(strHuman: String): Either[AppError, String] = {
 
-        assert (length <= 11);
-        assert (start >= 0);
-        assert (length >= 0);
-        assert (start + length <= 66);
+    val words: List[String] = strHuman.trim().split(" ").toList
 
-        shift = ((8 - ((start + length) % 8)) % 8);
-        y = x << shift;
-        cl = (int) (y >> 16) & 0xff;
-        cc = (int) (y >> 8) & 0xff;
-        cr = (int) y & 0xff;
+    if (words.length != 12) AppError(s"${words.length} != 12 ").asLeft
+    else {
+      val strFirst: Either[AppError, Array[Byte]]  = etob(words.slice(0, 6))
+      val strSecond: Either[AppError, Array[Byte]] = etob(words.slice(6, 12))
+      val strKey: Either[AppError, Array[Byte]]    = (strFirst, strSecond).mapN(_ ++ _)
+      val seedHex = strKey
+        .map(_.reverse)
+        .map(v ⇒ ByteUtils.bytes2hex(v))
 
-        if (shift + length > 16) {
-            s[start / 8] |= cl;
-            s[start / 8 + 1] |= cc;
-            s[start / 8 + 2] |= cr;
-        } else if (shift + length > 8) {
-            s[start / 8] |= cc;
-            s[start / 8 + 1] |= cr;
-        } else {
-            s[start / 8] |= cr;
-        }
-        return s;
+      seedHex
     }
+  }
 
-    static String standard(String strWord) {
-        char[] letters = strWord.toCharArray();
-        for (int i = 0; i < letters.length; i++) {
-            char letter = letters[i];
-            if (Character.isLowerCase(letter))
-                letter = Character.toUpperCase(letter);
-            else if (letter == '1')
-                letter = 'L';
-            else if (letter == '0')
-                letter = 'O';
-            else if (letter == '5')
-                letter = 'S';
-            letters[i] = letter;
-        }
-        return new String(letters);
-    }
-
-    public static String key2English(byte[] seedHex) {
-        byte[] bytes = seedHex;
-        reverse(bytes);
-        String upper = btoe(org.bouncycastle.util.Arrays.copyOf(bytes, 8));
-        String lower = btoe(org.bouncycastle.util.Arrays.copyOfRange(bytes, 8, 16));
-        return upper + lower;
-    }
-
-    public static String getKeyFromEnglish(String strHuman) {
-        String strFirst = null, strSecond = null;
-        String strTrimmed = strHuman.trim();
-        String[] words = strTrimmed.split(" ");
-        String rc = 12 == words.length ? "" : null;
-
-        List<String> wordList = Arrays.asList(words);
-
-        if (rc != null)
-            strFirst = etob(wordList.subList(0, 6));
-
-        if (strFirst != null)
-            strSecond = etob(wordList.subList(6, 12));
-
-        if (strSecond != null) {
-            String strKey = strFirst + strSecond;
-            byte[] seedHex = hexToBytes(strKey);
-            reverse(seedHex);
-            return bytesToHex(seedHex);
-        }
-        return null;
-    }
-
-    // Added  Utilities
-    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
-
-    static String bytesToHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
-
-    static byte[] hexToBytes(String hex) {
-        return org.bouncycastle.util.encoders.Hex.decode(hex);
-    }
-
-    static void reverse(byte[] array) {
-        for (int i = 0; i < array.length / 2; i++) {
-            byte temp = array[i];
-            array[i] = array[array.length - i - 1];
-            array[array.length - i - 1] = temp;
-        }
-    }
-
-    // Maybe startIndex , negative for not found it appears
-    static int indexOf(String[] wordlist, String word, int startIndex) {
-        // Nice to binary search but...
-        for (int i = 0; i < wordlist.length; i++) {
-            if (wordlist[i].equals(word)) return i;
-        }
-        return -1;
-    }
+  /**
+    *
+    *
+    * @param wordlist   This is always WORDLIST above for non-testing
+    * @param word       The word to find.
+    * @param startIndex This is always zero in our scenario
+    * @return
+    */
+  def indexOf(wordlist: Seq[String], word: String, startIndex: Int): Int = {
+    wordlist.indexOf(word)
+  }
 }

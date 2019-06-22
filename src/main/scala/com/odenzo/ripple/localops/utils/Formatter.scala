@@ -1,8 +1,8 @@
 package com.odenzo.ripple.localops.utils
 
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 
-object Formatter extends StrictLogging {
+object Formatter extends Logging {
 
   /**
     * Pretty prints a Scala value similar to its source represention.
