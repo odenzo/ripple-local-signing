@@ -1,6 +1,6 @@
 
 # ripple-local-signing
-
+[![Build Status](https://travis-ci.com/odenzo/ripple-local-signing.svg?branch=master)](https://travis-ci.com/odenzo/ripple-local-signing)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/64c5333412184e23a22590db35f72181)](https://www.codacy.com/app/odenzo/ripple-local-signing?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=odenzo/ripple-local-signing&amp;utm_campaign=Badge_Grade)
 [![codecov](https://codecov.io/gh/odenzo/ripple-local-signing/branch/master/graph/badge.svg)](https://codecov.io/gh/odenzo/ripple-local-signing)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
