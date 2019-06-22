@@ -70,11 +70,14 @@ trait AccountFamily extends Logging with ByteUtils with HashOps {
     logger.debug(s"Full Hash/Seed: len ${fullHash.length} => ${bytes2hex(fullHash.toArray)}")
 
     val fgPrivateKey: Seq[Byte]  = fullHash.take(32)
-    val fgPublicKey: Array[Byte] = Secp256K1CryptoBC.privatekey2publickeySecp256k1(fgPrivateKey)
+    val fgPublicKey: Array[Byte] = Secp256K1CryptoBC.privatekey2publickeySecp256k1(fgPrivateKey,true)
     FamilyGenerator(fgPublicKey, fgPrivateKey.toArray)
   }
 
-  
+
+  /**
+    * @return The D value of the account private key
+    */
   protected def familygenerator2accountKeyPair(generator: FamilyGenerator): BigInteger = {
 
     val index_number: UInt                      = UInt(0L) 

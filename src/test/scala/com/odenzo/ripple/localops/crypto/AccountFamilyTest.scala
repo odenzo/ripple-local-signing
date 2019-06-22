@@ -39,7 +39,6 @@ class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils with Ripp
         |  }
         |}
     """.stripMargin
-  
 
   }
 
@@ -72,25 +71,23 @@ class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils with Ripp
   }
 
   test("Wallet Shuffle") {
-    val account_id = "r49pwNZibgeK83BeEuHYFKBpJE5Tt4USsQ"
-    val key_type   = "secp256k1"
-    val master_key = "TILE TAKE WELD CASK NEWT TIRE WIND SOFA SHED HELL TOOK FAR"
-    val master_seed = "ssDtFWc75geBLkzYcSYJ3nFbpRkaX"
+    val account_id      = "r49pwNZibgeK83BeEuHYFKBpJE5Tt4USsQ"
+    val key_type        = "secp256k1"
+    val master_key      = "TILE TAKE WELD CASK NEWT TIRE WIND SOFA SHED HELL TOOK FAR"
+    val master_seed     = "ssDtFWc75geBLkzYcSYJ3nFbpRkaX"
     val master_seed_hex = "25DC4E4B6933FCFBD93F1CB2E6E3BCEB"
-    val public_key = "aBPHrChJfFe7MtwyPtpf82CsseoW2X22M8dS4eAjWdrWGBX48gk5"
-    val public_key_hex = "02ADBA6E42BCC1CEF0DA5CF2AC82A374C72ED7A78527976225D8AF49B82137934B"
-
+    val public_key      = "aBPHrChJfFe7MtwyPtpf82CsseoW2X22M8dS4eAjWdrWGBX48gk5"
+    val public_key_hex  = "02ADBA6E42BCC1CEF0DA5CF2AC82A374C72ED7A78527976225D8AF49B82137934B"
 
     convertBase58Check2hex(master_seed).right.value shouldEqual master_seed_hex
-        
-
 
     val accountKeys = getOrLog(AccountFamily.rebuildAccountKeyPairFromSeedHex(master_seed_hex))
     logger.info(s"Account KeyPair: ${accountKeys.getPublic}")
     val pubKeyBytesSmall: Array[Byte] = Secp256K1CryptoBC.compressPublicKey(accountKeys.getPublic)
-    val compressedHex = bytes2hex(pubKeyBytesSmall)
-    val compPubKey = Secp256K1CryptoBC.compressPublicKey(accountKeys.getPublic)
-    val compPubKeyHex: String = bytes2hex(compPubKey)
-     compressedHex shouldEqual public_key_hex.drop(2) // Minus the 02 prefix in this case?
+    val compressedHex                 = bytes2hex(pubKeyBytesSmall)
+    val compPubKey                    = Secp256K1CryptoBC.compressPublicKey(accountKeys.getPublic)
+    val compPubKeyHex: String         = bytes2hex(compPubKey)
+    compressedHex shouldEqual public_key_hex // Minus the 02 prefix in this case?
+    compPubKeyHex shouldEqual public_key_hex
   }
 }

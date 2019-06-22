@@ -38,12 +38,17 @@ class SigningRqFixture$Test extends FunSuite with OTestSpec with ByteUtils with 
 
     findStringField("status", signRs) shouldEqual findStringField("status", rs)
 
-    val blob: String = getOrLog(findStringField("tx_blob", signResult))
+    val blob: String         = getOrLog(findStringField("tx_blob", signResult))
     val expectedBlob: String = getOrLog(findStringField("tx_blob", kResult))
     if (blob != expectedBlob) {
       val produced = TxBlobBuster.bust(blob).right.value
+      val pStr     = produced.map(v ⇒ v.show).mkString("\n")
       val expected = TxBlobBuster.bust(expectedBlob).right.value
+      val eStr     = expected.map(_.show).mkString("\n")
+      logger.info(s"Produced: \n $pStr")
+      logger.info(s"Expected: \n $eStr")
     }
+
     blob shouldEqual expectedBlob
     ()
   }

@@ -15,7 +15,7 @@ import org.bouncycastle.crypto.digests.SHA256Digest
 import org.bouncycastle.crypto.params.{ECDomainParameters, ECPrivateKeyParameters, ECPublicKeyParameters}
 import org.bouncycastle.crypto.signers.{ECDSASigner, HMacDSAKCalculator}
 import org.bouncycastle.jcajce.provider.asymmetric.ec.{BCECPrivateKey, BCECPublicKey}
-import org.bouncycastle.jce.ECNamedCurveTable
+import org.bouncycastle.jce.{ECNamedCurveTable, spec}
 import org.bouncycastle.jce.interfaces.ECPublicKey
 import org.bouncycastle.jce.spec.{ECNamedCurveParameterSpec, ECPrivateKeySpec, ECPublicKeySpec}
 import org.bouncycastle.math.ec
@@ -55,20 +55,24 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
     *                applied to SHA512Half (I am pretty sure)
     **/
   def verify(message: Array[Byte], sig: DERSignature, pubKey: PublicKey): Either[AppError, Boolean] = {
-    AppException.wrapPure("SECP Verify") {
-      val bcecKey: BCECPublicKey = pubKey.asInstanceOf[BCECPublicKey]
+    AppException.wrap("SECP Verify") {
+      pubKey match {
+        case bcecKey: BCECPublicKey ⇒
+          val signer                        = new ECDSASigner
+          val pubPoint                      = bcecKey.getQ
+          val params: ECPublicKeyParameters = new ECPublicKeyParameters(pubPoint, domainParams)
+          signer.init(false, params)
+          signer.verifySignature(message, sig.r.asBigInteger, sig.s.asBigInteger).asRight
 
-      val signer                        = new ECDSASigner
-      val pubPoint                      = bcecKey.getQ
-      val params: ECPublicKeyParameters = new ECPublicKeyParameters(pubPoint, domainParams)
-      signer.init(false, params)
-      signer.verifySignature(message, sig.r.asBigInteger, sig.s.asBigInteger)
+        case other ⇒ AppError(s"Illegal Public Key Type: ${other.getClass}").asLeft
+      }
     }
   }
 
   /** Currently using this, slightly painful to extract D, from the ripple-lib Java */
   def sign(hash: Array[Byte], secret: KeyPair): Either[AppError, DERSignature] = {
     AppException.wrap("SECP SIGN") {
+     
       val kCalc: HMacDSAKCalculator = new HMacDSAKCalculator(new SHA256Digest)
       val signer                    = new ECDSASigner(kCalc)
 
@@ -86,6 +90,7 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
   }
 
   /**
+    * Used in some tests -- exclude from coverage
     * @return Generates a JCA KeyPair for secp256k1 in its own packaging
     */
   def generateNewKeyPair(): KeyPair = {
@@ -96,26 +101,27 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
   }
 
   /**
-    * @param privateKey
-    * @param compress
+    * This is used for the special FamilyGenerator way of doing things.
+    * @param privateKey 32 bytes that corresponds to D value (magnitude)
+    * @param compress How the public key is encoded
     *
     * @return Compressed bytes for the public key.
     */
   def privatekey2publickeySecp256k1(privateKey: Seq[Byte], compress: Boolean = true): Array[Byte] = {
 
-    Class.forName("org.bouncycastle.asn1.sec.SECNamedCurves")
-    val params: X9ECParameters     = SECNamedCurves.getByName(curveName)
     val domain: ECDomainParameters = new ECDomainParameters(params.getCurve, params.getG, params.getN, params.getH)
 
     // This is a positive number, so 1, and then a bigendian binary array of the number
     val bd: BigInteger         = BigInt(1, privateKey.toArray).bigInteger
     val q: ECPoint             = domain.getG.multiply(bd)
     val publicParams           = new ECPublicKeyParameters(q, domain)
-    val publicKey: Array[Byte] = publicParams.getQ.getEncoded(true)
+    val publicKey: Array[Byte] = publicParams.getQ.getEncoded(compress)
     publicKey
   }
 
   /**
+    *  This is used now because FamilyGenerator creates d value.
+
     * @param d The SECP356k ECDSA Key as BigInteger It is the random value of private key really.
     *
     * @return d converted to public and private keypair.  Make compressed public key.
@@ -125,17 +131,10 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
 
     val privateKeySpec: ECPrivateKeySpec = new ECPrivateKeySpec(d, ecSpec)
     val exPrivateKey: PrivateKey         = eckf.generatePrivate(privateKeySpec)
-    val p2: ECParameterSpec              = exPrivateKey.asInstanceOf[ECPrivateKey].getParams
 
-    val q                                   = domainParams.getG.multiply(d)
-    val publicParams: ECPublicKeyParameters = new ECPublicKeyParameters(q, domainParams)
-    val Q: ec.ECPoint                       = publicParams.getQ
-
-    val publicKeySpec: ECPublicKeySpec = new ECPublicKeySpec(Q, ecSpec)
+    val q: ECPoint                     = domainParams.getG.multiply(d)
+    val publicKeySpec: ECPublicKeySpec = new ECPublicKeySpec(q, ecSpec)
     val exPublicKey: PublicKey         = eckf.generatePublic(publicKeySpec)
-    val encoded: Array[Byte]           = exPrivateKey.getEncoded
-    val privateEndoded                 = ByteUtils.bytes2hex(encoded)
-  
 
     new KeyPair(exPublicKey, exPrivateKey)
   }
@@ -144,7 +143,9 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
     * Public Keys with X only are compressed with added 0x02 or 0x03 as first byte and 32 byte X
     * Uncompressed Public Keys have 0x04 and 32 byte X and 32 byte Y
     *
-    * @param compressKey
+    * Might as well take the hex as the use-case is loading SigningPubKey from json.
+    *
+    * @param compressKey  The public key, how these bytes are am not sure. uncompressed with 02 or 03?
     *
     * @return
     */
@@ -158,23 +159,6 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
   }
 
   /**
-    * Extract D value from private key.
-    *
-    * @param priv
-    *
-    * @return
-    */
-  def privateKey2D(priv: PrivateKey): Either[AppError, BigInteger] = {
-    logger.info("Private Key: " + priv.getClass)
-    val key: Either[OError, BCECPrivateKey] = priv match {
-      case k: BCECPrivateKey ⇒ k.asInstanceOf[BCECPrivateKey].asRight
-      case other             ⇒ AppError(s"PrivateKey ${other.getClass} wasnt BCECPrivateKey").asLeft
-    }
-
-    key.map(_.getD)
-  }
-
-  /**
     * Gives the raw bytes of the public key, which are normally preceeded by 02 in encoded form.
     * This is for sepck key only now.
     *
@@ -183,29 +167,44 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
     * @return
     */
   def compressPublicKey(pub: PublicKey): Array[Byte] = {
-//    val params = pub match {
-//      case p: ECPublicKey => p.getParameters
-//    }
-    pub.getEncoded.slice(24, 56)
+    pub match {
+      case p: ECPublicKey =>
+        p.getQ.getEncoded(true)
+    }
   }
 
-
-  def publicKey2hex(pub:PublicKey): String = {
+  def publicKey2hex(pub: PublicKey): String = {
     bytes2hex(compressPublicKey(pub))
   }
+
   /**
-    * Dangling Example of Encoding KeyPairs. Somewhere theres a way to specific public key is compressed or not.
+    * Extract D value from private key.
+    *
+    * @param priv
+    *
+    * @return
     */
-  def keyPairWrapping(pair: KeyPair): KeyPair = {
-    val keyFactory = KeyFactory.getInstance(keyType, provider)
+  def privateKey2D(priv: PrivateKey): Either[AppError, BigInteger] = {
+    priv match {
+      case k: BCECPrivateKey ⇒ k.getD.asRight
+      case other             ⇒ AppError(s"PrivateKey ${other.getClass} wasnt BCECPrivateKey").asLeft
+    }
 
-    val publicKeySpec = new X509EncodedKeySpec(pair.getPublic.getEncoded)
-    val publicKey     = keyFactory.generatePublic(publicKeySpec)
-
-    val privateKeySpec = new PKCS8EncodedKeySpec(pair.getPrivate.getEncoded)
-    val privateKey     = keyFactory.generatePrivate(privateKeySpec)
-
-    new KeyPair(publicKey, privateKey)
   }
+//
+//  /**
+//    * Dangling Example of Encoding KeyPairs. Somewhere theres a way to specific public key is compressed or not.
+//    */
+//  def keyPairWrapping(pair: KeyPair): KeyPair = {
+//    val keyFactory = KeyFactory.getInstance(keyType, provider)
+//
+//    val publicKeySpec = new X509EncodedKeySpec(pair.getPublic.getEncoded)
+//    val publicKey     = keyFactory.generatePublic(publicKeySpec)
+//
+//    val privateKeySpec = new PKCS8EncodedKeySpec(pair.getPrivate.getEncoded)
+//    val privateKey     = keyFactory.generatePrivate(privateKeySpec)
+//
+//    new KeyPair(publicKey, privateKey)
+//  }
 
 }
