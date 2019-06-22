@@ -5,7 +5,7 @@ import java.util.Locale
 import cats._
 import cats.data._
 import cats.implicits._
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 import spire.implicits._
 import spire.math.{UByte, UInt, ULong}
 
@@ -23,7 +23,7 @@ case class Hex(v: String)
 /** Helpers since I seldom use bits/bytes directly and Scala/Java sucks. Don't know a good lib
   * SDtarting to use Spire, and making sure these all work -- but more convenience than speed at this point
   * */
-trait ByteUtils extends StrictLogging {
+trait ByteUtils extends Logging {
 
   val bytezero: Byte = 0.toByte
   

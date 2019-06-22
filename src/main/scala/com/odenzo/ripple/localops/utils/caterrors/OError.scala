@@ -4,9 +4,9 @@ import scala.util.{Failure, Success, Try}
 
 import cats._
 import cats.implicits._
-import com.typesafe.scalalogging.{Logger, StrictLogging}
 import io.circe.Decoder.Result
 import io.circe.{DecodingFailure, Json, ParsingFailure}
+import scribe.{Logger, Logging}
 
 import com.odenzo.ripple.bincodec.utils.caterrors.RippleCodecError
 import com.odenzo.ripple.localops.utils.caterrors.CatsTransformers.ErrorOr
@@ -35,7 +35,7 @@ object ShowHack {
   * Base Error is never instanciated, but the apply is up here as convenience
   * and delegates down. These will go away soon.
   */
-object AppError extends StrictLogging {
+object AppError extends Logging {
 
   type MonadAppError[F[_]] = MonadError[F, AppError]
 
@@ -62,12 +62,12 @@ object AppError extends StrictLogging {
   *
     * @param ee
     * @param msg
-    * @param loggger
+    * @param mylog
     */
-  def log(ee: ErrorOr[_], msg: String = "Error: ", loggger: Logger = logger): Unit = {
+  def log(ee: ErrorOr[_], msg: String = "Error: ", mylog: Logger = logger): Unit = {
     dump(ee) match {
-      case None       ⇒ loggger.debug("No Errors Found")
-      case Some(emsg) ⇒ loggger.error(s"$msg\t=> $emsg ")
+      case None       ⇒ mylog.debug("No Errors Found")
+      case Some(emsg) ⇒ mylog.error(s"$msg\t=> $emsg ")
     }
   }
 

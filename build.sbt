@@ -42,8 +42,6 @@ val libs = {
   Seq(
     "org.scalatest"              %% "scalatest"      % "3.0.8" % Test,
     "org.scalacheck"             %% "scalacheck"     % "1.14.0" % Test,
-    "com.typesafe.scala-logging" %% "scala-logging"  % "3.9.2",
-    "ch.qos.logback"             % "logback-classic" % "1.2.3"
   )
 }
 
@@ -57,7 +55,6 @@ val lib_circe = {
     "io.circe" %% "circe-java8"          % circeVersion,
     "io.circe" %% "circe-parser"         % circeVersion,
     "io.circe" %% "circe-generic-extras" % circeVersion,
-    "io.circe" %% "circe-iteratee" % "0.12.0",
     )
 
 }

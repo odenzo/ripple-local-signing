@@ -4,7 +4,7 @@ import java.io.File
 
 import cats._
 import cats.implicits._
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 import io.circe.Decoder.Result
 import io.circe._
 import io.circe.jawn.JawnParser
@@ -22,7 +22,7 @@ import com.odenzo.ripple.localops.utils.caterrors.{
 /**
   *  Traits for working with Circe DOM [[io.circe.Json]]
   */
-trait CirceUtils extends StrictLogging {
+trait CirceUtils extends Logging {
 
   /** Ripled doesn't like objects like { x=null } */
   val droppingNullsPrinter: Printer = Printer.spaces2.copy(dropNullValues = true)

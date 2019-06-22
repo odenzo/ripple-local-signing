@@ -3,7 +3,7 @@ package com.odenzo.ripple.localops
 import cats._
 import cats.data._
 import cats.implicits._
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 import io.circe.JsonObject
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 
@@ -13,7 +13,7 @@ import com.odenzo.ripple.localops.crypto.{AccountFamily, RippleFormatConverters}
 import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils, RBase58}
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 
-object RippleLocalAPI extends StrictLogging {
+object RippleLocalAPI extends Logging {
 
   /** Pack a key into internal format. Parameters per WalletProposeRs */
   def packSigningKey(master_seed_hex: String, key_type: String): Either[AppError, SigningKey] = {

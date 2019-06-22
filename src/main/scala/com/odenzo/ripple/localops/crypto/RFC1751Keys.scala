@@ -5,7 +5,7 @@ import scala.collection.mutable.ArrayBuffer
 import cats._
 import cats.data._
 import cats.implicits._
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 
 import com.odenzo.ripple.localops.utils.ByteUtils
 import com.odenzo.ripple.localops.utils.caterrors.AppError

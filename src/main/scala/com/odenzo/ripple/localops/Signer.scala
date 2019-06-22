@@ -3,7 +3,7 @@ package com.odenzo.ripple.localops
 import cats._
 import cats.data._
 import cats.implicits._
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 import io.circe.{Json, JsonObject}
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 
@@ -16,7 +16,7 @@ import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
 /** This takes a message and signs it. Returning the TxBlob
   *
   */
-object Signer extends StrictLogging with JsonUtils with ByteUtils {
+object Signer extends Logging with JsonUtils with ByteUtils {
 
   def preCalcKeys(seedhex: String, keyType: String): Either[AppError, SigningKey] = {
     keyType match {

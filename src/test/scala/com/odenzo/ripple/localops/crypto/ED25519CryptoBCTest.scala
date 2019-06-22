@@ -175,7 +175,7 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
     val signature       = signer.generateSignature
     val actualSignature = Base64.getUrlEncoder.encodeToString(signature).replace("=", "")
 
-    logger.info("Expected signature: {}", expectedSig)
-    logger.info("Actual signature  : {}", actualSignature)
+    logger.info(s"Expected signature: $expectedSig")
+    logger.info(s"Actual signature  : $actualSignature")
   }
 }

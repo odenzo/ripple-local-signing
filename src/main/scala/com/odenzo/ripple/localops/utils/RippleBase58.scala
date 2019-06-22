@@ -3,14 +3,14 @@ package com.odenzo.ripple.localops.utils
 import java.math.BigInteger
 import scala.annotation.tailrec
 
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 
 import com.odenzo.ripple.localops.utils.caterrors.CatsTransformers.ErrorOr
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException, OError}
 
 // Based on
 // https://github.com/ACINQ/bitcoin-lib/blob/master/src/main/scala/fr/acinq/bitcoin/Base58.scala
-object RBase58 extends StrictLogging {
+object RBase58 extends Logging {
 
   val alphabet = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz"
 

@@ -8,7 +8,7 @@ import scala.collection.immutable
 import cats._
 import cats.data._
 import cats.implicits._
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 import spire.math.UInt
 
 
@@ -23,7 +23,7 @@ import com.odenzo.ripple.localops.utils.{ByteUtils, RBase58}
   *
   * This is only applicable to secp256k1 key types.
   */
-trait AccountFamily extends StrictLogging with ByteUtils with HashOps {
+trait AccountFamily extends Logging with ByteUtils with HashOps {
 
   /** The order of secp256k1 is the max value */
   protected val maxSecp: BigInteger = Secp256K1CryptoBC.secp256k1Order

@@ -3,7 +3,7 @@ package com.odenzo.ripple.localops
 import cats._
 import cats.data._
 import cats.implicits._
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 import io.circe._
 
 import com.odenzo.ripple.localops.crypto.DERSignature
@@ -15,7 +15,7 @@ import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
 /**
   * Tries to verify a signed ripple transaction, with either Secp256k or ed25519 signatures.
   **/
-object Verify extends StrictLogging with JsonUtils with ByteUtils {
+object Verify extends Logging with JsonUtils with ByteUtils {
 
   def verifySigningResponse(txjson: JsonObject): Either[AppError, Boolean] = {
 

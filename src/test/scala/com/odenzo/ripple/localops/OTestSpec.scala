@@ -4,17 +4,17 @@ import java.net.URL
 import java.security.{Provider, Security}
 import scala.io.{BufferedSource, Source}
 
-import com.typesafe.scalalogging.{Logger, StrictLogging}
 import io.circe.{Decoder, Json, JsonObject}
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.scalatest.{EitherValues, Matchers}
+import scribe.{Logger, Logging}
 
 import com.odenzo.ripple.localops.utils.CirceUtils
 import com.odenzo.ripple.localops.utils.caterrors.AppError.dump
 import com.odenzo.ripple.localops.utils.caterrors.CatsTransformers.ErrorOr
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
 
-trait OTestSpec extends StrictLogging with Matchers with EitherValues {
+trait OTestSpec extends Logging with Matchers with EitherValues {
 
   Security.addProvider(new BouncyCastleProvider)
   val provider: Provider = Security.getProvider("BC")
@@ -44,11 +44,11 @@ trait OTestSpec extends StrictLogging with Matchers with EitherValues {
     }
   }
 
-  def getOrLog[T](ee: Either[AppError,T], msg: String = "Error: ", loggger: Logger = logger): T = {
+  def getOrLog[T](ee: Either[AppError,T], msg: String = "Error: ", myLog: Logger = logger): T = {
     if (ee.isLeft) {
       dump(ee) match {
-        case None       ⇒ loggger.debug("No Errors Found")
-        case Some(emsg) ⇒ loggger.error(s"$msg\t=> $emsg ")
+        case None       ⇒ myLog.debug("No Errors Found")
+        case Some(emsg) ⇒ myLog.error(s"$msg\t=> $emsg ")
       }
       assert(false, s"Auto Test of $msg")
 

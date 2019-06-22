@@ -8,7 +8,7 @@ import com.odenzo.ripple.localops.utils.caterrors.AppError
 import cats._
 import cats.data._
 import cats.implicits._
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 import org.bouncycastle.asn1.{ASN1InputStream, ASN1Integer, DERSequenceGenerator, DLSequence}
 
 import com.odenzo.ripple.localops.crypto.core.Secp256K1CryptoBC
@@ -31,7 +31,7 @@ case class DERField(twoPad: String, len: String, value: String) {
   def toHex: String = twoPad + len + value
 }
 
-object DERField extends StrictLogging with ByteUtils {
+object DERField extends Logging with ByteUtils {
 
   def toByteList(field: DERField): Either[AppError, List[Byte]] = {
     val parts: List[String]               = List(field.twoPad, field.len, field.value)
@@ -42,7 +42,7 @@ object DERField extends StrictLogging with ByteUtils {
   // TODO: Add Validate
 }
 
-object DERSignature extends StrictLogging with ByteUtils {
+object DERSignature extends Logging with ByteUtils {
 
   //TODO:  Add Validate
   def toByteList(sig: DERSignature): Either[AppError, List[Byte]] = {

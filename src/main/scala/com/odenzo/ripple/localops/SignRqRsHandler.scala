@@ -3,7 +3,7 @@ package com.odenzo.ripple.localops
 import cats._
 import cats.data._
 import cats.implicits._
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 import io.circe.{Json, JsonObject}
 import io.circe.syntax._
 import java.io
@@ -15,7 +15,7 @@ import com.odenzo.ripple.localops.reference.HashPrefix
 import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, OError}
 
-object SignRqRsHandler extends StrictLogging with JsonUtils with RippleFormatConverters {
+object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverters {
 
   // Returned if no secret and no key_type/seed_val
 

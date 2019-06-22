@@ -6,7 +6,7 @@ import java.security.{KeyFactory, SecureRandom}
 import cats._
 import cats.data._
 import cats.implicits._
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 import org.bouncycastle.asn1.edec.EdECObjectIdentifiers
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
 import org.bouncycastle.asn1.x9.X9ECParameters
@@ -25,7 +25,7 @@ import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException, OErro
   *  There is no account family for ed25519
   * https://tools.ietf.org/html/draft-josefsson-eddsa-ed25519-03#section-5.2
   * */
-object ED25519CryptoBC extends StrictLogging with ByteUtils {
+object ED25519CryptoBC extends Logging with ByteUtils {
 
   import java.security.Security
 

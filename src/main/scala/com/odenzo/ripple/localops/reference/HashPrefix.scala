@@ -1,6 +1,6 @@
 package com.odenzo.ripple.localops.reference
 
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 import spire.math.{UByte, UInt}
 
 import com.odenzo.ripple.localops.utils.ByteUtils
@@ -17,7 +17,7 @@ case class HashPrefix(v: List[UByte]) {
 }
 
 /** These are all Four Bytes Long with bottom byte 00  */
-object HashPrefix extends StrictLogging {
+object HashPrefix extends Logging {
 
   // Unsigned Transaction is "53545800 + TxBlob sha512half
   // Unsigned Multisigned

@@ -6,6 +6,7 @@ import cats.implicits._
 import io.circe.JsonObject
 import io.circe.syntax._
 import org.scalatest.FunSuite
+import scribe.Level
 
 import com.odenzo.ripple.bincodec.RippleCodecAPI
 import com.odenzo.ripple.bincodec.decoding.TxBlobBuster
@@ -52,6 +53,9 @@ class SigningRqFixture$Test extends FunSuite with OTestSpec with ByteUtils with 
     logger.info(s"Testing ${data.length} cases")
     data.zipWithIndex.foreach {
       case ((rq, rs), indx) ⇒
+        // Setting Global Levels...I am using global logger everywhere
+        scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Debug)).replace()
+
         logger.info(s"\n\n\n\n===================== INDEX $indx =============")
         runOne(rq, rs)
     }
@@ -59,6 +63,8 @@ class SigningRqFixture$Test extends FunSuite with OTestSpec with ByteUtils with 
 
   test("Some of all_txn") {
     val data: List[(JsonObject, JsonObject)] = loadRequestResponses("/test/myTestData/txnscenarios/all_txns.json")
+    scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Debug)).replace()
+
     logger.info(s"Testing ${data.length} cases")
     data.zipWithIndex.drop(54).take(1).foreach {
       case ((rq, rs), indx) ⇒

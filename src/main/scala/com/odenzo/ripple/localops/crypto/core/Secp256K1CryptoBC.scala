@@ -8,7 +8,7 @@ import java.security.{KeyFactory, KeyPair, KeyPairGenerator, PrivateKey, PublicK
 import cats._
 import cats.data._
 import cats.implicits._
-import com.typesafe.scalalogging.StrictLogging
+import scribe.Logging
 import org.bouncycastle.asn1.sec.SECNamedCurves
 import org.bouncycastle.asn1.x9.X9ECParameters
 import org.bouncycastle.crypto.digests.SHA256Digest
@@ -29,7 +29,7 @@ import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException, OErro
   * This is focussed just on getting Secp256k1 txnscenarios and Verification Working.
   * TODO: Trim this down to used functions
   **/
-object Secp256K1CryptoBC extends StrictLogging with ByteUtils {
+object Secp256K1CryptoBC extends Logging with ByteUtils {
 
   private val curveName = "secp256k1"
   private val keyType   = "ECDSA"
