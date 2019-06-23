@@ -1,4 +1,8 @@
 
+// https://get-coursier.io/docs/sbt-coursier
+// Speed up fetching of dependencies
+addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.1.0-M14-4")
+
 // https://github.com/rtimush/sbt-updates
 // List libraries that are outdates via `dependancyUpdates`
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.4")

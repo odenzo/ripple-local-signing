@@ -7,7 +7,7 @@ import scala.io.{BufferedSource, Source}
 import io.circe.{Decoder, Json, JsonObject}
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.scalatest.{EitherValues, Matchers}
-import scribe.{Logger, Logging}
+import scribe.{Level, Logger, Logging}
 
 import com.odenzo.ripple.localops.utils.CirceUtils
 import com.odenzo.ripple.localops.utils.caterrors.AppError.dump
@@ -16,6 +16,13 @@ import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
 
 trait OTestSpec extends Logging with Matchers with EitherValues {
 
+
+  // Setting Global Levels...I am using global logger everywhere
+  // TODO: Check if Travis CI build and always put to warn if there
+  scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Warn)).replace()
+  logger.withMinimumLevel(Level.Warn)
+
+     scribe.Logger.root.withMinimumLevel(Level.Warn)
   Security.addProvider(new BouncyCastleProvider)
   val provider: Provider = Security.getProvider("BC")
 

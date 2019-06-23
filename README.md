@@ -9,7 +9,8 @@
 Scala 12.x implementation of secp256k1 and ed25519 transaction signing for Ripple WebSocket API transactions.
 Also does verification of transaction signatures.
 
-* Depends on seperate seperate Scala binary serialization library [https://github.com/odenzo/ripple-local-signing]
+* Depends on seperate seperate Scala binary serialization library [https://github
+.com/odenzo/ripple-binary-codec]
 
 * Depends on BouncyCastle "org.bouncycastle" % "bcprov-jdk15on" % "1.6.2" 
 

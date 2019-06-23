@@ -21,12 +21,16 @@ lazy val signing = (project in file("."))
     scalacOptions ++= opts ++ warnings ++ linters
   )
 
+resolvers += Resolver.bintrayRepo("odenzooss", "maven")
+resolvers += Resolver.jcenterRepo // Will be moving there soon
+libraryDependencies += "com.odenzo" %% "ripple-binary-codec" % "0.2.2"
+
 lazy val commonSettings = Seq(
-  libraryDependencies ++= mylibs ++ libs ++ lib_circe ++ lib_cats ++ lib_spire ++ lib_bouncycastle ++ lib_scribe,
+  libraryDependencies ++= libs ++ lib_circe ++ lib_cats ++ lib_spire ++ lib_bouncycastle ++ lib_scribe,
   resolvers ++= Seq(
-    Resolver.bintrayIvyRepo("odenzo", "rippled-signing"),
-    Resolver.defaultLocal, // Usual I pulishLocal to Ivy not maven
-    Resolver.jcenterRepo // This is JFrogs Maven Repository for reading
+    //Resolver.defaultLocal, // Usual I pulishLocal to Ivy not maven
+    Resolver.jcenterRepo, // This is JFrogs Maven Repository for reading
+    Resolver.bintrayRepo("odenzooss", "maven")
   )
 )
 val devSettings = Seq(
@@ -34,9 +38,6 @@ val devSettings = Seq(
   Test / parallelExecution := false,
 )
 
-val mylibs = {
-  Seq("com.odenzo" %% "ripple-binary-codec" % "0.2.1")
-}
 
 val libs = {
   Seq(
