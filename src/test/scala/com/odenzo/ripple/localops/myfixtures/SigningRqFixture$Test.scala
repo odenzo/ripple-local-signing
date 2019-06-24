@@ -6,7 +6,7 @@ import cats.implicits._
 import io.circe.JsonObject
 import io.circe.syntax._
 import org.scalatest.FunSuite
-import scribe.Level
+import scribe.{Level, Logging}
 
 import com.odenzo.ripple.bincodec.RippleCodecAPI
 import com.odenzo.ripple.bincodec.decoding.TxBlobBuster
@@ -17,7 +17,7 @@ import com.odenzo.ripple.bincodec.syntax.debugging._
 /**
   *  Goes through some server signed txn and results and does local signing udsing the SignRq / SignRs
   */
-class SigningRqFixture$Test extends FunSuite with OTestSpec with ByteUtils with FixtureUtils with JsonUtils {
+class SigningRqFixture$Test extends OTestSpec with ByteUtils with FixtureUtils with JsonUtils with Logging {
 
   def runOne(rq: JsonObject, rs: JsonObject): Unit = {
 

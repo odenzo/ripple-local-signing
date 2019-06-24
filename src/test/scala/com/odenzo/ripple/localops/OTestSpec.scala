@@ -6,7 +6,7 @@ import scala.io.{BufferedSource, Source}
 
 import io.circe.{Decoder, Json, JsonObject}
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.scalatest.{EitherValues, Matchers}
+import org.scalatest.{EitherValues, FunSpec, FunSpecLike, FunSuiteLike, Matchers}
 import scribe.{Level, Logger, Logging}
 
 import com.odenzo.ripple.localops.utils.CirceUtils
@@ -14,13 +14,20 @@ import com.odenzo.ripple.localops.utils.caterrors.AppError.dump
 import com.odenzo.ripple.localops.utils.caterrors.CatsTransformers.ErrorOr
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
 
-trait OTestSpec extends Logging with Matchers with EitherValues {
+trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with Logging {
 
 
-  // Setting Global Levels...I am using global logger everywhere
+
+  // bincodec is still using scribe.Logger
+  // localops is using mixing Logging / logger
+  logger.warn("Cranking Logging Down To WARN")
   // TODO: Check if Travis CI build and always put to warn if there
+  com.odenzo.ripple.bincodec.defaultSetup
   scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Warn)).replace()
   logger.withMinimumLevel(Level.Warn)
+  Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Warn)).replace()
+
+  OTestSpec.trigger
 
      scribe.Logger.root.withMinimumLevel(Level.Warn)
   Security.addProvider(new BouncyCastleProvider)
@@ -65,6 +72,20 @@ trait OTestSpec extends Logging with Matchers with EitherValues {
 
 }
 
+object OTestSpec extends Logging {
+
+
+  def trigger: Logger = {
+  // bincodec is still using scribe.Logger
+  // localops is using mixing Logging / logger
+  logger.warn("Cranking Logging Down To WARN IN OBJECT")
+  // TODO: Check if Travis CI build and always put to warn if there
+  com.odenzo.ripple.bincodec.defaultSetup
+  scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Warn)).replace()
+  logger.withMinimumLevel(Level.Warn)
+  Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Warn)).replace()
+  }
+}
 /**
   * Common to have object with binary and json in test files.
   * @param binary
