@@ -39,7 +39,6 @@ trait CirceEncoderUtils {
 
 trait CirceDecoderUtils
 
-object CirceDecoderUtils extends CirceDecoderUtils
 
 trait CirceCodecUtils extends CirceEncoderUtils with CirceDecoderUtils {
 
