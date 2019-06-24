@@ -6,11 +6,10 @@ import cats._
 import cats.data._
 import cats.implicits._
 import scribe.Logging
-import spire.implicits._
+import spire.implicits.bitStringOps
 import spire.math.{UByte, UInt, ULong}
 
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException, OError}
-
 
 /**
   * Hex representation of binary value. May be odd length.
@@ -19,17 +18,14 @@ import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException, OErro
   */
 case class Hex(v: String)
 
-
 /** Helpers since I seldom use bits/bytes directly and Scala/Java sucks. Don't know a good lib
   * SDtarting to use Spire, and making sure these all work -- but more convenience than speed at this point
   * */
 trait ByteUtils extends Logging {
 
   val bytezero: Byte = 0.toByte
-  
-  def hex2bytes(hex: String): Either[AppError, List[Byte]] = Nested(hex2ubytes(hex)).map(_.toByte).value
 
-  
+  def hex2bytes(hex: String): Either[AppError, List[Byte]] = Nested(hex2ubytes(hex)).map(_.toByte).value
 
   def bigint2bytes(bi: BigInt): Array[Byte] = {
     val bytes: Array[Byte] = bi.toByteArray // Not sure the left padding on this.
@@ -37,7 +33,6 @@ trait ByteUtils extends Logging {
   }
 
   def bytes2bigint(a: Array[Byte]): BigInt = BigInt(1, a)
-
 
   /**
     * @return Formats unsigned byte as two hex characters, padding on left as needed (lowercase btw)
@@ -57,15 +52,15 @@ trait ByteUtils extends Logging {
   }
 
   /**
-  *   Unsafe converstion of Hex to list of Unsigned Bytes.
+    *   Unsafe converstion of Hex to list of Unsigned Bytes.
     *   If hex is invalid then it throw Exception
     * @param v
     * @return
     */
-  def unsafeHex2ubytes(v:String): List[UByte] = {
+  def unsafeHex2ubytes(v: String): List[UByte] = {
     hex2ubytes(v) match {
       case Right(list) ⇒ list
-      case Left(err) ⇒ throw new Exception(s"Programming Error $err")
+      case Left(err)   ⇒ throw new Exception(s"Programming Error $err")
     }
   }
 
@@ -91,7 +86,6 @@ trait ByteUtils extends Logging {
     }
   }
 
-
   // FIXME: 32 bits instead of 8
   def ubyte2bitStr(v: UByte): String = zeroPadLeft(v.toInt.toBinaryString, 8)
 
@@ -106,30 +100,30 @@ trait ByteUtils extends Logging {
 
   def zeroPadLeft(v: String, len: Int): String = {
     val maxPad: String = "000000000000000000000000000000000000000000000000000000000000000000"
-    val padding: Int   = len - v.length
-    if (padding > 0) {
-      maxPad.take(padding) + v
-    } else {
-      v
+    len - v.length match {
+      case c if c > maxPad.length ⇒ "0".repeat(c) + v
+      case c if c > 0             ⇒ maxPad.take(c) + v
+      case c if c === 0           ⇒ v
+
     }
   }
 
-  def zeroEvenPadHex(hex: String): String = if (hex.length % 2 == 1) "0" + hex else hex
+  def zeroEvenPadHex(hex: String): String = {
+    hex.length % 2 match {
+      case 0 ⇒ hex
+      case 1 ⇒ "0" + hex
+    }
+  }
 
-
-  def trimLeftZeroBytes(a:Array[Byte]):Array[Byte] = {
+  def trimLeftZeroBytes(a: Array[Byte]): Array[Byte] = {
     if (a.head != bytezero) a
     else trimLeftZeroBytes(a.tail)
   }
-
-
 
   def ulong2bitStr(v: ULong): String = {
     val str = v.toLong.toBinaryString
     zeroPadLeft(str, 64)
   }
-
- 
 
   /** Quicky to take 16 hex chars and turn into ULong. Hex prefixed with 0x if missing */
   def hex2ulong(hex: String): Either[AppError, ULong] = {
@@ -142,7 +136,7 @@ trait ByteUtils extends Logging {
   /** If there are 8 bytes then return as ULong otherwise error. */
   def longBytesToULong(bytes: List[UByte]): Either[OError, ULong] = {
 
-    if (bytes.length == 8) {
+    if (bytes.length === 8) {
       // Convert to ULong 64
 
       val shifted: List[ULong] = bytes.mapWithIndex {
@@ -156,8 +150,6 @@ trait ByteUtils extends Logging {
       AppError(s"8 Bytes needed to convert to ulong but ${bytes.length}").asLeft
     }
   }
-
-
 
   def ensureMaxLength(l: List[UByte], len: Int): Either[AppError, List[UByte]] = {
     if (l.length > len) AppError(s"Byte List length ${l.length} > $len").asLeft
@@ -181,7 +173,7 @@ trait ByteUtils extends Logging {
   }
 
   def bytes2ulong(bytes: Seq[Byte]): UInt = {
-    val ints  = bytes.map(v ⇒ UInt(v.toLong))
+    val ints = bytes.map(v ⇒ UInt(v.toLong))
     (ints.head << 24) + (ints(1) << 16) + (ints(2) << 8) + ints(3)
   }
 
@@ -197,9 +189,8 @@ trait ByteUtils extends Logging {
     val ans: List[Byte] = longBytes.map(v ⇒ v.signed.toByte)
     ans
   }
-  
 
-  def bytes2hex(bytes: Traversable[Byte] ): String = {
+  def bytes2hex(bytes: Traversable[Byte]): String = {
     bytes.map(byte2hex).mkString
   }
 
@@ -209,7 +200,6 @@ trait ByteUtils extends Logging {
     val notPadded = UByte(byte).toHexString.toUpperCase
     zeroEvenPadHex(notPadded)
   }
-
 
 }
 

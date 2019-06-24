@@ -35,8 +35,8 @@ object ED25519CryptoBC extends Logging with ByteUtils {
 
   val order: BigInteger = curve.getCurve.getOrder
 
-  private val domainParams: ECDomainParameters =
-    new ECDomainParameters(curve.getCurve, curve.getG, curve.getN, curve.getH)
+//  private val domainParams: ECDomainParameters =
+//    new ECDomainParameters(curve.getCurve, curve.getG, curve.getN, curve.getH)
 
   /** Generate signature using Bouncy Castle Directly */
   def edSign(payload: Array[Byte], kp: AsymmetricCipherKeyPair): Either[AppError, Array[Byte]] = {

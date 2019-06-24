@@ -15,7 +15,7 @@ import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
 /**
   * Tries to verify a signed ripple transaction, with either Secp256k or ed25519 signatures.
   **/
-object Verify extends Logging with JsonUtils with ByteUtils {
+trait Verify extends Logging with JsonUtils with ByteUtils {
 
   def verifySigningResponse(txjson: JsonObject): Either[AppError, Boolean] = {
 
@@ -27,8 +27,8 @@ object Verify extends Logging with JsonUtils with ByteUtils {
       serialized <- RippleLocalAPI.serializeForSigning(txjson)
       payload    = HashPrefix.transactionSig.asBytes ++ serialized
       ans ← keyType match {
-             case "ed25519"   ⇒ edVerify(signature, pubkeyraw, payload)
-             case "secp256k1" ⇒ secpVerify(signature, pubkeyraw, payload)
+             case "ed25519"   ⇒ ed25519(signature, pubkeyraw, payload)
+             case "secp256k1" ⇒ secp256k1(signature, pubkeyraw, payload)
              case other       ⇒ AppError(s"Unknown Key Type $other").asLeft
 
            }
@@ -46,7 +46,7 @@ object Verify extends Logging with JsonUtils with ByteUtils {
     *
     * @return
     */
-  def edVerify(signature: String, pubkeyraw: String, payload: Seq[Byte]): Either[AppError, Boolean] = {
+  protected def ed25519(signature: String, pubkeyraw: String, payload: Seq[Byte]): Either[AppError, Boolean] = {
     for {
       pubkey   <- ED25519CryptoBC.signingPubKey2KeyParameter(pubkeyraw)
       sig      <- ByteUtils.hex2bytes(signature)
@@ -55,7 +55,7 @@ object Verify extends Logging with JsonUtils with ByteUtils {
 
   }
 
-  def secpVerify(signature: String, pubkeyraw: String, payload: Seq[Byte]): Either[AppError, Boolean] = {
+  protected def secp256k1(signature: String, pubkeyraw: String, payload: Seq[Byte]): Either[AppError, Boolean] = {
     val hash = HashOps.sha512Half(payload)
     for {
       pubkey <- hex2bytes(pubkeyraw).map(v => Secp256K1CryptoBC.decompressPublicKey(v.toArray))
@@ -65,3 +65,5 @@ object Verify extends Logging with JsonUtils with ByteUtils {
   }
 
 }
+
+object Verify extends Verify

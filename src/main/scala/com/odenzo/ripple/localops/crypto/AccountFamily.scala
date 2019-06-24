@@ -8,13 +8,14 @@ import scala.collection.immutable
 import cats._
 import cats.data._
 import cats.implicits._
+
 import scribe.Logging
 import spire.math.UInt
 
 
 import com.odenzo.ripple.localops.crypto.core.{ED25519CryptoBC, HashOps, Secp256K1CryptoBC}
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
-import com.odenzo.ripple.localops.utils.{ByteUtils, RBase58}
+import com.odenzo.ripple.localops.utils.{ByteUtils, RippleBase58}
 
 /**
   * For secp the basic idea if that a FamilyGenerator has a public and private key
@@ -59,7 +60,9 @@ trait AccountFamily extends Logging with ByteUtils with HashOps {
       val hash512                = sha512(appended)
       val privateKey: Seq[Byte]  = hash512.take(32)
 
-      if (!(privateKey == ZERO_KEY) || (bytes2bigint(privateKey.toArray) > MAX_KEY)) {
+      
+      
+      if (!(privateKey ==  ZERO_KEY) || (bytes2bigint(privateKey.toArray) > MAX_KEY)) {
         hash512 // TODO: Review this code
       } else {
         pass(seed, index + UInt(1))
@@ -89,7 +92,7 @@ trait AccountFamily extends Logging with ByteUtils with HashOps {
       val appended: Seq[Byte]      = pubkey ++ index_number_bytes ++ counterBytes
       val additionalKey: Seq[Byte] = sha512(appended).take(32)
 
-      val isZero = additionalKey.forall(_ == 0x00.toByte)
+      val isZero = additionalKey.forall(_ === 0x00.toByte)
       val tooBig = bytes2bigint(additionalKey.toArray) > MAX_KEY
       if (!(isZero || tooBig)) {
         additionalKey

@@ -7,7 +7,7 @@ import org.scalatest.FunSuite
 import com.odenzo.ripple.localops.OTestSpec
 
 import com.odenzo.ripple.localops.crypto.{AccountFamily, DERSignature, core}
-import com.odenzo.ripple.localops.utils.{ByteUtils, RBase58}
+import com.odenzo.ripple.localops.utils.{ByteUtils, RippleBase58}
 
 class KeysTest extends FunSuite with OTestSpec {
 

@@ -33,13 +33,13 @@ object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverter
   def processSignRequest(rq: JsonObject): Either[JsonObject, JsonObject] = {
 
     //validateRequest(rq)
-        
+
     val ok: Either[ResponseError, JsonObject] = for {
-      valid   ← validateRequest(rq)
-      key     <- extractKey(rq)
-      tx_json ← JsonUtils.findObjectField("tx_json", rq).leftMap(err ⇒ ResponseError.kNoTxJson)
+      valid      ← validateRequest(rq)
+      key        <- extractKey(rq)
+      tx_json    ← JsonUtils.findObjectField("tx_json", rq).leftMap(err ⇒ ResponseError.kNoTxJson)
       withPubKey = tx_json.add("SigningPubKey", key.signPubKey.asJson)
-      sig     <- Signer.signToTxnSignature(withPubKey, key).leftMap(err⇒ ResponseError.kBadSecret)
+      sig        <- Signer.signToTxnSignature(withPubKey, key).leftMap(err ⇒ ResponseError.kBadSecret)
 
       txBlob  ← Signer.createSignedTxBlob(withPubKey, sig).leftMap(err ⇒ ResponseError.kBadSecret)
       blobhex = ByteUtils.bytes2hex(txBlob)
@@ -51,8 +51,7 @@ object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverter
 
   }
 
-
-  def validateAutofillFields(tx_json:JsonObject): Either[OError, JsonObject] = {
+  def validateAutofillFields(tx_json: JsonObject): Either[OError, JsonObject] = {
     List("Sequence", "Fee")
     if (tx_json.contains("Sequence") && tx_json.contains("Fee")) tx_json.asRight
     else AppError(s"Sequence and Fee must be present in tx_json").asLeft
@@ -117,11 +116,13 @@ object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverter
     val fieldsPresent = params.keys
     val keycount      = fieldsPresent.count(_ =!= "key_type")
     if (fieldsPresent.count(f ⇒ f === "key_type" || f === "secret") > 1) ResponseError.kSecretAndType.asLeft
-    else if (keycount > 1) ResponseError.kTooMany.asLeft
-    else if (keycount === 0) ResponseError.kNoSecret.asLeft // Even if key_type is present
-    else {
-      // We know we have the correct # paremeter fields now, execept key_type maybe missing
-      params.get("secret").fold(explicitKey(params))(secretKey(_, params))
+    else keycount match {
+      case 1 ⇒
+        // We know we have the correct # paremeter fields now, execept key_type maybe missing
+        params.get("secret").fold(explicitKey(params))(secretKey(_, params))
+
+      case 0 ⇒ ResponseError.kNoSecret.asLeft // Even if key_type is present
+      case other ⇒ ResponseError.kTooMany.asLeft
     }
   }
 
@@ -136,14 +137,18 @@ object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverter
     params.get("key_type") match {
       case None ⇒ ResponseError.kNoSecret.asLeft // Mimicing Ripple even if there are seed, seed_hex passphrase
       case Some(kt) ⇒
-        logger.info(s"Explicit Key Type $kt from $params")
-        List(
+        logger.debug(s"Explicit Key Type $kt from $params")
+        // collectFirst...
+        val shouldBeOne: List[Either[AppError, String]] = List(
           params.get("passphrase").map(convertPassphrase2hex),
           params.get("seed").map(convertBase58Check2hex),
           params.get("seed_hex").map(_.asRight[AppError])
-        ).flatten.head
-          .flatMap(packSigningKey(_, kt))
-          .leftMap(ae ⇒ ResponseError.kBadSecret)
+        ).flatten
+        val exactlyOne: Either[AppError, SigningKey] = shouldBeOne match { // Exactly one check
+          case first :: Nil ⇒ first.flatMap((v: String) ⇒ packSigningKey(v, kt))
+          case other        ⇒ AppError("Not Exactly One passphrease,seed, seed_hex").asLeft[SigningKey]
+        }
+        exactlyOne.leftMap(e ⇒ ResponseError.kNoSecret) // Throwing away a potential useful error
     }
   }
 }

@@ -300,7 +300,7 @@ object RFC1751Keys {
   /** Six Words to Binary in some tortured Scala mutable code */
   def etob(vsHuman: List[String]): Either[AppError, Array[Byte]] = {
 
-    assert(vsHuman.length == 6)
+    assert(vsHuman.length === 6)
 
     /* These bytes will be mutated in the array itself */
     val bytes: ArrayBuffer[Byte] = Seq.fill[Byte](11)(0.toByte).to[ArrayBuffer]
@@ -326,7 +326,7 @@ object RFC1751Keys {
     binary.flatMap { b ⇒
       val ab     = b.toArray
       val parity = computeParity(ab)
-      if ((parity & 3) != extract(ab, 64, 2)) {
+      if ((parity & 3) =!= extract(ab, 64, 2)) {
         Left(AppError(s"Parity Check Failed"))
       } else {
         ab.take(8).asRight
@@ -346,23 +346,26 @@ object RFC1751Keys {
   protected def insert(s: ArrayBuffer[Byte], x: Int, start: Int, length: Int): ArrayBuffer[Byte] = {
 
     val shift: Int = (8 - ((start + length) % 8)) % 8
-    val y: Long    =(x << shift).toLong
+    val y: Long    = (x << shift).toLong
     val cl         = (y >> 16) & 0xff
     val cc         = (y >> 8) & 0xff
     val cr         = y & 0xff
 
     val baseIndx: Int = start / 8
+    val shiftEnd      = shift + length
+    shiftEnd match {
+      case se if se > 16 ⇒
+        s(baseIndx) = (s(baseIndx) | cl).toByte
+        s(baseIndx + 1) = (s(baseIndx + 1) | cc).toByte
+        s(baseIndx + 2) = (s(baseIndx + 2) | cr).toByte
+      case se if se > 8 ⇒
+        s(baseIndx) = (s(baseIndx) | cc).toByte
+        s(baseIndx + 1) = (s(baseIndx + 1) | cr).toByte
+      case other ⇒
+        s(baseIndx) = (s(baseIndx) | cr).toByte
 
-    if (shift + length > 16) {
-      s(baseIndx) = (s(baseIndx) | cl).toByte
-      s(baseIndx + 1) = (s(baseIndx + 1) | cc).toByte
-      s(baseIndx + 2) = (s(baseIndx + 2) | cr).toByte
-    } else if (shift + length > 8) {
-      s(baseIndx) = (s(baseIndx) | cc).toByte
-      s(baseIndx + 1) = (s(baseIndx + 1) | cr).toByte
-    } else {
-      s(baseIndx) = (s(baseIndx) | cr).toByte
     }
+
     s
   }
 
@@ -389,7 +392,7 @@ object RFC1751Keys {
 
     val words: List[String] = strHuman.trim().split(" ").toList
 
-    if (words.length != 12) AppError(s"${words.length} != 12 ").asLeft
+    if (words.length =!= 12) AppError(s"${words.length} not  12 ").asLeft
     else {
       val strFirst: Either[AppError, Array[Byte]]  = etob(words.slice(0, 6))
       val strSecond: Either[AppError, Array[Byte]] = etob(words.slice(6, 12))

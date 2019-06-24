@@ -37,9 +37,7 @@ trait CirceEncoderUtils {
 
 }
 
-trait CirceDecoderUtils {
-
-}
+trait CirceDecoderUtils
 
 object CirceDecoderUtils extends CirceDecoderUtils
 
@@ -170,8 +168,9 @@ trait CirceCodecUtils extends CirceEncoderUtils with CirceDecoderUtils {
     */
   def parseKeyValuesList[T](json: Json, fn: (String, Json) ⇒ Either[AppError, T]): ErrorOr[List[T]] = {
     val kvs: ErrorOr[List[(String, Json)]] = extractAsKeyValueList(json)
+    // kvs.flatTraverse( ??)
     kvs.flatMap { theList ⇒
-      theList.traverse((tup: (String, Json)) ⇒ fn(tup._1, tup._2))
+      theList.traverse { case (key:String, value:Json) ⇒ fn(key, value)}
     }
   }
 }

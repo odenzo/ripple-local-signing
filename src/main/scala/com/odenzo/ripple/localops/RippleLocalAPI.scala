@@ -10,7 +10,7 @@ import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 import com.odenzo.ripple.bincodec.{EncodedNestedVals, RippleCodecAPI}
 import com.odenzo.ripple.bincodec.encoding.BinarySerializer
 import com.odenzo.ripple.localops.crypto.{AccountFamily, RippleFormatConverters}
-import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils, RBase58}
+import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils, RippleBase58}
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 
 object RippleLocalAPI extends Logging {
