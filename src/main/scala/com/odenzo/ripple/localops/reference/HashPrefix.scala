@@ -23,31 +23,31 @@ object HashPrefix extends Logging {
   // Unsigned Multisigned
   // Signed "54584E00 (both kinds I think)
   /** For after a signed (and? multisignd) txn is signed */
-  val transactionID: HashPrefix = toHashPrefix("54584E00")
+  val transactionID: HashPrefix = fromHex("54584E00")
   // For unsigned single signer txn
-  val transaction: HashPrefix = toHashPrefix("534E4400")
+  val transaction: HashPrefix = fromHex("534E4400")
   // account state
-  val accountStateEntry: HashPrefix = toHashPrefix("4D4C4E00")
+  val accountStateEntry: HashPrefix = fromHex("4D4C4E00")
   // inner node in tree
-  val innerNode: HashPrefix = toHashPrefix("4D494E00")
+  val innerNode: HashPrefix = fromHex("4D494E00")
   // ledger master data for signing
-  val ledgerHeader: HashPrefix = toHashPrefix("4C575200")
+  val ledgerHeader: HashPrefix = fromHex("4C575200")
 
 
   /**  inner transaction to single signed, before signing */
-  val transactionSig: HashPrefix = toHashPrefix("53545800")
+  val transactionSig: HashPrefix = fromHex("53545800")
 
   // inner transaction to sign
-  val transactionMultiSig: HashPrefix = toHashPrefix("534D5400")
+  val transactionMultiSig: HashPrefix = fromHex("534D5400")
   // validation for signing
-  val validation: HashPrefix = toHashPrefix("56414C00")
+  val validation: HashPrefix = fromHex("56414C00")
   // proposal for signing
-  val proposal: HashPrefix = toHashPrefix("50525000")
+  val proposal: HashPrefix = fromHex("50525000")
   // payment channel claim
-  val paymentChannelClaim: HashPrefix = toHashPrefix("434C4D00")
+  val paymentChannelClaim: HashPrefix = fromHex("434C4D00")
 
   /** None of these overflow signed I think */
-  def toHashPrefix(lhex: String): HashPrefix = {
+  def fromHex(lhex: String): HashPrefix = {
     val ubytes: List[UByte] = ByteUtils.unsafeHex2ubytes(lhex)
     HashPrefix(ubytes)
   }

@@ -53,7 +53,8 @@ trait CirceUtils extends Logging {
 
   /** Does top level sorting of fields in this object alphanumeric with capital before lowercase  */
   def sortFields(jsonObject: JsonObject): JsonObject = {
-    val sortedList = jsonObject.toList.sortBy(_._1) // Want Capital letters sorted before lower case
+    // Want Capital letters sorted before lower case
+    val sortedList = jsonObject.toList.sortBy { case(fieldName:String, _:Json) ⇒ fieldName}
     JsonObject.fromIterable(sortedList)
   }
 

@@ -2,6 +2,7 @@ package com.odenzo.ripple.localops.crypto
 
 import java.io.{ByteArrayOutputStream, IOException}
 import java.math.BigInteger
+import scala.util.{Failure, Success, Try}
 
 import com.odenzo.ripple.localops.utils.ByteUtils
 import com.odenzo.ripple.localops.utils.caterrors.AppError
@@ -141,26 +142,31 @@ object DERSignature extends Logging with ByteUtils {
     bos.toByteArray
   }
 
-  /**
-    *  Given a ECDSA DER Signature with R, S returns the positive value of R and S
-    * @param bytes
-    * @return
-    */
-  def decodeFromDERBytes(bytes: Array[Byte]): (BigInteger, BigInteger) = {
-
-    val decoder = new ASN1InputStream(bytes)
-    val seq     = decoder.readObject.asInstanceOf[DLSequence]
-
-    try {
-      val r = seq.getObjectAt(0).asInstanceOf[ASN1Integer]
-      val s = seq.getObjectAt(1).asInstanceOf[ASN1Integer]
-      (r.getPositiveValue, s.getPositiveValue)
-    } catch {
-      case e: ClassCastException ⇒ null
-    } finally decoder.close()
-    // OpenSSL deviates from the DER spec by interpreting these values as unsigned, though they should not be
-    // Thus, we always use the positive versions. See: http://r6.ca/blog/20111119T211504Z.html
-  }
+//  /**
+//    *  Given a ECDSA DER Signature with R, S returns the positive value of R and S
+//    * @param bytes
+//    * @return
+//    */
+//  def decodeFromDERBytes(bytes: Array[Byte]): (BigInteger, BigInteger) = {
+//
+//    val decoder = new ASN1InputStream(bytes)
+//    // TODO: Resource handling and return possible error
+//
+//    Try {
+//      val seq = decoder.readObject.asInstanceOf[DLSequence]
+//      val r   = seq.getObjectAt(0).asInstanceOf[ASN1Integer]
+//      val s   = seq.getObjectAt(1).asInstanceOf[ASN1Integer]
+//      decoder.close()
+//      (r.getPositiveValue, s.getPositiveValue)
+//    } recover {
+//      case e ⇒
+//        decoder.close()
+//        throw e
+//    }
+//
+//    // OpenSSL deviates from the DER spec by interpreting these values as unsigned, though they should not be
+//    // Thus, we always use the positive versions. See: http://r6.ca/blog/20111119T211504Z.html
+//  }
 
   /** s should be less then CurveOrder - s, this returns true if it is else false
     * using secp256k1 curve */

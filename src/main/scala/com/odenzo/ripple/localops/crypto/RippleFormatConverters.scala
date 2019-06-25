@@ -6,7 +6,7 @@ import cats.implicits._
 
 import com.odenzo.ripple.localops.crypto.AccountFamily.{ripemd160, sha256, sha512}
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
-import com.odenzo.ripple.localops.utils.{ByteUtils, RBase58}
+import com.odenzo.ripple.localops.utils.{ByteUtils, RippleBase58}
 
 trait RippleFormatConverters {
 
@@ -18,7 +18,7 @@ trait RippleFormatConverters {
     *
     */
   def accountpubkey2address(publicKey: Seq[Byte]): String = {
-    assert(publicKey.length == 32 || publicKey.length == 33)
+    assert(publicKey.length === 32 || publicKey.length === 33)
 
     // Should start with ED if 32 byte  Ed25519
     val sha: Seq[Byte]       = sha256(publicKey)
@@ -29,7 +29,7 @@ trait RippleFormatConverters {
     val checksum                 = sha256(checksumHash1).take(4)
 
     val bytes: Seq[Byte] = payload ++ checksum
-    val b58: String      = RBase58.encode(bytes)
+    val b58: String      = RippleBase58.encode(bytes)
     b58
   }
 
@@ -49,7 +49,7 @@ trait RippleFormatConverters {
   def convertBase58Check2hex(rippleB58: String): Either[AppError, String] = {
     AppException.wrap(s"Converting MasterSeed $rippleB58 to MasterSeedHex") {
       for {
-        bytes   <- RBase58.decode(rippleB58)
+        bytes   <- RippleBase58.decode(rippleB58)
         trimmed = bytes.drop(1).dropRight(4)
         hex     = ByteUtils.bytes2hex(trimmed)
       } yield hex
