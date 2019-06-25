@@ -101,7 +101,9 @@ trait ByteUtils extends Logging {
   def zeroPadLeft(v: String, len: Int): String = {
     val maxPad: String = "000000000000000000000000000000000000000000000000000000000000000000"
     len - v.length match {
-      case c if c > maxPad.length ⇒ "0".repeat(c) + v
+      // Meh, this is Java 11 up, rarely hit this case so just recurse
+      //case c if c > maxPad.length ⇒ "0".repeat(c) + v
+      case c if c > maxPad.length ⇒ zeroPadLeft(maxPad+v, len)
       case c if c > 0             ⇒ maxPad.take(c) + v
       case c if c === 0           ⇒ v
 
