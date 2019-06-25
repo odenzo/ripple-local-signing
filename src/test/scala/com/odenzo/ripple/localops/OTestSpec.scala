@@ -73,6 +73,8 @@ object OTestSpec extends Logging {
   def testLoggingSetup(): Unit = {
     if (!bincodec.inCI) {
       logger.warn("Think I am in Travis")
+      scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Error)).replace()
+
       val packagesToMute: List[String] = List(
         "com.odenzo.ripple.bincodec",
         "com.odenzo.ripple.localops",

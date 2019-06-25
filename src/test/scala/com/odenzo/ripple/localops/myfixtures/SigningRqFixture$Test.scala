@@ -60,7 +60,8 @@ class SigningRqFixture$Test extends OTestSpec with ByteUtils with FixtureUtils w
     data.zipWithIndex.foreach {
       case ((rq, rs), indx) ⇒
         // Setting Global Levels...I am using global logger everywhere
-//        scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Debug)).replace()
+        // This will override other settings,
+        //        scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Debug)).replace()
 
         scribe.info(s"\n\n\n\n===================== INDEX $indx =============")
         runOne(rq, rs)
