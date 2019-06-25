@@ -7,8 +7,10 @@ import scala.io.{BufferedSource, Source}
 import io.circe.{Decoder, Json, JsonObject}
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.scalatest.{EitherValues, FunSpec, FunSpecLike, FunSuiteLike, Matchers}
-import scribe.{Level, Logger, Logging}
+import scribe.{Level, Logger, Logging, Priority}
 
+import com.odenzo.ripple.bincodec
+import com.odenzo.ripple.bincodec.LoggingConfig
 import com.odenzo.ripple.localops.utils.CirceUtils
 import com.odenzo.ripple.localops.utils.caterrors.AppError.dump
 import com.odenzo.ripple.localops.utils.caterrors.CatsTransformers.ErrorOr
@@ -16,20 +18,8 @@ import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
 
 trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with Logging {
 
-
-
-  // bincodec is still using scribe.Logger
-  // localops is using mixing Logging / logger
-  logger.warn("Cranking Logging Down To WARN")
-  // TODO: Check if Travis CI build and always put to warn if there
-  com.odenzo.ripple.bincodec.defaultSetup
-  scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Warn)).replace()
-  logger.withMinimumLevel(Level.Warn)
-  Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Warn)).replace()
-
-  OTestSpec.trigger
-
-     scribe.Logger.root.withMinimumLevel(Level.Warn)
+  // Well, it seems that each test is getting built/instanciated before runing.
+  OTestSpec.x
   Security.addProvider(new BouncyCastleProvider)
   val provider: Provider = Security.getProvider("BC")
 
@@ -58,7 +48,7 @@ trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with Loggin
     }
   }
 
-  def getOrLog[T](ee: Either[AppError,T], msg: String = "Error: ", myLog: Logger = logger): T = {
+  def getOrLog[T](ee: Either[AppError, T], msg: String = "Error: ", myLog: Logger = logger): T = {
     if (ee.isLeft) {
       dump(ee) match {
         case None       ⇒ myLog.debug("No Errors Found")
@@ -74,18 +64,51 @@ trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with Loggin
 
 object OTestSpec extends Logging {
 
-
-  def trigger: Logger = {
   // bincodec is still using scribe.Logger
   // localops is using mixing Logging / logger
   logger.warn("Cranking Logging Down To WARN IN OBJECT")
-  // TODO: Check if Travis CI build and always put to warn if there
-  com.odenzo.ripple.bincodec.defaultSetup
-  scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Warn)).replace()
-  logger.withMinimumLevel(Level.Warn)
-  Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Warn)).replace()
+
+  val x = testLoggingSetup()
+
+  def testLoggingSetup(): Unit = {
+    if (!bincodec.inCI) {
+      logger.warn("Think I am in Travis")
+      val packagesToMute: List[String] = List(
+        "com.odenzo.ripple.bincodec",
+        "com.odenzo.ripple.localops",
+      )
+      val pri = Priority.High // unnecessary since clearing existing modifiers, but handy for future.
+      scribe.Logger.root
+      .clearModifiers()
+      .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
+      .replace()
+
+      Logger.root
+      .clearModifiers()
+      .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
+      .replace()
+
+    } else {
+      logger.warn("Regular Testing")
+      val packagesToMute: List[String] = List(
+        "com.odenzo.ripple.bincodec",
+        "com.odenzo.ripple.localops",
+      )
+      val pri = Priority.High // unnecessary since clearing existing modifiers, but handy for future.
+      scribe.Logger.root
+        .clearModifiers()
+        .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
+        .replace()
+
+      Logger.root
+      .clearModifiers()
+      .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
+      .replace()
+
+    }
   }
 }
+
 /**
   * Common to have object with binary and json in test files.
   * @param binary

@@ -6,7 +6,7 @@ import cats.implicits._
 import io.circe.JsonObject
 import io.circe.syntax._
 import org.scalatest.{Assertion, FunSuite}
-import scribe.Logging
+import scribe.{Level, Logging}
 
 import com.odenzo.ripple.bincodec.{EncodedNestedVals, RippleCodecAPI}
 import com.odenzo.ripple.localops.utils.caterrors.AppError
@@ -20,6 +20,8 @@ import com.odenzo.ripple.localops.{OTestSpec, ResponseError, RippleLocalAPI, Sig
   */
 class SigningFixture$Test extends OTestSpec with ByteUtils with FixtureUtils with JsonUtils with Logging {
 
+  logger.withMinimumLevel(Level.Warn).replace()
+  
   def testJustSigning(rq: JsonObject, rs: JsonObject): Unit = {
     // This assumes all required fields are filled in.
     logger.info(s"Signing Rq ${rq.asJson.spaces4}")
