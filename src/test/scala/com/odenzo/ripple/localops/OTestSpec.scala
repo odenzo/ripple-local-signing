@@ -6,23 +6,20 @@ import scala.io.{BufferedSource, Source}
 
 import io.circe.{Decoder, Json, JsonObject}
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.scalatest.{EitherValues, Matchers}
-import scribe.{Level, Logger, Logging}
+import org.scalatest.{EitherValues, FunSpec, FunSpecLike, FunSuiteLike, Matchers}
+import scribe.{Level, Logger, Logging, Priority}
 
+import com.odenzo.ripple.bincodec
+import com.odenzo.ripple.bincodec.LoggingConfig
 import com.odenzo.ripple.localops.utils.CirceUtils
 import com.odenzo.ripple.localops.utils.caterrors.AppError.dump
 import com.odenzo.ripple.localops.utils.caterrors.CatsTransformers.ErrorOr
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
 
-trait OTestSpec extends Logging with Matchers with EitherValues {
+trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with Logging {
 
-
-  // Setting Global Levels...I am using global logger everywhere
-  // TODO: Check if Travis CI build and always put to warn if there
-  scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Warn)).replace()
-  logger.withMinimumLevel(Level.Warn)
-
-     scribe.Logger.root.withMinimumLevel(Level.Warn)
+  // Well, it seems that each test is getting built/instanciated before runing.
+  OTestSpec.x
   Security.addProvider(new BouncyCastleProvider)
   val provider: Provider = Security.getProvider("BC")
 
@@ -51,7 +48,7 @@ trait OTestSpec extends Logging with Matchers with EitherValues {
     }
   }
 
-  def getOrLog[T](ee: Either[AppError,T], msg: String = "Error: ", myLog: Logger = logger): T = {
+  def getOrLog[T](ee: Either[AppError, T], msg: String = "Error: ", myLog: Logger = logger): T = {
     if (ee.isLeft) {
       dump(ee) match {
         case None       ⇒ myLog.debug("No Errors Found")
@@ -63,6 +60,59 @@ trait OTestSpec extends Logging with Matchers with EitherValues {
     ee.right.value
   }
 
+}
+
+object OTestSpec extends Logging {
+
+  // bincodec is still using scribe.Logger
+  // localops is using mixing Logging / logger
+  logger.warn("Cranking Logging Down To WARN IN OBJECT")
+
+  val x = testLoggingSetup()
+
+  def testLoggingSetup(): Unit = {
+    if (!bincodec.inCI) {
+      logger.warn("Think I am in Travis")
+      scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Error)).replace()
+
+      val packagesToMute: List[String] = List(
+        "com.odenzo.ripple.bincodec",
+        "com.odenzo.ripple.localops",
+      )
+      val pri = Priority.High // unnecessary since clearing existing modifiers, but handy for future.
+      scribe.Logger.root
+      .clearModifiers()
+      .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
+      .replace()
+
+      Logger.root
+      .clearModifiers()
+      .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
+      .replace()
+
+    } else {
+      logger.warn("Regular Testing")
+      val packagesToMute: List[String] = List(
+        "com.odenzo.ripple.bincodec",
+        "com.odenzo.ripple.localops",
+      )
+      val pri = Priority.High // unnecessary since clearing existing modifiers, but handy for future.
+      scribe.Logger.root
+        .clearModifiers()
+        .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
+        .replace()
+
+      Logger.root
+      .clearModifiers()
+      .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
+      .replace()
+
+    }
+
+    Logger.root.orphan() // Fully detach from console output
+    Logger.logger.orphan()
+    scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Error)).replace()
+  }
 }
 
 /**

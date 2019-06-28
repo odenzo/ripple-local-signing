@@ -1,13 +1,10 @@
 package com.odenzo.ripple.localops.crypto
 
-import java.security.KeyPair
-
 import org.scalatest.FunSuite
 
 import com.odenzo.ripple.localops._
 import com.odenzo.ripple.localops.crypto.core.Secp256K1CryptoBC
-import com.odenzo.ripple.localops.utils.caterrors.AppError
-import com.odenzo.ripple.localops.utils.{ByteUtils, HexData}
+import com.odenzo.ripple.localops.utils.ByteUtils
 
 class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils with RippleFormatConverters {
 

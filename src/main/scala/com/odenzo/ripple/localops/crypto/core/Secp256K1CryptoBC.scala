@@ -72,18 +72,18 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
   /** Currently using this, slightly painful to extract D, from the ripple-lib Java */
   def sign(hash: Array[Byte], secret: KeyPair): Either[AppError, DERSignature] = {
     AppException.wrap("SECP SIGN") {
-     
+
       val kCalc: HMacDSAKCalculator = new HMacDSAKCalculator(new SHA256Digest)
       val signer                    = new ECDSASigner(kCalc)
 
       privateKey2D(secret.getPrivate).flatMap { d ⇒
         val privKeyParam = new ECPrivateKeyParameters(d, domainParams)
         signer.init(true, privKeyParam)
-        val sigs   = signer.generateSignature(hash)
-        val r      = sigs(0)
-        val s      = sigs(1)
-        val otherS = secp256k1Order.subtract(s)
-        val finalS = if (s.compareTo(otherS) == 1) otherS else s
+        val sigs               = signer.generateSignature(hash)
+        val r: BigInteger      = sigs(0)
+        val s: BigInteger      = sigs(1)
+        val otherS: BigInteger = secp256k1Order.subtract(s)
+        val finalS             = if (s.compareTo(otherS) === 1) otherS else s
         DERSignature.fromRandS(r, finalS)
       }
     }

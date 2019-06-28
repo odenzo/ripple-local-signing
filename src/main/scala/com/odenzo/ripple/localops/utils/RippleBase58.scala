@@ -1,5 +1,9 @@
 package com.odenzo.ripple.localops.utils
 
+import cats._
+import cats.data._
+import cats.implicits._
+
 import java.math.BigInteger
 import scala.annotation.tailrec
 
@@ -10,7 +14,7 @@ import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException, OErro
 
 // Based on
 // https://github.com/ACINQ/bitcoin-lib/blob/master/src/main/scala/fr/acinq/bitcoin/Base58.scala
-object RBase58 extends Logging {
+object RippleBase58 extends Logging {
 
   val alphabet = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz"
 
@@ -39,21 +43,22 @@ object RBase58 extends Logging {
       }
 
       encode1(big)
-      input.takeWhile(_ == 0).map(_ => builder.append(alphabet.charAt(0)))
+      input.takeWhile(_ === 0).map(_ => builder.append(alphabet.charAt(0)))
       builder.toString().reverse
     }
   }
 
   /**
     * This potentially fails if String has char not in the alphabet.
+    * Seems a bit wacky overall.
     * @param input base-58 encoded data
     *
     * @return the decoded data
     */
   def decode(input: String): ErrorOr[Array[Byte]] = {
     AppException.wrapPure(s"B58 Decoding $input") {
-      val zeroes = input.takeWhile(_ == '1').map(_ => 0: Byte).toArray
-      val trim   = input.dropWhile(_ == '1').toList
+      val zeroes = input.takeWhile(_ === '1').map(_ => 0: Byte).toArray
+      val trim   = input.dropWhile(_ === '1').toList
       val decoded = trim
         .foldLeft(BigInteger.ZERO)(
           (a, b) =>
@@ -63,7 +68,7 @@ object RBase58 extends Logging {
       if (trim.isEmpty) zeroes
       else
         zeroes ++ decoded.toByteArray
-          .dropWhile(_ == 0) // BigInteger.toByteArray may add a leading 0x00
+          .dropWhile(_ === 0) // BigInteger.toByteArray may add a leading 0x00
     }
   }
 
