@@ -7,8 +7,9 @@ import io.circe.syntax._
 import org.scalatest.FunSuite
 
 import com.odenzo.ripple.localops.utils.caterrors.AppError
-import com.odenzo.ripple.localops.utils.{ByteUtils, FixtureUtils}
-import com.odenzo.ripple.localops.{OTestSpec, RippleLocalAPI}
+import com.odenzo.ripple.localops.utils.ByteUtils
+import com.odenzo.ripple.localops.RippleLocalAPI
+import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 
 /** This test is designed check the secret to pubsigning key conversion
   * Lots of different types of secrets

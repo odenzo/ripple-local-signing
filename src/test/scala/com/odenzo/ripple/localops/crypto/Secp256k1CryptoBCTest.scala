@@ -6,8 +6,8 @@ import java.security.{KeyFactory, Security}
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.scalatest.FunSuite
 
-import com.odenzo.ripple.localops.OTestSpec
-import com.odenzo.ripple.localops.crypto.core.{Secp256K1CryptoBC}
+import com.odenzo.ripple.localops.crypto.core.Secp256K1CryptoBC
+import com.odenzo.ripple.localops.testkit.OTestSpec
 import com.odenzo.ripple.localops.utils.ByteUtils
 
 

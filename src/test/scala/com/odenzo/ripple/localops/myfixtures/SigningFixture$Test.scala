@@ -9,9 +9,10 @@ import org.scalatest.{Assertion, FunSuite}
 import scribe.{Level, Logging}
 
 import com.odenzo.ripple.bincodec.{EncodedNestedVals, RippleCodecAPI}
+import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 import com.odenzo.ripple.localops.utils.caterrors.AppError
-import com.odenzo.ripple.localops.utils.{ByteUtils, FixtureUtils, JsonUtils}
-import com.odenzo.ripple.localops.{OTestSpec, ResponseError, RippleLocalAPI, SignRqRsHandler, SigningKey, TxnSignature}
+import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
+import com.odenzo.ripple.localops.{ResponseError, RippleLocalAPI, SignRqRsHandler, SigningKey, TxnSignature}
 
 /**
   *  Goes through some server signed txn and results and does local signing to check correct

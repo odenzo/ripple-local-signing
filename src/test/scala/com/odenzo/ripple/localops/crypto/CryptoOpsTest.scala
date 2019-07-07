@@ -4,7 +4,8 @@ import io.circe.Json
 import org.scalatest.FunSuite
 
 import com.odenzo.ripple.localops.utils.CirceUtils
-import com.odenzo.ripple.localops.{AccountKeys, OTestSpec}
+import com.odenzo.ripple.localops.AccountKeys
+import com.odenzo.ripple.localops.testkit.{AccountKeys, OTestSpec}
 
 class CryptoOpsTest extends FunSuite with OTestSpec {
 

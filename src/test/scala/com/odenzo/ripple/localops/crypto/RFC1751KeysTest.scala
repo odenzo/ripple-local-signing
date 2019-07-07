@@ -2,10 +2,10 @@ package com.odenzo.ripple.localops.crypto
 
 import org.scalatest.FunSuite
 
-
-import com.odenzo.ripple.localops.{OTestSpec, RFC1751}
+import com.odenzo.ripple.localops.RFC1751
 import scala.collection.JavaConverters._
 
+import com.odenzo.ripple.localops.testkit.OTestSpec
 import com.odenzo.ripple.localops.utils.ByteUtils
 
 class RFC1751KeysTest extends FunSuite with OTestSpec {

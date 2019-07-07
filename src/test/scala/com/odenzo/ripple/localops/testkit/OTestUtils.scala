@@ -1,4 +1,4 @@
-package com.odenzo.ripple.localops
+package com.odenzo.ripple.localops.testkit
 
 import cats.implicits._
 import scribe.Logging

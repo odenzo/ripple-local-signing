@@ -5,11 +5,11 @@ import cats.data._
 import cats.implicits._
 
 import com.odenzo.ripple.localops.crypto.AccountFamily.{ripemd160, sha256, sha512}
+import com.odenzo.ripple.localops.crypto.core.HashOps
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
 import com.odenzo.ripple.localops.utils.{ByteUtils, RippleBase58}
 
 trait RippleFormatConverters {
-
 
   /**
     * @param publicKey secp265k or ed25519 keys key, if ed25519 padded with 0xED
@@ -33,7 +33,6 @@ trait RippleFormatConverters {
     b58
   }
 
-
   /** TODO: Check this. */
   def convertPassphrase2hex(password: String): Either[AppError, String] = {
     ByteUtils.bytes2hex(sha512(password.getBytes("UTF-8")).take(16)).asRight[AppError]
@@ -54,6 +53,29 @@ trait RippleFormatConverters {
         hex     = ByteUtils.bytes2hex(trimmed)
       } yield hex
     }
+  }
+
+  val accountPrefix          = "00"
+  val publicKeyPrefix        = "23"
+  val seedValuePrefix        = "21"
+  val validationPubKeyPrefix = "1C"
+
+  /** You will have to add prefix per https://xrpl.org/base58-encodings.html */
+  def convertHex2seedB58Check(prefix: String, hex: String) = {
+    // This is pure conversion, no family stuff. Adds s and checksum
+
+  }
+
+  /**
+    *
+    * @param bytes 33 bytes (OD+32 bytes for ed25519)
+    *              @return Base58 checksum encoded
+    */
+  def publicKeyToAddress(bytes: List[Byte]) = {
+    val accountId = HashOps.sha256(HashOps.ripemd160(bytes))
+    val checksum  = HashOps.sha256(HashOps.sha256(accountId))
+    val address   = RippleBase58.encode(accountId ++ checksum)
+    address
   }
 
   /**

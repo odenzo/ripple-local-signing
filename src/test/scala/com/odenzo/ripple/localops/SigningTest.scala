@@ -6,7 +6,8 @@ import cats.implicits._
 import io.circe.{Json, JsonObject}
 import org.scalatest.FunSuite
 
-import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, FixtureUtils, JsonUtils}
+import com.odenzo.ripple.localops.testkit.{AccountKeys, FixtureUtils, OTestSpec}
+import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, JsonUtils}
 
 
 class SigningTest extends FunSuite with OTestSpec with ByteUtils with FixtureUtils {

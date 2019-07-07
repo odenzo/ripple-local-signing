@@ -2,7 +2,7 @@ package com.odenzo.ripple.localops.crypto.core
 
 import org.scalatest.FunSuite
 
-import com.odenzo.ripple.localops.OTestSpec
+import com.odenzo.ripple.localops.testkit.OTestSpec
 
 class HashOpsTest extends FunSuite with OTestSpec with HashOps {
 

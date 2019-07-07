@@ -5,8 +5,9 @@ import org.scalatest.FunSuite
 
 import com.odenzo.ripple.localops.crypto.core.HashOps
 import com.odenzo.ripple.localops.reference.HashPrefix
-import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, FixtureUtils, JsonUtils}
-import com.odenzo.ripple.localops.{OTestSpec, RippleLocalAPI, Verify}
+import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
+import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, JsonUtils}
+import com.odenzo.ripple.localops.{RippleLocalAPI, Verify}
 
 class VerifyTest extends FunSuite with OTestSpec with JsonUtils with FixtureUtils {
 

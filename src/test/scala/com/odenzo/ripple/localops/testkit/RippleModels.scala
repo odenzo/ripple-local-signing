@@ -1,13 +1,10 @@
-package com.odenzo.ripple.localops
+package com.odenzo.ripple.localops.testkit
 
 import cats.Show
 import cats.implicits._
 import io.circe._
 import io.circe.generic.semiauto._
 import io.circe.syntax._
-
-
-import com.odenzo.ripple.localops.utils.ByteUtils
 /*
   "account_id" : "ra8iBMyU6JrEVLxBBG98sWnmai3fKdTZvd",       AKA: AccountAddress
   "key_type" : "secp256k1",
@@ -159,7 +156,7 @@ object SigningPublicKey {
 }
 
 /**
-  * Account Keys created by propose_wallet, removing redundant HEX   but keeping masterKey and masterseed
+  * 
   *
   * "result" : {
   * "account_id" : "r99mP5QSjNdsEtng26uCnrieTZQe1wNYkf",
@@ -171,24 +168,21 @@ object SigningPublicKey {
   * "public_key_hex" : "036F89F2B2E5DC47E4F72B7C33169F071E9F476DAD3D20EF39CA3778BC4508F102"
   * }
   *
-  * This just gets a subset of the keys -- forget why.
-  *
-  * @param account_id The id of the account, always in account address format.
-  * @param key_type
-  * @param master_key
-  * @param master_seed
-  * @param public_key
-  */
-case class AccountKeys(
-    account_id: AccountAddr,
-    key_type: RippleKeyType,
-    master_key: RippleKey,
-    master_seed: RippleSeed,
-    public_key: RipplePublicKey
-) {
 
-  def address: AccountAddr    = account_id
-  def secret: RippleSignature = master_seed
+*/
+
+case class AccountKeys(
+                        account_id: AccountAddr,
+                        key_type: RippleKeyType,
+                        master_key: RippleKey,
+                        master_seed: RippleSeed,
+                        master_seed_hex: String,
+                        public_key: RipplePublicKey,
+                        public_key_hex: String
+                      ) {
+
+  def address: AccountAddr = account_id
+
 
 }
 

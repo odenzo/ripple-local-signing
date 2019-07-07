@@ -5,7 +5,7 @@ import scala.collection.immutable
 import org.scalatest.FunSuite
 import spire.math._
 
-import com.odenzo.ripple.localops.OTestSpec
+import com.odenzo.ripple.localops.testkit.OTestSpec
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 
 class ByteUtilsTest extends FunSuite with OTestSpec {

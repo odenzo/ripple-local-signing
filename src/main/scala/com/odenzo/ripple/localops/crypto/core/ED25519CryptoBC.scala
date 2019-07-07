@@ -63,7 +63,7 @@ object ED25519CryptoBC extends Logging with ByteUtils {
 
   def nativeGenerateKeyPair(): AsymmetricCipherKeyPair = {
     val RANDOM: SecureRandom = new SecureRandom()
-    val keygen               = new Ed25519KeyPairGenerator()
+    val keygen: Ed25519KeyPairGenerator = new Ed25519KeyPairGenerator()
     keygen.init(new Ed25519KeyGenerationParameters(RANDOM))
     val keyPair = keygen.generateKeyPair()
     keyPair

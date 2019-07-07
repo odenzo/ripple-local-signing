@@ -6,8 +6,9 @@ import org.scalatest.FunSuite
 
 import com.odenzo.ripple.localops.crypto.core.{ED25519CryptoBC, HashOps}
 import com.odenzo.ripple.localops.reference.HashPrefix
-import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, FixtureUtils, JsonUtils}
-import com.odenzo.ripple.localops.{OTestSpec, RippleLocalAPI}
+import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, JsonUtils}
+import com.odenzo.ripple.localops.RippleLocalAPI
+import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 
 class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with JsonUtils with ByteUtils {
 

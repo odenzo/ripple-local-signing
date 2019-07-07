@@ -1,4 +1,4 @@
-package com.odenzo.ripple.localops
+package com.odenzo.ripple.localops.testkit
 
 import java.net.URL
 import java.security.{Provider, Security}
@@ -6,7 +6,7 @@ import scala.io.{BufferedSource, Source}
 
 import io.circe.{Decoder, Json, JsonObject}
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.scalatest.{EitherValues, FunSpec, FunSpecLike, FunSuiteLike, Matchers}
+import org.scalatest.{EitherValues, FunSuiteLike, Matchers}
 import scribe.{Level, Logger, Logging, Priority}
 
 import com.odenzo.ripple.bincodec
@@ -19,7 +19,7 @@ import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
 trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with Logging {
 
   // Well, it seems that each test is getting built/instanciated before runing.
-  OTestSpec.x
+
   Security.addProvider(new BouncyCastleProvider)
   val provider: Provider = Security.getProvider("BC")
 

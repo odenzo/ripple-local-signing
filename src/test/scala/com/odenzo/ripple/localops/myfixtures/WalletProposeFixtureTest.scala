@@ -6,11 +6,11 @@ import cats.implicits._
 import io.circe.JsonObject
 import org.scalatest.FunSuite
 
-import com.odenzo.ripple.localops.OTestSpec
 import com.odenzo.ripple.localops.crypto.core.{ED25519CryptoBC, Secp256K1CryptoBC}
 import com.odenzo.ripple.localops.crypto.{AccountFamily, RippleFormatConverters}
+import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 import com.odenzo.ripple.localops.utils.caterrors.CatsTransformers.ErrorOr
-import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, FixtureUtils, JsonUtils}
+import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, JsonUtils}
 
 /**
   * * TODO: Implement true WalletPropose local and test sample responses with me processing same requests.

@@ -1,21 +1,27 @@
 package com.odenzo.ripple.localops
 
 import com.odenzo.ripple.localops.crypto.{AccountFamily, RippleFormatConverters}
-import com.odenzo.ripple.localops.crypto.core.HashOps
-import com.odenzo.ripple.localops.utils.ByteUtils
+import com.odenzo.ripple.localops.crypto.core.{ED25519CryptoBC, HashOps}
+import com.odenzo.ripple.localops.utils.{ByteUtils, RippleBase58}
+import com.odenzo.ripple.localops.utils.caterrors.AppError
 
 /** In Progress */
 object WalletGenerator {
 
-  def generate(passphrase:String, keyType:String) = {
+  def generateSecpKeys(passphrase: String) = {}
 
-    val secretKey: Seq[Byte] = HashOps.sha512Half(passphrase.getBytes("UTF-8")) // ??
-    val secretKeyHex = ByteUtils.bytes2hex(secretKey)
-    
+  def generateEdKeys(passphrase: String) = {
 
-    // val publicKey = derivePublicKey
-    val publicKeyBytes: Array[Byte] = Array.emptyByteArray
-    RippleFormatConverters.accountpubkey2address(publicKeyBytes)
-    
+    for {
+      seedHex <- RippleFormatConverters.convertPassphrase2hex(passphrase)
+      // Boo... I will need to checksum etc this.
+      //seedB58 ← RippleBase58.encode(ByteUtils.hex2bytes(seedHex))
+      kp     ← ED25519CryptoBC.seedHex2keypair(seedHex)
+      pubHex ← ED25519CryptoBC.publicKey2Hex(kp.getPublic)
+      pubBin ← ByteUtils.hex2bytes(pubHex)
+      addr   = RippleFormatConverters.accountpubkey2address(pubBin)
+
+    } yield kp
   }
+
 }

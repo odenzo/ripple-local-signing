@@ -4,6 +4,7 @@ import org.scalatest.FunSuite
 
 import com.odenzo.ripple.localops._
 import com.odenzo.ripple.localops.crypto.core.Secp256K1CryptoBC
+import com.odenzo.ripple.localops.testkit.OTestSpec
 import com.odenzo.ripple.localops.utils.ByteUtils
 
 class AccountFamilyTest extends FunSuite with OTestSpec with ByteUtils with RippleFormatConverters {

@@ -1,11 +1,11 @@
-package com.odenzo.ripple.localops.utils
+package com.odenzo.ripple.localops.testkit
 
 import cats._
 import cats.data._
 import cats.implicits._
 import io.circe.{Decoder, Json, JsonObject}
 
-import com.odenzo.ripple.localops.OTestSpec
+import com.odenzo.ripple.localops.utils.{CirceUtils, JsonUtils}
 
 trait FixtureUtils extends JsonUtils with OTestSpec {
 

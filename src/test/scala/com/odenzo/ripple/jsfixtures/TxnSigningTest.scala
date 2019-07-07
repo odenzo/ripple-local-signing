@@ -5,7 +5,7 @@ import scala.collection.mutable
 import javax.script.ScriptEngineFactory
 import org.scalatest.FunSuite
 
-import com.odenzo.ripple.localops.OTestSpec
+import com.odenzo.ripple.localops.testkit.OTestSpec
 
 /**
 * From signing-data-encoding-test.js
