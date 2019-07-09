@@ -22,14 +22,6 @@ class RFC1751KeysTest extends FunSuite with OTestSpec {
     cHex shouldEqual "F2D344EAAC93BE6C"
   }
 
-  test("From RFC A") {
-    val txt = "TROD MUTE TAIL WARM CHAR KONG HAAG CITY BORE O TEAL AWL"
-    val exp = "EFF81F9BFBC65350920CDD7416DE8009"
-
-    val res: String = getOrLog(RFC1751Keys.twelveWordsToHex(txt))
-    res shouldEqual exp
-  }
-
   test("Ripple ED Wallet Ex") {
     val master_key             = "HICK LAUD TONY FORM SCOT DOES ORGY BUOY JUKE GLOB HUGE POE"
     val master_seed_hex        = "69C269468F0E4CC9E97C9DC2B667B597"

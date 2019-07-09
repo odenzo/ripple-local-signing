@@ -31,10 +31,12 @@ object WalletGenerator extends Logging with ByteUtils {
     */
   def generateSeedBySniffing(someSeed: String): Either[AppError, List[Byte]] = {
     // Try and sniff the seed type and delegate, most specific to least with fallback
-    // Could sniff by length < 32 B58Check 32 == Hex >32 SeedRFC and fallback to password on fail, but...
+    // Order is important, ie valid SecretKey cannot be any other thing
+    // Valid Hex cannot be valid B58Check. Also need to negative test all those routines.
+    // TODO: Seems  SeedB58 is not returning error on all failures (not checking prefix and checksum just chopping)
     generateSeedFromSecretKey(someSeed)
+      .recoverWith{ case e ⇒ generateSeedFromHex(someSeed) }
       .recoverWith { case e ⇒ generateSeedFromSeedB58(someSeed) }
-      .recoverWith { case e ⇒ generateSeedFromHex(someSeed) }
       .recoverWith { case e ⇒ generateSeedFromPassword(someSeed) }
 
   }

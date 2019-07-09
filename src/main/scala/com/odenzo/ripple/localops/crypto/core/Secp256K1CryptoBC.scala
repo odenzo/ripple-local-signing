@@ -180,9 +180,9 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
   /**
     * Extract D value from private key.
     *
-    * @param priv
+    * @param priv instance of BCECPrivateKey
     *
-    * @return
+    * @return The D value of the private key.
     */
   def privateKey2D(priv: PrivateKey): Either[AppError, BigInteger] = {
     priv match {
@@ -191,20 +191,6 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
     }
 
   }
-//
-//  /**
-//    * Dangling Example of Encoding KeyPairs. Somewhere theres a way to specific public key is compressed or not.
-//    */
-//  def keyPairWrapping(pair: KeyPair): KeyPair = {
-//    val keyFactory = KeyFactory.getInstance(keyType, provider)
-//
-//    val publicKeySpec = new X509EncodedKeySpec(pair.getPublic.getEncoded)
-//    val publicKey     = keyFactory.generatePublic(publicKeySpec)
-//
-//    val privateKeySpec = new PKCS8EncodedKeySpec(pair.getPrivate.getEncoded)
-//    val privateKey     = keyFactory.generatePrivate(privateKeySpec)
-//
-//    new KeyPair(publicKey, privateKey)
-//  }
+
 
 }

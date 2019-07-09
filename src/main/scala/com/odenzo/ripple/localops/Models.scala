@@ -23,10 +23,7 @@ trait SigningKey  {
 }
 
 case class SigningKeyEd25519(kp: AsymmetricCipherKeyPair, signPubKey:String) extends SigningKey
-
 case class SigningKeySecp256(kp: KeyPair,signPubKey:String) extends SigningKey
-
-
 
 case class Base58(v:String)
 case class Base58Check(v:String)

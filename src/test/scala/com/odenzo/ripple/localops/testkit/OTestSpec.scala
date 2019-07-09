@@ -16,7 +16,7 @@ import com.odenzo.ripple.localops.utils.caterrors.AppError.dump
 import com.odenzo.ripple.localops.utils.caterrors.CatsTransformers.ErrorOr
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
 
-trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with Logging {
+trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with OTestLogging {
 
   // Well, it seems that each test is getting built/instanciated before runing.
 

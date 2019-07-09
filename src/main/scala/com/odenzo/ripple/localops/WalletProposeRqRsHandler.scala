@@ -20,7 +20,7 @@ import com.odenzo.ripple.localops.utils.caterrors.AppError
   */
 trait WalletProposeRqRsHandler extends Logging with JsonUtils {
 
-  def propose(walletProposeRq: JsonObject) = {
+  def propose(walletProposeRq: JsonObject): JsonObject = {
 
     val atMostOne = List("passphrase", "seed", "seed_hex")
 
@@ -33,7 +33,7 @@ trait WalletProposeRqRsHandler extends Logging with JsonUtils {
       case _                        ⇒ AppError("At most one of [passphrase, seed, seed_hex] may be supplied.").asLeft
     }
 
-    seed.flatMap { seedBytes ⇒
+    val result: Either[AppError, WalletProposeResult] = seed.flatMap { seedBytes ⇒
       findStringField("key_type", walletProposeRq) match {
         case Left(err)          ⇒ AppError("IllegalArgumentException - no key_type").asLeft
         case Right("ed25519")   ⇒ WalletGenerator.generateEdKeys(seedBytes)
@@ -42,14 +42,12 @@ trait WalletProposeRqRsHandler extends Logging with JsonUtils {
       }
     }
 
-    /*
-    {
-      "request": {
-        "command": "wallet_propose",
-        "key_type": "ed25519",
-        "id": "7685e62f-0fd9-4661-bd54-2045675cbfb7"
-      }
-   */
+    val rqId: Option[Json] = walletProposeRq("id")
+
+    result match {
+      case Right(res) ⇒ buildSuccessResponse(res,rqId)
+      case Left(err) ⇒ buildErrorResponse(walletProposeRq,err)
+    }
   }
 
   /**
@@ -58,7 +56,7 @@ trait WalletProposeRqRsHandler extends Logging with JsonUtils {
     * @param id
     * @return
     */
-  def buildSuccessResponse(result: WalletProposeResult, id: Option[String] = None): JsonObject = {
+  def buildSuccessResponse(result: WalletProposeResult, id: Option[Json] = None): JsonObject = {
 
     val fields = Map(
       "id"     → id.asJson,
@@ -87,3 +85,5 @@ trait WalletProposeRqRsHandler extends Logging with JsonUtils {
   }
 
 }
+
+object WalletProposeRqRsHandler extends  WalletProposeRqRsHandler

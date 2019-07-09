@@ -3,7 +3,7 @@ package com.odenzo.ripple
 import scribe.Level
 import scribe.Level.Warn
 
-import com.odenzo.ripple.bincodec.{inCI, setAllToLevel}
+import com.odenzo.ripple.bincodec.inCI
 
 
 
