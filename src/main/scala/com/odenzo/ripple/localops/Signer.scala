@@ -22,7 +22,7 @@ object Signer extends Logging with JsonUtils with ByteUtils {
     keyType match {
       case "ed25519" ⇒
         for {
-          keys <- ED25519CryptoBC.seedHex2keypair(seedhex)
+          keys <- ED25519CryptoBC.generateKeyPairFromHex(seedhex)
           spub ← ED25519CryptoBC.publicKey2Hex(keys.getPublic)
         } yield SigningKeyEd25519(keys, spub)
       case "secp256k1" ⇒
@@ -59,7 +59,7 @@ object Signer extends Logging with JsonUtils with ByteUtils {
 
   def signEd(keys: SigningKeyEd25519, payload: Array[Byte]): Either[AppError, TxnSignature] = {
     for {
-      sig    <- ED25519CryptoBC.edSign(payload, keys.kp)
+      sig    <- ED25519CryptoBC.sign(payload, keys.kp)
       sigHex = bytes2hex(sig)
     } yield TxnSignature(sigHex)
 

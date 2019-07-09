@@ -57,12 +57,12 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
   val kTxnSig = txjsonResult.flatMap(findStringField("TxnSignature", _))
   val kHash   = txjsonResult.flatMap(findStringField("hash", _))
 
-  val newKeyPar: AsymmetricCipherKeyPair = ED25519CryptoBC.nativeGenerateKeyPair()
+  val newKeyPar: AsymmetricCipherKeyPair = ED25519CryptoBC.generateKeyPair()
 
 
 
   test("Private Key KeyPair") {
-    val kp                               = getOrLog(ED25519CryptoBC.seedHex2keypair(seedHex))
+    val kp                               = getOrLog(ED25519CryptoBC.generateKeyPairFromHex(seedHex))
     val akPublic: AsymmetricKeyParameter = kp.getPublic
     val edPublic                         = akPublic.asInstanceOf[Ed25519PublicKeyParameters]
     val pubEnc: Array[Byte]              = edPublic.getEncoded
@@ -88,7 +88,7 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
   test("Verification") {
     val ok = for {
       tx_json ← txjsonResult
-      keyPair <- ED25519CryptoBC.seedHex2keypair(seedHex)
+      keyPair <- ED25519CryptoBC.generateKeyPairFromHex(seedHex)
       pubHex  ← ED25519CryptoBC.publicKey2Hex(keyPair.getPublic)
       calcPub ← ED25519CryptoBC.signingPubKey2KeyParameter(signPubKey)
 
@@ -100,7 +100,7 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
       sigBytes <- hex2bytes(sig)
       pubKey   = keyPair.getPublic.asInstanceOf[Ed25519PublicKeyParameters]
       _        = calcPub.getEncoded shouldEqual pubKey.getEncoded
-      verfied  <- ED25519CryptoBC.edVerify(toHash, sigBytes.toArray, calcPub)
+      verfied  <- ED25519CryptoBC.verify(toHash, sigBytes.toArray, calcPub)
     } yield verfied
     val passed: Boolean = getOrLog(ok)
     passed shouldEqual true
@@ -110,11 +110,11 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
   test("Sign to TxnSignature") {
     val txnsig = for {
       tx_json  ← txjsonResult
-      keyPair  <- ED25519CryptoBC.seedHex2keypair(seedHex)
+      keyPair  <- ED25519CryptoBC.generateKeyPairFromHex(seedHex)
       binBytes <- RippleLocalAPI.serializeForSigning(tx_json)
       toHash   = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction! 0x53545800L
 
-      sigBytes <- ED25519CryptoBC.edSign(toHash, keyPair)
+      sigBytes <- ED25519CryptoBC.sign(toHash, keyPair)
       sigHex   = bytes2hex(sigBytes)
       _        = logger.info(s"EDSignature Len: ${sigBytes.length}")
     } yield sigHex
@@ -132,13 +132,13 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
       binBytes <- RippleLocalAPI.serializeForSigning(tx_json)
       toHash   = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction! 0x53545800L
       hashed   = HashOps.sha512Half(toHash.toSeq).toArray
-      sigBytes <- ED25519CryptoBC.edSign(hashed, keyPair)
-      sign2    <- ED25519CryptoBC.edSign(hashed, keyPair)
+      sigBytes <- ED25519CryptoBC.sign(hashed, keyPair)
+      sign2    <- ED25519CryptoBC.sign(hashed, keyPair)
       sigHex   = bytes2hex(sigBytes)
       sig2Hex  = bytes2hex(sign2)
       _        = assert(sig2Hex === sigHex)
       pubKey   = keyPair.getPublic.asInstanceOf[Ed25519PublicKeyParameters]
-      verfied  <- ED25519CryptoBC.edVerify(hashed, sigBytes, pubKey)
+      verfied  <- ED25519CryptoBC.verify(hashed, sigBytes, pubKey)
       _        = assert(verfied)
     } yield (sigHex, verfied)
     val (sig, ok) = getOrLog(sigVerified)

@@ -12,7 +12,6 @@ import cats.implicits._
 import scribe.Logging
 import spire.math.UInt
 
-
 import com.odenzo.ripple.localops.crypto.core.{ED25519CryptoBC, HashOps, Secp256K1CryptoBC}
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
 import com.odenzo.ripple.localops.utils.{ByteUtils, RippleBase58}
@@ -33,17 +32,23 @@ trait AccountFamily extends Logging with ByteUtils with HashOps {
 
   protected case class FamilyGenerator(publicKey: Array[Byte], privateKey: Array[Byte])
 
-
-
-  /** Rebuild Account Keys from Master Seed  - How to determine what keytype? */
+  /** Rebuild Account Keys from Master Seed Hex (Always Secp) */
   def rebuildAccountKeyPairFromSeedHex(mastSeedHex: String): Either[AppError, KeyPair] = {
     for {
       bytes          <- hex2bytes(mastSeedHex)
-      generator      = seed2FamilyGenerator(bytes)
-      d              = familygenerator2accountKeyPair(generator)
-      accountKeyPair = Secp256K1CryptoBC.dToKeyPair(d)
+      accountKeyPair <- rebuildAccountKeyPairFromSeed(bytes)
     } yield accountKeyPair
 
+  }
+
+  /** Rebuild Account Keys from Master Seed Binary */
+  def rebuildAccountKeyPairFromSeed(seed: List[Byte]): Either[AppError, KeyPair] = {
+    AppException.wrapPure("Building secp Account KeyPair from Seed") {
+      val generator      = seed2FamilyGenerator(seed)
+      val d              = familygenerator2accountKeyPair(generator)
+      val accountKeyPair = Secp256K1CryptoBC.dToKeyPair(d)
+      accountKeyPair
+    }
   }
 
   /**
@@ -60,9 +65,7 @@ trait AccountFamily extends Logging with ByteUtils with HashOps {
       val hash512                = sha512(appended)
       val privateKey: Seq[Byte]  = hash512.take(32)
 
-      
-      
-      if (!(privateKey ==  ZERO_KEY) || (bytes2bigint(privateKey.toArray) > MAX_KEY)) {
+      if (!(privateKey == ZERO_KEY) || (bytes2bigint(privateKey.toArray) > MAX_KEY)) {
         hash512 // TODO: Review this code
       } else {
         pass(seed, index + UInt(1))
@@ -73,17 +76,16 @@ trait AccountFamily extends Logging with ByteUtils with HashOps {
     logger.debug(s"Full Hash/Seed: len ${fullHash.length} => ${bytes2hex(fullHash.toArray)}")
 
     val fgPrivateKey: Seq[Byte]  = fullHash.take(32)
-    val fgPublicKey: Array[Byte] = Secp256K1CryptoBC.privatekey2publickeySecp256k1(fgPrivateKey,true)
+    val fgPublicKey: Array[Byte] = Secp256K1CryptoBC.privatekey2publickeySecp256k1(fgPrivateKey, true)
     FamilyGenerator(fgPublicKey, fgPrivateKey.toArray)
   }
-
 
   /**
     * @return The D value of the account private key
     */
   protected def familygenerator2accountKeyPair(generator: FamilyGenerator): BigInteger = {
 
-    val index_number: UInt                      = UInt(0L) 
+    val index_number: UInt                      = UInt(0L)
     val index_number_bytes: immutable.Seq[Byte] = uint2bytes(index_number)
 
     def pass(pubkey: Array[Byte], counterI: UInt): Seq[Byte] = {

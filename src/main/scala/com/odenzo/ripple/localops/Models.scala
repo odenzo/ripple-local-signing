@@ -2,6 +2,8 @@ package com.odenzo.ripple.localops
 
 import java.security.KeyPair
 
+import io.circe.{Decoder, ObjectEncoder}
+import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 
 object Models {
@@ -24,8 +26,10 @@ case class SigningKeyEd25519(kp: AsymmetricCipherKeyPair, signPubKey:String) ext
 
 case class SigningKeySecp256(kp: KeyPair,signPubKey:String) extends SigningKey
 
-case class Base58Check(b58:String)
 
+
+case class Base58(v:String)
+case class Base58Check(v:String)
 case class TxnSignature(hex:String)
 
 
@@ -48,4 +52,25 @@ object ResponseError {
    val kTooMany       = invalid("Exactly one of the following must be specified: passphrase, secret, seed or seed_hex")
    val kSecretAndType = invalid("The secret field is not allowed if key_type is used.")
    val kBadSecret     = ResponseError("badSecret", 41, "Secret does not match account.")
+}
+
+
+case class WalletProposeResult(
+                        account_id: String,
+                        key_type: String,
+                        master_key: String,
+                        master_seed:String,
+                        master_seed_hex: String,
+                        public_key: String,
+                        public_key_hex: String
+                      ) {
+
+}
+
+
+object WalletProposeResult {
+
+   implicit val encoder: ObjectEncoder[WalletProposeResult] = deriveEncoder[WalletProposeResult]
+   implicit val decoder: Decoder[WalletProposeResult]       = deriveDecoder[WalletProposeResult]
+
 }

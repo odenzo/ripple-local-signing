@@ -140,10 +140,10 @@ object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverter
         logger.debug(s"Explicit Key Type $kt from $params")
         // collectFirst...
         val shouldBeOne: List[Either[AppError, String]] = List(
-          params.get("passphrase").map(convertPassphrase2hex),
+          params.get("passphrase").map(convertPassword2hex),
           params.get("seed").map(convertBase58Check2hex),
           params.get("seed_hex").map(_.asRight[AppError])
-        ).flatten
+          ).flatten
         val exactlyOne: Either[AppError, SigningKey] = shouldBeOne match { // Exactly one check
           case first :: Nil ⇒ first.flatMap((v: String) ⇒ packSigningKey(v, kt))
           case other        ⇒ AppError("Not Exactly One passphrease,seed, seed_hex").asLeft[SigningKey]

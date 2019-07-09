@@ -39,7 +39,7 @@ class WalletProposeFixtureTest
     getOrLog(convertBase58Check2hex(kPublicKey)) shouldEqual kPublicKeyHex
 
     val pubKeyBytes = getOrLog(ByteUtils.hex2bytes(kPublicKeyHex))
-    accountpubkey2address(pubKeyBytes) shouldEqual kAccount
+    accountpubkey2address(pubKeyBytes).right.value.v shouldEqual kAccount
 
     // Now it is keytype dependant to derive the public AccountKey from the Family Private Key / Generator
     kKeyType match {
@@ -54,7 +54,7 @@ class WalletProposeFixtureTest
   def checkDerivedKeyEd(seedHex: String, accountPublicKeyHex: String): Unit = {
     // Okay, this is the mystery. We DO NOT use AccountFamily generator etc.
     // I *think* this is the account keypair for ed
-    val keypair = getOrLog(ED25519CryptoBC.seedHex2keypair(seedHex))
+    val keypair = getOrLog(ED25519CryptoBC.generateKeyPairFromHex(seedHex))
     val pubHex  = getOrLog(ED25519CryptoBC.publicKey2Hex(keypair.getPublic))
     pubHex shouldEqual accountPublicKeyHex
     ()
@@ -71,7 +71,6 @@ class WalletProposeFixtureTest
     val results = getOrLog(loadResults, s"Trouble Getting Result fields")
 
     results.foreach { result ⇒
-      // logger.debug(s"Testing Result: ${result.asJson.spaces4}")
       testKeyAgnostic(result)
     }
     ()

@@ -4,12 +4,18 @@ import cats._
 import cats.data._
 import cats.implicits._
 
+import com.odenzo.ripple.localops.Base58Check
 import com.odenzo.ripple.localops.crypto.AccountFamily.{ripemd160, sha256, sha512}
 import com.odenzo.ripple.localops.crypto.core.HashOps
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
-import com.odenzo.ripple.localops.utils.{ByteUtils, RippleBase58}
+import com.odenzo.ripple.localops.utils.{ByteUtils, Hex, RippleBase58}
 
 trait RippleFormatConverters {
+
+  val accountPrefix          = Hex("00")
+  val publicKeyPrefix        = Hex("23")
+  val seedValuePrefix        = Hex("21")
+  val validationPubKeyPrefix = Hex("1C")
 
   /**
     * @param publicKey secp265k or ed25519 keys key, if ed25519 padded with 0xED
@@ -17,25 +23,36 @@ trait RippleFormatConverters {
     * @return Ripple Account Address Base58 encoded with leading r
     *
     */
-  def accountpubkey2address(publicKey: Seq[Byte]): String = {
-    assert(publicKey.length === 32 || publicKey.length === 33)
-
+  def accountpubkey2address(publicKey: Seq[Byte]): Either[AppError, Base58Check] = {
     // Should start with ED if 32 byte  Ed25519
-    val sha: Seq[Byte]       = sha256(publicKey)
-    val accountId: Seq[Byte] = ripemd160(sha)
-    val payload: Seq[Byte]   = 0.toByte +: accountId
+    val sha: Seq[Byte]        = sha256(publicKey)
+    val accountId: List[Byte] = ripemd160(sha).toList
 
-    val checksumHash1: Seq[Byte] = sha256(payload)
-    val checksum                 = sha256(checksumHash1).take(4)
+    val prefix: Either[AppError, Byte]        = ByteUtils.hex2byte(accountPrefix)
+    val payload: Either[AppError, List[Byte]] = prefix.map(_ :: accountId)
+    payload.map(base58Checksum)
 
-    val bytes: Seq[Byte] = payload ++ checksum
-    val b58: String      = RippleBase58.encode(bytes)
-    b58
   }
 
-  /** TODO: Check this. */
-  def convertPassphrase2hex(password: String): Either[AppError, String] = {
-    ByteUtils.bytes2hex(sha512(password.getBytes("UTF-8")).take(16)).asRight[AppError]
+  /**
+    * Password typically should not be used. Generate random and note the RFC-1751
+    *
+    * @param password Random password, this routine doesn't warn about low entropy
+    *
+    * @return 16 bytes in hex form suitable to use as master_seed_hex (if password is good)
+    */
+  def convertPassword2hex(password: String): Either[AppError, String] = {
+    convertPassword2bytes(password).map(ByteUtils.bytes2hex)
+  }
+
+  /**
+    * Password typically should not be used. Generate random and note the RFC-1751
+    * @param password Random password, this routine doesn't warn about low entropy
+    *
+    * @return 16 bytes suitable to use as master_seed_hex (if password is good)
+    */
+  def convertPassword2bytes(password: String): Either[AppError, List[Byte]] = {
+    sha512(password.getBytes("UTF-8")).take(16).toList.asRight[AppError]
   }
 
   /** This trims off the first *byte* and the last four checksum bytes from
@@ -46,36 +63,49 @@ trait RippleFormatConverters {
     * @return
     */
   def convertBase58Check2hex(rippleB58: String): Either[AppError, String] = {
-    AppException.wrap(s"Converting MasterSeed $rippleB58 to MasterSeedHex") {
+    AppException.wrap(s"Converting Base58Check $rippleB58 to plain hex ") {
       for {
-        bytes   <- RippleBase58.decode(rippleB58)
-        trimmed = bytes.drop(1).dropRight(4)
+        trimmed ← convertBase58Check2bytes(rippleB58)
         hex     = ByteUtils.bytes2hex(trimmed)
       } yield hex
     }
   }
 
-  val accountPrefix          = "00"
-  val publicKeyPrefix        = "23"
-  val seedValuePrefix        = "21"
-  val validationPubKeyPrefix = "1C"
+  def convertBase58Check2bytes(rippleB58: String): Either[AppError, List[Byte]] = {
+    AppException.wrap(s"Converting Base58Check $rippleB58 to Plain Bytes") {
+      for {
+        bytes   <- RippleBase58.decode(rippleB58)
+        trimmed = bytes.toList.drop(1).dropRight(4)
+      } yield trimmed
+    }
+  }
+
+  protected def base58Checksum(payload: List[Byte]): Base58Check = {
+    val checksum = sha256(sha256(payload)).take(4)
+    val encoded  = RippleBase58.encode(payload ++ checksum)
+    Base58Check(encoded)
+  }
 
   /** You will have to add prefix per https://xrpl.org/base58-encodings.html */
-  def convertHex2seedB58Check(prefix: String, hex: String) = {
+  protected def convertHex2seedB58Check(prefix: Hex, hex: Hex): Either[AppError, Base58Check] = {
     // This is pure conversion, no family stuff. Adds s and checksum
+    for {
+      header  ← ByteUtils.hex2byte(prefix)
+      bytes   <- ByteUtils.hex2bytes(hex.v)
+      payload = header +: bytes
+      b58c    = base58Checksum(payload)
+    } yield b58c
 
   }
 
-  /**
-    *
-    * @param bytes 33 bytes (OD+32 bytes for ed25519)
-    *              @return Base58 checksum encoded
-    */
-  def publicKeyToAddress(bytes: List[Byte]) = {
-    val accountId = HashOps.sha256(HashOps.ripemd160(bytes))
-    val checksum  = HashOps.sha256(HashOps.sha256(accountId))
-    val address   = RippleBase58.encode(accountId ++ checksum)
-    address
+  /** Converts Master Seed Hex to Riopple Base58Check encoding */
+  def convertSeedHexToB58Check(seedhex: Hex): Either[AppError, Base58Check] = {
+    convertHex2seedB58Check(seedValuePrefix, seedhex)
+  }
+
+  /** Converts Public Key Hex to Riopple Base58Check encoding */
+  def convertPubKeyHexToB58Check(pubkeyhex: Hex): Either[AppError, Base58Check] = {
+    convertHex2seedB58Check(publicKeyPrefix, pubkeyhex)
   }
 
   /**
@@ -87,7 +117,7 @@ trait RippleFormatConverters {
     */
   def convertMasterKey2masterSeedHex(masterKeyRFC1751: String): Either[AppError, String] = {
     AppException.wrap("RFC1751 to Master Seed Hex") {
-      RFC1751Keys.getKeyFromTwelveWords(masterKeyRFC1751)
+      RFC1751Keys.twelveWordsToHex(masterKeyRFC1751)
     }
   }
 

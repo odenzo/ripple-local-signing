@@ -11,7 +11,7 @@ import com.odenzo.ripple.localops.utils.ByteUtils
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 
 /**
-  * Converting to Scala
+  * Converting to Scala (crudely) 128 bits <-> 12 words.
   */
 object RFC1751Keys {
   // format: off
@@ -261,14 +261,13 @@ object RFC1751Keys {
 
   // format: on
 
-  def extract(s: Array[Byte], start: Int, length: Int): Long = {
+  protected def extract(s: Array[Byte], start: Int, length: Int): Long = {
 
-    // s(start/8) is a byte, why anding?
     val cl: Int = s(start / 8) & 0xFF // get components
     val cc: Int = s(start / 8 + 1) & 0xFF
     val cr: Int = s(start / 8 + 2) & 0xFF
 
-    val x = (cl << 8 | cc).toLong << 8 | cr // Put bytes together
+    val x: Long = (cl << 8 | cc).toLong << 8 | cr // Put bits together
 
     val y: Long = x >> (24 - (length + (start % 8))) // Right justify number
     val z: Long = y & (0xffff >> (16 - length)) // Trim extra bits.
@@ -276,15 +275,20 @@ object RFC1751Keys {
     z
   }
 
-  /** Bytes to English String */
+  /** Bytes to English String -- extactly how many bytes this should be?
+    * Typically 64 bits done twice.
+    **/
   def btoe(strData: Array[Byte]): String = {
-    val caBuffer: Array[Byte] = strData.take(8) // add in room for the parity 2 bits
+    val caBuffer: Array[Byte] = strData.take(8)
+    val fullBuffer            = strData.take(8) ++ Array[Byte](0, 0)
 
-    val parity: Long     = computeParity(caBuffer) // compute parity: merely add groups of two bits.
-    val parityByte: Long = parity << 6
-    val withParity       = caBuffer ++ caBuffer
+    //val parity: Long     = computeParity(caBuffer) // compute parity: merely add groups of two bits.
+    val parity: Int      = computeParity(fullBuffer)
+    val parityByte: Byte = (parity << 6).toByte
+    val withParity       = caBuffer ++ Array[Byte](parityByte, 0)
+    fullBuffer.update(8, parityByte)
 
-    val human = Seq(0, 11, 22, 33, 44, 55).map(start ⇒ WORDLIST(extract(caBuffer, start, 11).toInt))
+    val human = Seq(0, 11, 22, 33, 44, 55).map(start ⇒ WORDLIST(extract(fullBuffer, start, 11).toInt))
     human.mkString(" ")
   }
 
@@ -293,8 +297,8 @@ object RFC1751Keys {
     * @param bytes Not sure the prerequisites on length
     * @return
     */
-  def computeParity(bytes: Array[Byte]): Long = {
-    Range(0, 64, 2).map(i ⇒ extract(bytes, i, 2)).sum
+  protected def computeParity(bytes: Array[Byte]): Int = {
+    Range.Int(0, 64, 2).map(i ⇒ extract(bytes, i, 2)).sum.toInt
   }
 
   /** Six Words to Binary in some tortured Scala mutable code */
@@ -323,10 +327,10 @@ object RFC1751Keys {
       }
       .map(_ ⇒ bytes)
 
-    binary.flatMap { b ⇒
+    binary.flatMap { b: ArrayBuffer[Byte] ⇒
       val ab     = b.toArray
       val parity = computeParity(ab)
-      if ((parity & 3) =!= extract(ab, 64, 2)) {
+      if ((parity & 3) =!= extract(ab, 64, 2).toInt) {
         Left(AppError(s"Parity Check Failed"))
       } else {
         ab.take(8).asRight
@@ -369,8 +373,21 @@ object RFC1751Keys {
     s
   }
 
+  /**
+    *
+    *
+    * @param wordlist   This is always WORDLIST above for non-testing
+    * @param word       The word to find.
+    * @param startIndex This is always zero in our scenario
+    *
+    * @return
+    */
+  protected def indexOf(wordlist: Seq[String], word: String, startIndex: Int): Int = {
+    wordlist.indexOf(word)
+  }
+
   /** Just cleans up a word before processing */
-  def standard(strWord: String): String = {
+  protected def standard(strWord: String): String = {
     strWord.toUpperCase.map { letter: Char ⇒
       letter match {
         case '1'   ⇒ 'L'
@@ -381,14 +398,17 @@ object RFC1751Keys {
     }
   }
 
-  def key2English(seedHexAsBytes: Array[Byte]): String = {
+  /** 16 bytes to twelve words. Note this reverses the order of bytes per Ripple.
+    * Some examples on net don't seem to do this. */
+  def bytesToEnglish(seedHexAsBytes: Array[Byte]): String = {
     val bytes = seedHexAsBytes.reverse
     val upper = btoe(org.bouncycastle.util.Arrays.copyOf(bytes, 8))
     val lower = btoe(org.bouncycastle.util.Arrays.copyOfRange(bytes, 8, 16))
-    upper + lower
+    upper +" "+ lower
   }
 
-  def getKeyFromTwelveWords(strHuman: String): Either[AppError, String] = {
+  /** Ripple case, 12 RFX words to 128 bits in hex form (seed_hex) */
+  def twelveWordsToHex(strHuman: String): Either[AppError, String] = {
 
     val words: List[String] = strHuman.trim().split(" ").toList
 
@@ -405,15 +425,4 @@ object RFC1751Keys {
     }
   }
 
-  /**
-    *
-    *
-    * @param wordlist   This is always WORDLIST above for non-testing
-    * @param word       The word to find.
-    * @param startIndex This is always zero in our scenario
-    * @return
-    */
-  def indexOf(wordlist: Seq[String], word: String, startIndex: Int): Int = {
-    wordlist.indexOf(word)
-  }
 }

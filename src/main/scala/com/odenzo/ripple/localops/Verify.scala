@@ -50,7 +50,7 @@ trait Verify extends Logging with JsonUtils with ByteUtils {
     for {
       pubkey   <- ED25519CryptoBC.signingPubKey2KeyParameter(pubkeyraw)
       sig      <- ByteUtils.hex2bytes(signature)
-      verified <- ED25519CryptoBC.edVerify(payload.toArray, sig.toArray, pubkey)
+      verified <- ED25519CryptoBC.verify(payload.toArray, sig.toArray, pubkey)
     } yield verified
 
   }

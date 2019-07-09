@@ -50,22 +50,21 @@ trait CirceUtils extends Logging {
 
   }
 
-
   /** Does top level sorting of fields in this object alphanumeric with capital before lowercase  */
   def sortFields(jsonObject: JsonObject): JsonObject = {
     // Want Capital letters sorted before lower case
-    val sortedList = jsonObject.toList.sortBy { case(fieldName:String, _:Json) ⇒ fieldName}
+    val sortedList = jsonObject.toList.sortBy { case (fieldName: String, _: Json) ⇒ fieldName }
     JsonObject.fromIterable(sortedList)
   }
 
   /** Sorts top level object and all nested fields */
   def sortDeepFields(jsonObject: JsonObject): JsonObject = {
-    val deep =  jsonObject.mapValues { iv: Json ⇒
-          iv.asObject match {
-            case None ⇒ iv
-            case Some(obj) ⇒ sortDeepFields(obj).asJson
-          }
+    val deep = jsonObject.mapValues { iv: Json ⇒
+      iv.asObject match {
+        case None      ⇒ iv
+        case Some(obj) ⇒ sortDeepFields(obj).asJson
       }
+    }
     sortFields(deep)
   }
 
@@ -109,6 +108,11 @@ trait CirceUtils extends Logging {
     val decoderInfo = decoder.toString
     val msg         = s"Using Decoder $decoderInfo for Type"
     decoder.decodeJson(json).leftMap((e: DecodingFailure) ⇒ new AppJsonDecodingError(json, e, msg))
+  }
+
+  def decode[T](jsonObj: JsonObject, decoder: Decoder[T]): ErrorOr[T] = {
+    val json = jsonObj.asJson
+    decode(json, decoder)
   }
 }
 

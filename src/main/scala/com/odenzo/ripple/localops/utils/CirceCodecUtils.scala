@@ -157,10 +157,10 @@ trait CirceCodecUtils extends CirceEncoderUtils with CirceDecoderUtils {
   }
 
   /**
-    * Parses the list of json key  value pairs until it hits first error (not-accumulating parsing).
-    *
-    * @param json
-    * @param fn
+    * Parses the list of json key  value pairs until it hits first error (not-accumulating errors).
+    * Now assumes no variance, and all the fields are decoded to type T.
+    * @param json Really a JSONObject
+    * @param fn   Function that takes the field name and Json value and returns T
     * @tparam T
     *
     * @return

@@ -11,16 +11,16 @@ import spire.math.{UByte, UInt, ULong}
 
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException, OError}
 
+
+trait BinaryValue
 /**
   * Hex representation of binary value. May be odd length.
-  *
+
   * @param v Hex string, without 0x prefix.
   */
-case class Hex(v: String)
+case class Hex(v: String) extends BinaryValue
 
-/** Helpers since I seldom use bits/bytes directly and Scala/Java sucks. Don't know a good lib
-  * SDtarting to use Spire, and making sure these all work -- but more convenience than speed at this point
-  * */
+
 trait ByteUtils extends Logging {
 
   val bytezero: Byte = 0.toByte
@@ -73,6 +73,7 @@ trait ByteUtils extends Logging {
     hex2byte(v).map(UByte(_))
   }
 
+  def hex2byte(v:Hex): Either[AppError, Byte] = hex2byte(v.v)
   /**
     * Note for speed
     *
