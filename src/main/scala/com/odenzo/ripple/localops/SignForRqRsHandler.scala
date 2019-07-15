@@ -3,19 +3,27 @@ package com.odenzo.ripple.localops
 import cats._
 import cats.data._
 import cats.implicits._
-import scribe.Logging
-import io.circe.{Json, JsonObject}
 import io.circe.syntax._
-import java.io
+import io.circe.{Json, JsonObject}
+import scribe.Logging
 
-import com.odenzo.ripple.localops.RippleLocalOps.{packSigningKey, packSigningKeyFromB58}
-import com.odenzo.ripple.localops.SignForRqRsHandler.extractKey
+import com.odenzo.ripple.localops.RippleLocalOps.packSigningKey
 import com.odenzo.ripple.localops.crypto.RippleFormatConverters
-import com.odenzo.ripple.localops.reference.HashPrefix
-import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
 import com.odenzo.ripple.localops.utils.caterrors.{AppError, OError}
+import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
 
-object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverters {
+/**
+ * Overview: Account Address needs a SIgnerList.
+  * SignFor adds one signer to the list.
+  * When enough signers are added, then use SubmitFor with the JSON
+  * or Submit with TxBlob
+  * The SigningPublicKey on the request needs to be an empty string.
+  * Not sure exactly how the signing is done, since SIgningList is in tx_json
+  * I think its pretty much the same way to generate the TxnSignature
+  * Build soem test cases from the server first.
+  * 
+  * */
+object SignForRqRsHandler extends Logging with JsonUtils with RippleFormatConverters {
 
 
   /**
@@ -23,7 +31,7 @@ object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverter
     * @param rq Full SignRq (SingingPubKey doesn't need to be filled)
     * @return Left is error response SignRs, Right is success response
     */
-  def processSignRequest(rq: JsonObject): Either[JsonObject, JsonObject] = {
+  def signFor(rq: JsonObject): Either[JsonObject, JsonObject] = {
 
     //validateRequest(rq)
 

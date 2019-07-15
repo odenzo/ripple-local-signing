@@ -78,7 +78,7 @@ object RippleLocalOps extends Logging {
     */
   def sign(signRq: JsonObject): JsonObject = {
 
-    SignRqRsHandler.processSignRequest(signRq) match {
+    SignForRqRsHandler.signFor(signRq) match {
       case Left(v)  ⇒ v
       case Right(v) ⇒ v
     }

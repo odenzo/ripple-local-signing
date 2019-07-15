@@ -2,14 +2,11 @@ package com.odenzo.ripple.localops.testkit
 
 import cats.Eval
 import cats.implicits._
-import scribe.Level.{Debug, Info, Warn}
+import scribe.Level.Warn
 import scribe.{Level, Logging, Priority}
-import spire.math.{UByte, ULong}
 
 import com.odenzo.ripple.bincodec.LoggingConfig
 import com.odenzo.ripple.localops.testkit.OTestLogging.setTestLogLevel
-import com.odenzo.ripple.localops.utils.ByteUtils
-import com.odenzo.ripple.localops.utils.caterrors.AppError
 
 trait OTestLogging extends Logging {
 
@@ -31,9 +28,6 @@ trait OTestLogging extends Logging {
       scribe.Logger.root.clearHandlers().withHandler(minimumLevel = Some(l)).replace()
     }
   }
-
-
-
 }
 
 object DefaultSettings {
@@ -53,7 +47,7 @@ object DefaultSettings {
     } else {
       Warn // On Assumption we are in library mode, not testing, which will override.
     }
-    scribe.warn(s"defaultSetup for test logging ${threshold}")
+    scribe.warn(s"defaultSetup for test logging $threshold")
     setTestLogLevel(threshold)
     threshold
   }
