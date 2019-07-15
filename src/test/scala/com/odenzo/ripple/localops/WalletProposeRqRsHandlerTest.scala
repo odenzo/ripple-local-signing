@@ -14,6 +14,16 @@ class WalletProposeRqRsHandlerTest extends OTestSpec with FixtureUtils with Befo
   lazy val ed   = loadRqRsResource("/test/myTestData/keysAndTxn/ed25519_wallets.json")
   lazy val secp = loadRqRsResource("/test/myTestData/keysAndTxn/secp256k1_wallets.json")
 
+
+  before{
+    //setTestLogLevel(Level.Debug)
+  }
+
+  after{
+  //  setTestLogLevel(Level.Info)
+  }
+
+
   test("all") {
 
     val rr: List[(JsonObject, JsonObject)] = getOrLog(ed) ::: getOrLog(secp)
@@ -44,13 +54,6 @@ class WalletProposeRqRsHandlerTest extends OTestSpec with FixtureUtils with Befo
     }
   }
 
-  before {
-    setTestLogLevel(Level.Debug)
-  }
-
-  after {
-    setTestLogLevel(Level.Info)
-  }
 
   /** Goes through all the possible test cases we can mimic and get the same result. */
   def testAllGood(rq: JsonObject, rs: JsonObject): Unit = {
@@ -66,7 +69,7 @@ class WalletProposeRqRsHandlerTest extends OTestSpec with FixtureUtils with Befo
       "passphrase" → keys.master_seed_hex
     ).foreach {
       case (fieldName: String, fieldVal: String) ⇒
-        logger.info(s"Injecting $fieldName => $fieldVal")
+        logger.debug(s"Injecting $fieldName => $fieldVal")
         val injected             = rq.add(fieldName, fieldVal.asJson)
         val response: JsonObject = WalletProposeRqRsHandler.propose(injected)
         logger.debug(s"Response:\n${response.asJson.spaces4}")

@@ -72,7 +72,7 @@ val lib_spire = {
 
 
 val lib_scribe = {
-  Seq("com.outr" %% "scribe" % "2.7.7")
+  Seq("com.outr" %% "scribe" % "2.7.8")
 }
 
 

@@ -24,7 +24,7 @@ trait Verify extends Logging with JsonUtils with ByteUtils {
       pubkeyraw  <- findField("SigningPubKey", txjson).flatMap(json2string)
       keyType    = if (pubkeyraw.startsWith("ED")) "ed25519" else "secp256k1"
       signature  <- findField("TxnSignature", txjson).flatMap(json2string)
-      serialized <- RippleLocalAPI.serializeForSigning(txjson)
+      serialized <- RippleLocalOps.serializeForSigning(txjson)
       payload    = HashPrefix.transactionSig.asBytes ++ serialized
       ans ← keyType match {
              case "ed25519"   ⇒ ed25519(signature, pubkeyraw, payload)

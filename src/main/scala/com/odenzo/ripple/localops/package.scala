@@ -1,19 +1,14 @@
 package com.odenzo.ripple
 
-import scribe.Level
+import cats._
+import cats.data._
+import cats.implicits._
 import scribe.Level.Warn
+import scribe.{Level, Logging}
 
-import com.odenzo.ripple.bincodec.inCI
+package object localops extends Logging {
 
-
-
-package object localops {
-
-
-  scribe.warn("*********** bincodec package initialization **************")
-  private val touch: Unit = defaultSetup
-
-
+  scribe.warn("*********** localops package initialization **************")
   /** Scala test should manuall control after this */
   lazy val defaultSetup: Unit = {
 
@@ -22,17 +17,18 @@ package object localops {
     } else {
       setAllToLevel(Warn) // On Assumption we are in library mode, not testing, which will override.
     }
-    scribe.error("Done with Default")
+    logger.warn("Done with Default in localops ")
   }
+  protected val inCI: Boolean = scala.sys.env.getOrElse("CONTINUOUS_INTEGRATION", "false") === "true"
+  private val touch: Unit = defaultSetup
 
   /** This sets the handler filter level,  all settings to modifiers are essentially overridden on level,
     * althought the modifiers may filter out additional things.
     *
     * */
   def setAllToLevel(l: Level): Unit = {
-    scribe.warn(s"Setting all to log level $l")
+    logger.warn(s"Setting all to log level $l")
     scribe.Logger.root.clearHandlers().withHandler(minimumLevel = Some(l)).replace()
-    //scribe.Logger.root.clearModifiers().withMinimumLevel(l).replace()
   }
 
 }

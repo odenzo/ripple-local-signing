@@ -8,7 +8,7 @@ import org.scalatest.FunSuite
 
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 import com.odenzo.ripple.localops.utils.ByteUtils
-import com.odenzo.ripple.localops.RippleLocalAPI
+import com.odenzo.ripple.localops.RippleLocalOps
 import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 
 /** This test is designed check the secret to pubsigning key conversion
@@ -22,7 +22,7 @@ class VerificationFixture$Test extends FunSuite with OTestSpec with ByteUtils wi
 
     val result                              = findRequiredObject("result", rs)
     val tx_json: JsonObject                 = findRequiredObject("tx_json", result)
-    val verified: Either[AppError, Boolean] = RippleLocalAPI.verify(tx_json)
+    val verified: Either[AppError, Boolean] = RippleLocalOps.verify(tx_json)
     val ok                                  = getOrLog(verified)
     ok shouldEqual true
   }

@@ -8,7 +8,7 @@ import io.circe.{Json, JsonObject}
 import io.circe.syntax._
 import java.io
 
-import com.odenzo.ripple.localops.RippleLocalAPI.{packSigningKey, packSigningKeyFromB58}
+import com.odenzo.ripple.localops.RippleLocalOps.{packSigningKey, packSigningKeyFromB58}
 import com.odenzo.ripple.localops.SignRqRsHandler.extractKey
 import com.odenzo.ripple.localops.crypto.RippleFormatConverters
 import com.odenzo.ripple.localops.reference.HashPrefix
@@ -17,13 +17,6 @@ import com.odenzo.ripple.localops.utils.caterrors.{AppError, OError}
 
 object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverters {
 
-  // Returned if no secret and no key_type/seed_val
-
-  /*
-       Sign will overwrite any SigningPubKey even if its wrong.
-       But if key_type is present and no secret it still barks about missing secret
-
-   */
 
   /**
     *
@@ -126,19 +119,23 @@ object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverter
     }
   }
 
+  /** THis is when secret field is used in signing request, and only applicable for SECP256K1 keys */
   protected def secretKey(secretB58: String, params: Map[String, String]): Either[ResponseError, SigningKey] = {
     convertBase58Check2hex(secretB58)
-      .flatMap(packSigningKey(_, "secp256k1"))
+      .flatMap(packSigningKey(_, SECP256K1))
       .leftMap(ae ⇒ ResponseError.kBadSecret)
   }
 
   protected def explicitKey(params: Map[String, String]): Either[ResponseError, SigningKey] = {
 
-    params.get("key_type") match {
+    val keyType = params.get("key_type") match {
       case None ⇒ ResponseError.kNoSecret.asLeft // Mimicing Ripple even if there are seed, seed_hex passphrase
-      case Some(kt) ⇒
+      case Some(kt) ⇒ KeyType.fromText(kt)
+    }
+
+    keyType.flatMap { kt ⇒
         logger.debug(s"Explicit Key Type $kt from $params")
-        // collectFirst...
+
         val shouldBeOne: List[Either[AppError, String]] = List(
           params.get("passphrase").map(convertPassword2hex),
           params.get("seed").map(convertBase58Check2hex),

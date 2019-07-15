@@ -7,7 +7,7 @@ import com.odenzo.ripple.localops.crypto.core.HashOps
 import com.odenzo.ripple.localops.reference.HashPrefix
 import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, JsonUtils}
-import com.odenzo.ripple.localops.{RippleLocalAPI, Verify}
+import com.odenzo.ripple.localops.{RippleLocalOps, Verify}
 
 class VerifyTest extends FunSuite with OTestSpec with JsonUtils with FixtureUtils {
 
@@ -39,7 +39,7 @@ class VerifyTest extends FunSuite with OTestSpec with JsonUtils with FixtureUtil
 
     // First lets see if we can get the hash
     for {
-      all        <- RippleLocalAPI.binarySerialize(tx)
+      all        <- RippleLocalOps.binarySerialize(tx)
       allHash    = hashOp((HashPrefix.transactionID.v ::: all.rawBytes).map(_.toByte))
       allHashHex = ByteUtils.bytes2hex(allHash)
       _          = logger.info(s"AllHash ${ByteUtils.bytes2hex(allHash)}")

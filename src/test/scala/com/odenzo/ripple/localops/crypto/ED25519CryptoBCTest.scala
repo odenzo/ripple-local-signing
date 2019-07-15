@@ -7,7 +7,7 @@ import org.scalatest.FunSuite
 import com.odenzo.ripple.localops.crypto.core.{ED25519CryptoBC, HashOps}
 import com.odenzo.ripple.localops.reference.HashPrefix
 import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, JsonUtils}
-import com.odenzo.ripple.localops.RippleLocalAPI
+import com.odenzo.ripple.localops.RippleLocalOps
 import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 
 class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with JsonUtils with ByteUtils {
@@ -76,7 +76,7 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
     // First lets see if we can get the hash
     for {
       tx_json    ← txjsonResult
-      all        <- RippleLocalAPI.binarySerialize(tx_json)
+      all        <- RippleLocalOps.binarySerialize(tx_json)
       allHash    = HashOps.sha512Half((HashPrefix.transactionID.v ::: all.rawBytes).map(_.toByte))
       allHashHex = ByteUtils.bytes2hex(allHash)
       _          = logger.info(s"AllHash ${ByteUtils.bytes2hex(allHash)}")
@@ -93,7 +93,7 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
       calcPub ← ED25519CryptoBC.signingPubKey2KeyParameter(signPubKey)
 
       _        = pubHex shouldEqual signPubKey
-      binBytes <- RippleLocalAPI.serializeForSigning(tx_json)
+      binBytes <- RippleLocalOps.serializeForSigning(tx_json)
       toHash   = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction! 0x53545800L
 
       sig      ← kTxnSig
@@ -111,7 +111,7 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
     val txnsig = for {
       tx_json  ← txjsonResult
       keyPair  <- ED25519CryptoBC.generateKeyPairFromHex(seedHex)
-      binBytes <- RippleLocalAPI.serializeForSigning(tx_json)
+      binBytes <- RippleLocalOps.serializeForSigning(tx_json)
       toHash   = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction! 0x53545800L
 
       sigBytes <- ED25519CryptoBC.sign(toHash, keyPair)
@@ -129,7 +129,7 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
     val sigVerified = for {
       tx_json ← txjsonResult
 
-      binBytes <- RippleLocalAPI.serializeForSigning(tx_json)
+      binBytes <- RippleLocalOps.serializeForSigning(tx_json)
       toHash   = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction! 0x53545800L
       hashed   = HashOps.sha512Half(toHash.toSeq).toArray
       sigBytes <- ED25519CryptoBC.sign(hashed, keyPair)

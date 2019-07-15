@@ -10,7 +10,7 @@ import scribe.{Level, Logging}
 import com.odenzo.ripple.bincodec.decoding.TxBlobBuster
 import com.odenzo.ripple.bincodec.syntax.debugging._
 import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
-import com.odenzo.ripple.localops.RippleLocalAPI
+import com.odenzo.ripple.localops.RippleLocalOps
 import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 
 /**
@@ -24,12 +24,12 @@ class SigningRqFixture$Test extends OTestSpec with ByteUtils with FixtureUtils w
   def runOne(rq: JsonObject, rs: JsonObject): Unit = {
 
     val rsResultTx = findRequiredObject("tx_json", findRequiredObject("result", rs))
-    val rsDump     = RippleLocalAPI.binarySerialize(rsResultTx)
+    val rsDump     = RippleLocalOps.binarySerialize(rsResultTx)
     scribe.info(s"Binary Serialized Rs Result: ${rsDump.show}")
 
     // val txnsigFromRq: String = getOrLog(RippleLocalAPI.sign(tx_jsonRq, seed, keyType))
 
-    val signRs: JsonObject = RippleLocalAPI.sign(rq)
+    val signRs: JsonObject = RippleLocalOps.sign(rq)
     val kResult            = findRequiredObject("result", rs)
     val signResult         = findRequiredObject("result", signRs)
     val signResultTxJson   = findRequiredObject("tx_json", signResult)

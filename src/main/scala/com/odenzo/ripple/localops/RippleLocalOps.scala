@@ -9,26 +9,60 @@ import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 
 import com.odenzo.ripple.bincodec.{EncodedNestedVals, RippleCodecAPI}
 import com.odenzo.ripple.bincodec.encoding.BinarySerializer
+import com.odenzo.ripple.localops.crypto.core.HashOps
 import com.odenzo.ripple.localops.crypto.{AccountFamily, RippleFormatConverters}
 import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils, RippleBase58}
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 
-object RippleLocalAPI extends Logging {
+object RippleLocalOps extends Logging {
+
+  /** This is the recommended programmatic API for Local Signing. The TxBlob response is
+    * the only item needed for subsequent `submit` to XRPL server.
+    *
+    * @param tx_json
+    * @param signingKey
+    *
+    * @return
+    */
+  def signToTxnBlob(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, (String, String)] = {
+    for {
+      sig       ← Signer.signToTxnSignature(tx_json, signingKey)
+      txblob    ← Signer.createSignedTxBlob(tx_json, sig)
+      txblobHex = ByteUtils.bytes2hex(txblob)
+      hash      = HashOps.sha512(txblob)
+      hashHex   = ByteUtils.bytes2hex(hash)
+    } yield (txblobHex, hashHex)
+  }
+
+  /**
+    * This is recommended API for verifying a Signature.
+    * I have yet to run across a client side use-case for this.
+    *
+    * Takes a signed tx_json object and verified the TxnSignature
+    * usign SigningPubKey
+    *
+    * @param tx_json
+    *
+    * @return true if verified correctly
+    */
+  def verify(tx_json: JsonObject): Either[AppError, Boolean] = {
+    Verify.verifySigningResponse(tx_json)
+  }
 
   /** Pack a key into internal format. Parameters per WalletProposeRs */
-  def packSigningKey(master_seed_hex: String, key_type: String): Either[AppError, SigningKey] = {
+  def packSigningKey(master_seed_hex: String, key_type: KeyType): Either[AppError, SigningKey] = {
     Signer.preCalcKeys(master_seed_hex, key_type)
   }
 
   /** Pack a key into internal format. Parameters per WalletProposeRs */
-  def packSigningKeyFromB58(master_seed: String, key_type: String): Either[AppError, SigningKey] = {
+  def packSigningKeyFromB58(master_seed: String, key_type: KeyType): Either[AppError, SigningKey] = {
     RippleFormatConverters
       .convertBase58Check2hex(master_seed)
       .flatMap(packSigningKey(_, key_type))
   }
 
   /** Pack a key into internal format. Parameters per WalletProposeRs */
-  def packSigningKeyFromRFC1751(master_key: String, key_type: String): Either[AppError, SigningKey] = {
+  def packSigningKeyFromRFC1751(master_key: String, key_type: KeyType): Either[AppError, SigningKey] = {
     RippleFormatConverters
       .convertMasterKey2masterSeedHex(master_key)
       .flatMap(packSigningKey(_, key_type))
@@ -40,36 +74,19 @@ object RippleLocalAPI extends Logging {
     * Note that the Fee should already be specified, also all the paths.
     *
     * This is for backward compatiability, signToTxnBlob is preferred method for speed
-    * 
+    *
     */
   def sign(signRq: JsonObject): JsonObject = {
 
     SignRqRsHandler.processSignRequest(signRq) match {
-      case Left(v) ⇒ v
+      case Left(v)  ⇒ v
       case Right(v) ⇒ v
     }
 
   }
 
-
   def signToTxnSignature(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, TxnSignature] = {
     Signer.signToTxnSignature(tx_json, signingKey)
-  }
-
-  def signToTxnBlob(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, String] = {
-    Signer
-      .signToTxnSignature(tx_json, signingKey)
-      .flatMap(sig ⇒ Signer.createSignedTxBlob(tx_json, sig))
-      .map(v ⇒ ByteUtils.bytes2hex(v))
-  }
-
-  /**
-    * Takes a signed tx_json object and verified the TxnSignature usign SigningPubKey
-    * @param tx_json
-    * @return true if verified correctly
-    */
-  def verify(tx_json: JsonObject): Either[AppError, Boolean] = {
-    Verify.verifySigningResponse(tx_json)
   }
 
   /**

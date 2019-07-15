@@ -16,12 +16,21 @@ import com.odenzo.ripple.localops.utils.caterrors.AppError
 /** In Progress */
 object WalletGenerator extends Logging with ByteUtils {
 
-  /** Generates a wallet using Java SecureRandom */
+  /** This is the recommended method. It will generate an ed25519 set of keys.
+    * It will not initialize the account (no initial deposit).
+    * All the rest of the methods are for compatability for existing legacy use cases.
+    * Note: ed25519 keys do not work with Payment Channels (yet?) according to Ripple
+    *
+    */
+  def generateWallet(): Either[AppError, WalletProposeResult] = {
+    generateSeed().flatMap(generateEdKeys)
+  }
+
+  
+  /** Generates a wallet using Java SecureRandom.  */
   def generateSeed(): Either[AppError, List[Byte]] = {
     val ranBytes = new Array[Byte](16)
-    logger.info(s"Random Bytes After Secure: $ranBytes")
     SecureRandom.getInstanceStrong.nextBytes(ranBytes)
-    logger.info(s"Random Bytes After Secure: $ranBytes")
     ranBytes.toList.asRight[AppError]
   }
 
@@ -35,7 +44,7 @@ object WalletGenerator extends Logging with ByteUtils {
     // Valid Hex cannot be valid B58Check. Also need to negative test all those routines.
     // TODO: Seems  SeedB58 is not returning error on all failures (not checking prefix and checksum just chopping)
     generateSeedFromSecretKey(someSeed)
-      .recoverWith{ case e ⇒ generateSeedFromHex(someSeed) }
+      .recoverWith { case e ⇒ generateSeedFromHex(someSeed) }
       .recoverWith { case e ⇒ generateSeedFromSeedB58(someSeed) }
       .recoverWith { case e ⇒ generateSeedFromPassword(someSeed) }
 
@@ -62,7 +71,6 @@ object WalletGenerator extends Logging with ByteUtils {
     RippleFormatConverters.convertPassword2bytes(password)
   }
 
-
   /**
     * Canonical generator given the "random" seed
     * @param bytes This requires exactly 16 bytes
@@ -81,7 +89,7 @@ object WalletGenerator extends Logging with ByteUtils {
     } yield
       WalletProposeResult(
         account_id = addr.v,
-        key_type = "ed25519",
+        key_type = ED25519,
         master_key = masterKey,
         master_seed = seedB58.v,
         master_seed_hex = seedHex,
@@ -106,7 +114,7 @@ object WalletGenerator extends Logging with ByteUtils {
     } yield
       WalletProposeResult(
         account_id = addr.v,
-        key_type = "secp256k1",
+        key_type = SECP256K1,
         master_key = masterKey,
         master_seed = seedB58.v,
         master_seed_hex = seedHex,

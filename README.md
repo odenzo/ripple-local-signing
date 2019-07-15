@@ -30,7 +30,8 @@ This is stable and unlikely to change, although additional API may be added.
 ## Limitations
 
 - Its relatively fast, but the code is not optimized
-- Signs and Verifies all key types. Multi-signing/Signers list not supported yets 
+- Signs and Verifies all key types. 
+- Multi-signing/Signers list not supported yets 
 - It does not (and probably never will) auto-fill any fields
 - It does not (maybe will) check for the presence of empty auto-fill fields (e.g. Fee and Sequence)
 
@@ -49,8 +50,8 @@ This is stable and unlikely to change, although additional API may be added.
 
 
 
-## License TBD
+## License 
+
+Apache 2.0
 
 ## Build and Publish TBD
-
-+ Will publish somewhere, for now I use sbt publishLocal

@@ -4,6 +4,7 @@ import java.net.URL
 import java.security.{Provider, Security}
 import scala.io.{BufferedSource, Source}
 
+import cats.effect.{IO, Resource}
 import io.circe.{Decoder, Json, JsonObject}
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.scalatest.{EitherValues, FunSuiteLike, Matchers}
@@ -23,21 +24,6 @@ trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with OTestL
   Security.addProvider(new BouncyCastleProvider)
   val provider: Provider = Security.getProvider("BC")
 
-  /**
-    * This will load from resources/test/fixtures/...
-    * Most of those were stolen from Ripple Javascript.
-    *
-    * @param in JSON File Name as input to a test fixture
-    * @param out JSON File Name matching the desired result
-    */
-  def loadFixture(in: String, out: String): ErrorOr[(Json, Json)] = {
-
-    for {
-      inJson <- loadJsonResource(s"/test/fixtures/$in")
-      okJson ← loadJsonResource(s"/test/fixtures/$out")
-    } yield (inJson, okJson)
-
-  }
 
   def loadJsonResource(path: String): Either[AppError, Json] = {
     AppException.wrap(s"Getting Resource $path") {
@@ -47,6 +33,24 @@ trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with OTestL
       CirceUtils.parseAsJson(data)
     }
   }
+
+  /** Construct a Cats Resource with the JSON parsed from the named Java resource
+    *
+    **/
+  def makeJsonResource(path: String): ErrorOr[Json] = {
+
+    val url: URL = getClass.getResource(path)
+    val acquire = IO( Source.fromURL(url))
+    val resource = Resource.fromAutoCloseable(acquire)
+
+    val json = resource.use { src ⇒
+      IO(CirceUtils.parseAsJson(src.mkString))
+    }
+
+    json.unsafeRunSync()
+
+  }
+
 
   def getOrLog[T](ee: Either[AppError, T], msg: String = "Error: ", myLog: Logger = logger): T = {
     if (ee.isLeft) {

@@ -18,20 +18,18 @@ import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
   */
 object Signer extends Logging with JsonUtils with ByteUtils {
 
-  def preCalcKeys(seedhex: String, keyType: String): Either[AppError, SigningKey] = {
+  def preCalcKeys(seedhex: String, keyType: KeyType): Either[AppError, SigningKey] = {
     keyType match {
-      case "ed25519" ⇒
+      case ED25519 ⇒
         for {
           keys <- ED25519CryptoBC.generateKeyPairFromHex(seedhex)
           spub ← ED25519CryptoBC.publicKey2Hex(keys.getPublic)
         } yield SigningKeyEd25519(keys, spub)
-      case "secp256k1" ⇒
+      case SECP256K1 ⇒
         for {
           keys <- AccountFamily.rebuildAccountKeyPairFromSeedHex(seedhex)
           spub = Secp256K1CryptoBC.publicKey2hex(keys.getPublic)
         } yield SigningKeySecp256(keys, spub)
-
-      case other ⇒ AppError(s"Unsupported key type $keyType -- ed25519 or sec256k1").asLeft
     }
   }
 
@@ -44,10 +42,9 @@ object Signer extends Logging with JsonUtils with ByteUtils {
   def signToTxnSignature(tx_json: JsonObject, key: SigningKey): Either[AppError, TxnSignature] = {
 
     for {
-      encoded <- RippleLocalAPI.binarySerializeForSigning(tx_json)
+      encoded  <- RippleLocalOps.binarySerializeForSigning(tx_json)
       binBytes = encoded.toBytes
       payload  = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction
-
 
       ans <- key match {
               case k: SigningKeyEd25519 ⇒ signEd(k, payload)
@@ -80,9 +77,14 @@ object Signer extends Logging with JsonUtils with ByteUtils {
   def createSignedTxBlob(tx_json: JsonObject, txnSignature: TxnSignature): Either[AppError, Array[Byte]] = {
     // Could add the HashPrefix. and get the hash if needed, e.g. to recreate SignRs message
     val withSig = tx_json.add("TxnSignature", Json.fromString(txnSignature.hex))
-    RippleLocalAPI.serialize(withSig)
+    RippleLocalOps.serialize(withSig)
   }
 
+  /**
+  *   Has this been thoroughly tested?
+    * @param txblob
+    * @return
+    */
   def createResponseHash(txblob: Array[Byte]): String = {
     bytes2hex(HashOps.sha512(txblob))
   }

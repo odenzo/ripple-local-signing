@@ -66,7 +66,7 @@ class SigningTest extends FunSuite with OTestSpec with ByteUtils with FixtureUti
     logger.debug(s"Account Keys: $acctKeys")
     //val mainHex = getOrLog(BinarySerializerPublic.binarySerialize(json), "All")
     val jobj: JsonObject = getOrLog(JsonUtils.json2object(txjson), "TX_JSON not object")
-    val tx_sig           = getOrLog(RippleLocalAPI.serializeForSigning(jobj), "txnscenarios")
+    val tx_sig           = getOrLog(RippleLocalOps.serializeForSigning(jobj), "txnscenarios")
     logger.info(s"TXSIGNATURE: $tx_sig")
 
   }

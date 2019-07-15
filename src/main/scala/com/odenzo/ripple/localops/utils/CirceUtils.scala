@@ -75,6 +75,7 @@ trait CirceUtils extends Logging {
     *  @return JSON or an exception if problems parsing, error holds the original String.
     */
   def parseAsJson(m: String): ErrorOr[Json] = {
+
     io.circe.parser.parse(m).leftMap { pf ⇒
       new AppJsonParsingError("Error Parsing String to Json", m, pf)
     }
