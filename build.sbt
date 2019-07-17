@@ -5,7 +5,7 @@ ThisBuild / organization := "com.odenzo"
 ThisBuild / scalaVersion := "2.12.8"
 ThisBuild / version := "0.0.2"
 
-name := "rippled-signing"
+name := "ripple-local-signing"
 
 scalacOptions ++= Seq("-feature",
                       "-deprecation",

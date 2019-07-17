@@ -11,6 +11,7 @@ import com.odenzo.ripple.bincodec.{EncodedNestedVals, RippleCodecAPI}
 import com.odenzo.ripple.bincodec.encoding.BinarySerializer
 import com.odenzo.ripple.localops.crypto.core.HashOps
 import com.odenzo.ripple.localops.crypto.{AccountFamily, RippleFormatConverters}
+import com.odenzo.ripple.localops.handlers.SignForRqRsHandler
 import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils, RippleBase58}
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 

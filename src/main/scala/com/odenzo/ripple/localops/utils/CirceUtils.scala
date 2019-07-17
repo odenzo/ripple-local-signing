@@ -81,6 +81,10 @@ trait CirceUtils extends Logging {
     }
   }
 
+  def parseAndDecode[T](m:String, decoder:Decoder[T]): Either[AppError, T] = {
+    parseAsJson(m).flatMap(decode(_,decoder))
+  }
+
   def parseAsJson(f: File): ErrorOr[Json] = {
     logger.info(s"Parsing File $f")
     new JawnParser().parseFile(f).leftMap { pf ⇒
