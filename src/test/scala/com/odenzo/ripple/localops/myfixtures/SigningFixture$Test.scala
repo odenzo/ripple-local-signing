@@ -5,15 +5,14 @@ import cats.data._
 import cats.implicits._
 import io.circe.JsonObject
 import io.circe.syntax._
-import org.scalatest.{Assertion, FunSuite}
 import scribe.{Level, Logging}
 
-import com.odenzo.ripple.bincodec.{EncodedNestedVals, RippleCodecAPI}
+import com.odenzo.ripple.bincodec.{EncodedSTObject, RippleCodecAPI}
 import com.odenzo.ripple.localops.handlers.SignForRqRsHandler
 import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
-import com.odenzo.ripple.localops.{ResponseError, RippleLocalOps, SigningKey, TxnSignature}
+import com.odenzo.ripple.localops.{RippleLocalOps, TxnSignature}
 
 /**
   *  Goes through some server signed txn and results and does local signing to check correct
@@ -23,7 +22,7 @@ import com.odenzo.ripple.localops.{ResponseError, RippleLocalOps, SigningKey, Tx
 class SigningFixture$Test extends OTestSpec with ByteUtils with FixtureUtils with JsonUtils with Logging {
 
   logger.withMinimumLevel(Level.Warn).replace()
-  
+
   def testJustSigning(rq: JsonObject, rs: JsonObject): Unit = {
     // This assumes all required fields are filled in.
     logger.info(s"Signing Rq ${rq.asJson.spaces4}")
@@ -39,12 +38,14 @@ class SigningFixture$Test extends OTestSpec with ByteUtils with FixtureUtils wit
 
     // val txnsigFromRq: String = getOrLog(RippleLocalAPI.sign(tx_jsonRq, seed, keyType))
     val key = getOrLog(
-                        SignForRqRsHandler.extractKey(rq).leftMap(re ⇒ AppError(re.error_message + " : " + re.error + " " + ": " + re.error_code))
-                        )
+      SignForRqRsHandler
+        .extractKey(rq)
+        .leftMap(re ⇒ AppError(re.error_message + " : " + re.error + " " + ": " + re.error_code))
+    )
 
-    val txnsigFromRs: TxnSignature                    = getOrLog(RippleLocalOps.signToTxnSignature(kTxJson, key))
-    val txblobFromRs                                  = getOrLog(RippleLocalOps.signToTxnBlob(kTxJson, key))
-    val cTxBlob: EncodedNestedVals = RippleCodecAPI.binarySerialize(kTxJson).right.value
+    val txnsigFromRs: TxnSignature = getOrLog(RippleLocalOps.signToTxnSignature(kTxJson, key))
+    val txblobFromRs               = getOrLog(RippleLocalOps.signToTxnBlob(kTxJson, key))
+    val cTxBlob: EncodedSTObject   = RippleCodecAPI.binarySerialize(kTxJson).right.value
 
     logger.info(s"=====\nGot/Excpted TxBlob: \n ${cTxBlob.toHex} \n $kTxBlob\n\n")
     cTxBlob.toHex shouldEqual kTxBlob

@@ -3,16 +3,14 @@ package com.odenzo.ripple.localops
 import cats._
 import cats.data._
 import cats.implicits._
-import scribe.Logging
 import io.circe.JsonObject
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair
+import scribe.Logging
 
-import com.odenzo.ripple.bincodec.{EncodedNestedVals, RippleCodecAPI}
-import com.odenzo.ripple.bincodec.encoding.BinarySerializer
+import com.odenzo.ripple.bincodec.{EncodedSTObject, RippleCodecAPI}
+import com.odenzo.ripple.localops.crypto.RippleFormatConverters
 import com.odenzo.ripple.localops.crypto.core.HashOps
-import com.odenzo.ripple.localops.crypto.{AccountFamily, RippleFormatConverters}
-import com.odenzo.ripple.localops.handlers.SignForRqRsHandler
-import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils, RippleBase58}
+import com.odenzo.ripple.localops.handlers.{SignForRqRsHandler, SignRqRsHandler}
+import com.odenzo.ripple.localops.utils.ByteUtils
 import com.odenzo.ripple.localops.utils.caterrors.AppError
 
 object RippleLocalOps extends Logging {
@@ -27,8 +25,8 @@ object RippleLocalOps extends Logging {
     */
   def signToTxnBlob(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, (String, String)] = {
     for {
-      sig       ← Signer.signToTxnSignature(tx_json, signingKey)
-      txblob    ← Signer.createSignedTxBlob(tx_json, sig)
+      sig    ← Signer.signToTxnSignature(tx_json, signingKey)
+      txblob ← Signer.createSignedTxBlob(tx_json, sig)
       txblobHex = ByteUtils.bytes2hex(txblob)
       hash      = HashOps.sha512(txblob)
       hashHex   = ByteUtils.bytes2hex(hash)
@@ -69,6 +67,15 @@ object RippleLocalOps extends Logging {
       .flatMap(packSigningKey(_, key_type))
   }
 
+  def sign(signRq: JsonObject): JsonObject = {
+
+    SignRqRsHandler.processSignRequest(signRq) match {
+      case Left(v)  ⇒ v
+      case Right(v) ⇒ v
+    }
+
+  }
+
   /**
     * Mimics a SignRq as much as possible. The SignRs is not returned, instead
     * just the TxBlob for use in the SubmitRq
@@ -77,7 +84,7 @@ object RippleLocalOps extends Logging {
     * This is for backward compatiability, signToTxnBlob is preferred method for speed
     *
     */
-  def sign(signRq: JsonObject): JsonObject = {
+  def signFor(signRq: JsonObject): JsonObject = {
 
     SignForRqRsHandler.signFor(signRq) match {
       case Left(v)  ⇒ v
@@ -98,7 +105,7 @@ object RippleLocalOps extends Logging {
     *
     * @return Hex string representing the serialization in total.
     */
-  def binarySerialize(jsonObject: JsonObject): Either[AppError, EncodedNestedVals] = {
+  def binarySerialize(jsonObject: JsonObject): Either[AppError, EncodedSTObject] = {
     RippleCodecAPI.binarySerialize(jsonObject).leftMap(AppError.wrapCodecError)
   }
 
@@ -111,7 +118,7 @@ object RippleLocalOps extends Logging {
     *
     * @param tx_json
     */
-  def binarySerializeForSigning(tx_json: JsonObject): Either[AppError, EncodedNestedVals] = {
+  def binarySerializeForSigning(tx_json: JsonObject): Either[AppError, EncodedSTObject] = {
     logger.trace("Serializing for txnscenarios")
     RippleCodecAPI.binarySerializeForSigning(tx_json).leftMap(AppError.wrapCodecError)
   }

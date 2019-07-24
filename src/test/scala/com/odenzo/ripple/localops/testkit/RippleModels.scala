@@ -24,8 +24,6 @@ TODO: Define base types like these in seperate file.
  *
  */
 
-
-
 /**
   * I use signature to normalize the different types of keys and associated information required in requests
   * Also to mask the values in toString here, if the secret if > 4 since I have hacky tests .
@@ -46,10 +44,7 @@ object AccountAddr {
 
 }
 
-
-case class Base58(v: String) extends AnyVal {
-
-}
+case class Base58(v: String) extends AnyVal {}
 
 object Base58 {
   implicit val encoder: Encoder[Base58] = Encoder.encodeString.contramap[Base58](_.v)
@@ -80,9 +75,7 @@ object RippleSignature {
   * Note sure the sematics of this and the SigningPublicKey
   * @param v e.g. "aBPUAJbNXvxP7uiTxmCcCpVgrGjsbJ8f7hQaYPRrdajXNWXuCNLX"
   **/
-case class RipplePublicKey(v: Base58) {
-  
-}
+case class RipplePublicKey(v: Base58) {}
 
 object RipplePublicKey {
   implicit val decode: Decoder[RipplePublicKey] = Decoder.decodeString.map(v => RipplePublicKey(Base58(v)))
@@ -156,7 +149,7 @@ object SigningPublicKey {
 }
 
 /**
-  * 
+  *
   *
   * "result" : {
   * "account_id" : "r99mP5QSjNdsEtng26uCnrieTZQe1wNYkf",
@@ -169,20 +162,18 @@ object SigningPublicKey {
   * }
   *
 
-*/
-
+  */
 case class AccountKeys(
-                        account_id: AccountAddr,
-                        key_type: RippleKeyType,
-                        master_key: RippleKey,
-                        master_seed: RippleSeed,
-                        master_seed_hex: String,
-                        public_key: RipplePublicKey,
-                        public_key_hex: String
-                      ) {
+    account_id: AccountAddr,
+    key_type: RippleKeyType,
+    master_key: RippleKey,
+    master_seed: RippleSeed,
+    master_seed_hex: String,
+    public_key: RipplePublicKey,
+    public_key_hex: String
+) {
 
   def address: AccountAddr = account_id
-
 
 }
 
@@ -203,3 +194,20 @@ object AccountKeys {
   implicit val decoder: Decoder[AccountKeys]       = deriveDecoder[AccountKeys]
 }
 
+/** These are normally objects, but for potential  error cases keep as Json for now */
+case class JsonReqRes(rq: Json, rs: Json)
+
+object JsonReqRes {
+  def empty = JsonReqRes(Json.Null, Json.Null)
+
+  implicit val show: Show[JsonReqRes] = Show.show[JsonReqRes] { rr ⇒
+    s"""
+       | rq: ${rr.rq.show}
+       | rs: ${rr.rs.show}
+     """.stripMargin
+
+  }
+
+  implicit val encoder: ObjectEncoder[JsonReqRes] = deriveEncoder[JsonReqRes]
+  implicit val decoder: Decoder[JsonReqRes]       = deriveDecoder[JsonReqRes]
+}

@@ -6,7 +6,9 @@ import scribe.Level.Warn
 import scribe.{Level, Logging, Priority}
 
 import com.odenzo.ripple.bincodec.LoggingConfig
+import com.odenzo.ripple.bincodec.reference.FieldMetaData
 import com.odenzo.ripple.localops.testkit.OTestLogging.setTestLogLevel
+import com.odenzo.ripple.localops.utils.ScribeLogUtils
 
 trait OTestLogging extends Logging {
 
@@ -30,16 +32,14 @@ trait OTestLogging extends Logging {
   }
 }
 
-object DefaultSettings {
+object DefaultSettings extends ScribeLogUtils {
 
   scribe.warn("DefaultSettings Object Initialized")
-  
+
   private val inCI: Boolean = scala.sys.env.getOrElse("CONTINUOUS_INTEGRATION", "false") === "true"
 
- 
-
   /** Scala test should manuall control after this. Executed only once, lazy and memoized */
-  val defaultSetup: Eval[Level] = Eval.later{
+  val defaultSetup: Eval[Level] = Eval.later {
 
     val threshold = if (inCI) { // This should catch case when as a library in someone elses CI
       scribe.warn("defaultSetup for logging IN CONTINUOUS_INTEGRATION")
@@ -49,6 +49,15 @@ object DefaultSettings {
     }
     scribe.warn(s"defaultSetup for test logging $threshold")
     setTestLogLevel(threshold)
+
+    val makeQuiet = List(
+      "com.odenzo.ripple.bincodec.reference",
+      "com.odenzo.ripple.bincodec.utils"
+    )
+
+    applyFilter(excludePackageSelction(makeQuiet, Level.Warn, Priority.Highest))
+
+    applyFilter(excludeByClass(classOf[OTestLogging], Level.Debug))
     threshold
   }
 }
@@ -57,17 +66,5 @@ object OTestLogging extends OTestLogging {
 
   logger.warn("OTestLogging Object Initializing")
   protected def inCI: Boolean = scala.sys.env.getOrElse("CONTINUOUS_INTEGRATION", "false") === "true"
-
-  // Well, as far as I can tell the flow is: Logger => Modifiers => Handlers, The handlers write with Formatters
-  // but the default console handler (at least) can also filter with minimumLogLevel
-  // This experiment has scribe.Logger.root set at DEBUG.
-  // We want to filter the debug messages just for com.odenzo.ripple.bincodec.reference.FieldInfo
-  // method encodeFieldID but do just for package s
-  def replaceModifiers(packages: List[String], l: Level): Unit = {
-    scribe.info(s"Setting Packages Level to $l")
-    val pri = Priority.Normal // unnecessary since clearing existing modifiers, but handy for future.
-    scribe.Logger.root.clearModifiers().withModifier(LoggingConfig.excludePackageSelction(packages, l, pri)).replace()
-
-  }
 
 }

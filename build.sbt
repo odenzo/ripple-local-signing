@@ -23,7 +23,7 @@ lazy val signing = (project in file("."))
 
 resolvers += Resolver.bintrayRepo("odenzoorg", "odenzooss")
 resolvers += Resolver.jcenterRepo // Will be moving there soon
-libraryDependencies += "com.odenzo" %% "ripple-binary-codec" % "0.2.3"
+libraryDependencies += "com.odenzo" %% "ripple-binary-codec" % "0.2.5"
 
 lazy val commonSettings = Seq(
   libraryDependencies ++= libs ++ lib_circe ++ lib_cats ++ lib_spire ++ lib_bouncycastle ++ lib_scribe,
@@ -72,7 +72,7 @@ val lib_spire = {
 
 
 val lib_scribe = {
-  Seq("com.outr" %% "scribe" % "2.7.8")
+  Seq("com.outr" %% "scribe" % "2.7.9")
 }
 
 

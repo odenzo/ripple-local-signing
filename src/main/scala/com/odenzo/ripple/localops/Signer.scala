@@ -3,10 +3,10 @@ package com.odenzo.ripple.localops
 import cats._
 import cats.data._
 import cats.implicits._
-import scribe.Logging
 import io.circe.{Json, JsonObject}
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair
+import scribe.Logging
 
+import com.odenzo.ripple.bincodec.RippleCodecAPI
 import com.odenzo.ripple.localops.crypto.AccountFamily
 import com.odenzo.ripple.localops.crypto.core.{ED25519CryptoBC, HashOps, Secp256K1CryptoBC}
 import com.odenzo.ripple.localops.reference.HashPrefix
@@ -34,29 +34,51 @@ object Signer extends Logging with JsonUtils with ByteUtils {
   }
 
   /**
+    * This does the binary serialize for signing (only isSigning fields), adds TransactionSig Prefix then signs.
     *
-    * @param tx_json     Filled tx_json, including SingingPubKey
+    * @param tx_json Filled tx_json, including SingingPubKey
     *
     * @return TxnSignature
     */
   def signToTxnSignature(tx_json: JsonObject, key: SigningKey): Either[AppError, TxnSignature] = {
 
     for {
-      encoded  <- RippleLocalOps.binarySerializeForSigning(tx_json)
+      encoded <- RippleLocalOps.binarySerializeForSigning(tx_json)
       binBytes = encoded.toBytes
       payload  = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction
 
       ans <- key match {
-              case k: SigningKeyEd25519 ⇒ signEd(k, payload)
-              case k: SigningKeySecp256 ⇒ signSecp(k, payload)
-            }
+        case k: SigningKeyEd25519 ⇒ signEd(k, payload)
+        case k: SigningKeySecp256 ⇒ signSecp(k, payload)
+      }
+    } yield ans
+
+  }
+
+  def signForToTxnSignature(tx_json: JsonObject,
+                            key: SigningKey,
+                            signAddrB58Check: String): Either[Throwable, TxnSignature] = {
+
+    // Well, first, we need to use different hash prefix. (transactionMultiSig)
+    // Then a suffix is encoding of the signingAccount as bytes.
+    //
+    for {
+      encoded <- RippleLocalOps.binarySerializeForSigning(tx_json)
+      address ← RippleCodecAPI.serializedAddress(signAddrB58Check)
+      binBytes = encoded.toBytes
+      payload  = HashPrefix.transactionMultiSig.asBytes ++ binBytes ++ address
+
+      ans <- key match {
+        case k: SigningKeyEd25519 ⇒ signEd(k, payload)
+        case k: SigningKeySecp256 ⇒ signSecp(k, payload)
+      }
     } yield ans
 
   }
 
   def signEd(keys: SigningKeyEd25519, payload: Array[Byte]): Either[AppError, TxnSignature] = {
     for {
-      sig    <- ED25519CryptoBC.sign(payload, keys.kp)
+      sig <- ED25519CryptoBC.sign(payload, keys.kp)
       sigHex = bytes2hex(sig)
     } yield TxnSignature(sigHex)
 
@@ -69,7 +91,7 @@ object Signer extends Logging with JsonUtils with ByteUtils {
 
   /**
     *
-    * @param tx_json     Filled tx_json, including SingingPubKey
+    * @param tx_json      Filled tx_json, including SingingPubKey
     * @param txnSignature In Hex format
     *
     * @return Updated tx_blob in hex form for use in Submit call.
@@ -81,8 +103,10 @@ object Signer extends Logging with JsonUtils with ByteUtils {
   }
 
   /**
-  *   Has this been thoroughly tested?
+    * Has this been thoroughly tested?
+    *
     * @param txblob
+    *
     * @return
     */
   def createResponseHash(txblob: Array[Byte]): String = {

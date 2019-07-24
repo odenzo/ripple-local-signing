@@ -39,7 +39,10 @@ trait CirceUtils extends Logging {
     * Now recurses */
   def pruneNullFields(obj: JsonObject): JsonObject = {
     obj
-      .filter { case (_, value) ⇒ !value.isNull }
+      .filter {
+        case (_, Json.Null) ⇒ false
+        case other          ⇒ true
+      }
       .mapValues { js: Json ⇒
         js.asObject match {
           case Some(v) ⇒ pruneNullFields(v).asJson
@@ -81,8 +84,8 @@ trait CirceUtils extends Logging {
     }
   }
 
-  def parseAndDecode[T](m:String, decoder:Decoder[T]): Either[AppError, T] = {
-    parseAsJson(m).flatMap(decode(_,decoder))
+  def parseAndDecode[T](m: String, decoder: Decoder[T]): Either[AppError, T] = {
+    parseAsJson(m).flatMap(decode(_, decoder))
   }
 
   def parseAsJson(f: File): ErrorOr[Json] = {
