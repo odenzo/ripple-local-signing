@@ -53,6 +53,10 @@ trait CirceUtils extends Logging {
 
   }
 
+  def replaceField(name: String, in: JsonObject, withValue: Json): JsonObject = {
+    in.remove(name).add(name, withValue)
+  }
+
   /** Does top level sorting of fields in this object alphanumeric with capital before lowercase  */
   def sortFields(jsonObject: JsonObject): JsonObject = {
     // Want Capital letters sorted before lower case

@@ -12,7 +12,7 @@ import cats.implicits._
 
 case class HashPrefix(v: List[UByte]) {
 
-  val asHex  : String      = ByteUtils.ubytes2hex(v)
+  val asHex: String        = ByteUtils.ubytes2hex(v)
   val asBytes: Array[Byte] = v.map(_.toByte).toArray
 }
 
@@ -22,7 +22,7 @@ object HashPrefix extends Logging {
   // Unsigned Transaction is "53545800 + TxBlob sha512half
   // Unsigned Multisigned
   // Signed "54584E00 (both kinds I think)
-  /** For after a signed (and? multisignd) txn is signed */
+  /** Prefix to txblob to make transaction hash */
   val transactionID: HashPrefix = fromHex("54584E00")
   // For unsigned single signer txn
   val transaction: HashPrefix = fromHex("534E4400")
@@ -32,7 +32,6 @@ object HashPrefix extends Logging {
   val innerNode: HashPrefix = fromHex("4D494E00")
   // ledger master data for signing
   val ledgerHeader: HashPrefix = fromHex("4C575200")
-
 
   /**  inner transaction to single signed, before signing */
   val transactionSig: HashPrefix = fromHex("53545800")

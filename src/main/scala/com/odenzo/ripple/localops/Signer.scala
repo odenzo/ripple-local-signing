@@ -5,6 +5,7 @@ import cats.data._
 import cats.implicits._
 import io.circe.{Json, JsonObject}
 import scribe.Logging
+import spire.math.UByte
 
 import com.odenzo.ripple.bincodec.RippleCodecAPI
 import com.odenzo.ripple.localops.crypto.AccountFamily
@@ -18,6 +19,7 @@ import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
   */
 object Signer extends Logging with JsonUtils with ByteUtils {
 
+  /** ToDo: Nice to put Address in this for use in MultiSigning future APIs */
   def preCalcKeys(seedhex: String, keyType: KeyType): Either[AppError, SigningKey] = {
     keyType match {
       case ED25519 ⇒
@@ -92,7 +94,7 @@ object Signer extends Logging with JsonUtils with ByteUtils {
   /**
     *
     * @param tx_json      Filled tx_json, including SingingPubKey
-    * @param txnSignature In Hex format
+    * @param txnSignature In Hex format, Empty String when multisigning.
     *
     * @return Updated tx_blob in hex form for use in Submit call.
     */
@@ -104,13 +106,19 @@ object Signer extends Logging with JsonUtils with ByteUtils {
 
   /**
     * Has this been thoroughly tested?
+    * Should be 32 bytes
+    *                TODO: Broken! And not always used as part of calc hash logic
     *
-    * @param txblob
+    * @param txblob Is this a SigningTxBlob or all TxBlob
     *
-    * @return
+    * @return Calculates a response objects Hash (in hex) from tx_blob
     */
-  def createResponseHash(txblob: Array[Byte]): String = {
-    bytes2hex(HashOps.sha512(txblob))
+  def createResponseHashHex(txblob: Array[Byte]): String = {
+    // return new Hash256(sha512Half(HashPrefix.transactionID, serialized));
+    val payload: Array[Byte] = HashPrefix.transactionID.asBytes ++ txblob
+    val hashBytes: Seq[Byte] = HashOps.sha512Half(payload)
+    val hex                  = bytes2hex(hashBytes)
+    hex
   }
 
 }

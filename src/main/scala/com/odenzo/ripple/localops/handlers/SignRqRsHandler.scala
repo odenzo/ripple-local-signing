@@ -33,7 +33,7 @@ object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverter
 
       txBlob ← Signer.createSignedTxBlob(withPubKey, sig).leftMap(err ⇒ ResponseError.kBadSecret)
       blobhex = ByteUtils.bytes2hex(txBlob)
-      hash    = Signer.createResponseHash(txBlob)
+      hash    = Signer.createResponseHashHex(txBlob)
       success = buildSuccessResponse(rq, tx_json, sig, blobhex, hash, key.signPubKey)
     } yield success
 

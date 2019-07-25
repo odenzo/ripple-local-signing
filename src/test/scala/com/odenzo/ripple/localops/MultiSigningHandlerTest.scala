@@ -162,11 +162,13 @@ class MultiSigningHandlerTest extends FunSuite with OTestSpec with ByteUtils wit
     logger.info(s"Got vs Expected Blob \n $cTxBlob \n $exTxBlob")
 
     val target: List[Decoded] = getOrLog(TxBlobBuster.bust(exTxBlob).leftMap(e ⇒ AppError(s"Busting ${e.msg}")))
-    target.foreach(dec ⇒ logger.info(s"TxBlob Field: " + dec.show))
 
     logger.info(s"Got vs Targert Str: \n $cTxBlob \n $exTxBlob")
     val gotEnc = getOrLog(TxBlobBuster.bust(cTxBlob).leftMap(e ⇒ AppError(s"Busting ${e.msg}")))
-    gotEnc.foreach(dec ⇒ logger.info(s"TxBlob Got Field: " + dec.show))
+
+    gotEnc.foreach(dec ⇒ logger.info(s"TxBlob Got    Field: " + dec.show))
+    target.foreach(dec ⇒ logger.info(s"TxBlob Target Field: " + dec.show))
+
     got shouldEqual expected
 
   }

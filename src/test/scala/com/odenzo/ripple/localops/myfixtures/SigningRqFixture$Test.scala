@@ -16,11 +16,8 @@ import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 /**
   *  Goes through some server signed txn and results and does local signing udsing the SignRq / SignRs
   */
-class SigningRqFixture$Test extends OTestSpec with ByteUtils with FixtureUtils with JsonUtils  {
+class SigningRqFixture$Test extends OTestSpec with ByteUtils with FixtureUtils with JsonUtils {
 
-
-
-  
   def runOne(rq: JsonObject, rs: JsonObject): Unit = {
 
     val rsResultTx = findRequiredObject("tx_json", findRequiredObject("result", rs))
@@ -34,6 +31,7 @@ class SigningRqFixture$Test extends OTestSpec with ByteUtils with FixtureUtils w
     val signResult         = findRequiredObject("result", signRs)
     val signResultTxJson   = findRequiredObject("tx_json", signResult)
     val kTxnSignature      = findStringField("TxnSignature", signResultTxJson)
+
     scribe.debug(s"Fix SignRq: \n${rq.asJson.spaces4}")
     scribe.debug(s"Fix SignRs: \n${rs.asJson.spaces4}")
     scribe.info(s"Calc Result: \n${signRs.asJson.spaces4}")
@@ -71,7 +69,6 @@ class SigningRqFixture$Test extends OTestSpec with ByteUtils with FixtureUtils w
 
   test("Some of all_txn") {
     val data: List[(JsonObject, JsonObject)] = loadRequestResponses("/test/myTestData/txnscenarios/all_txns.json")
-
 
     logger.info(s"Testing ${data.length} cases")
     data.zipWithIndex.drop(54).take(1).foreach {

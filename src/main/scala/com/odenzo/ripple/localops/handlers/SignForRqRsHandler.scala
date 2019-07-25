@@ -13,7 +13,7 @@ import com.odenzo.ripple.localops.utils.caterrors.{AppError, OError}
 import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
 
 /**
-  *  The details of how this works are not documented, so I am assuming similar to Sign.
+  * The details of how this works are not documented, so I am assuming similar to Sign.
   * Basically, the tx_json has a empty ("") string for SigningPubKey.
   * The account address for the transaction has a set of "keys" set to its SignerList.
   *
@@ -39,12 +39,14 @@ object SignForRqRsHandler extends HandlerBase with Logging with JsonUtils with R
       key         <- extractKey(rq) // One of the multisigners.
       signingAcct ← findStringField("account", rq).leftMap(err ⇒ ResponseError.invalid("Missing account field"))
       tx_json     ← JsonUtils.findObjectField("tx_json", rq).leftMap(err ⇒ ResponseError.kNoTxJson)
-      sig         <- Signer.signForToTxnSignature(tx_json, key, signingAcct).leftMap(err ⇒ ResponseError.kBadSecret)
-      txBlob      ← Signer.createSignedTxBlob(tx_json, sig).leftMap(err ⇒ ResponseError.kBadSecret)
-      blobhex = ByteUtils.bytes2hex(txBlob)
-      hash    = Signer.createResponseHash(txBlob)
 
-      success = buildSuccessResponse(rq, tx_json, signingAcct, sig, blobhex, hash, key.signPubKey)
+      sig <- Signer.signForToTxnSignature(tx_json, key, signingAcct).leftMap(err ⇒ ResponseError.kBadSecret)
+      // Empty Signing public key, but TxBlox needs Signers fields
+      tx_jsonOut = createSuccessTxJson(tx_json, signingAcct, sig, key.signPubKey)
+      txBlob ← RippleLocalOps.serialize(tx_jsonOut).leftMap(err ⇒ ResponseError.invalid(s"Internal Error ${err.msg}"))
+      blobhex = ByteUtils.bytes2hex(txBlob)
+      hash    = Signer.createResponseHashHex(txBlob)
+      success = buildSuccessResponse(rq("id"), tx_jsonOut, blobhex, hash)
     } yield success
 
     ok.leftMap(re ⇒ buildFailureResponse(rq, re))
@@ -69,6 +71,29 @@ object SignForRqRsHandler extends HandlerBase with Logging with JsonUtils with R
   }
 
   /**
+    *
+    * @param rqTxJson The Request TxJson -- this may or may not have Signers filled in.
+    *
+    * @return Response tx_json supplemented with single SignFor (no hash)
+    */
+  def createSuccessTxJson(rqTxJson: JsonObject, account: String, sig: TxnSignature, pubKey: String): JsonObject = {
+
+    val signers: Vector[Json] = rqTxJson("Signers").flatMap(_.asArray).getOrElse(Vector.empty[Json])
+
+    val signer: JsonObject = JsonObject(
+      "Signer" := JsonObject("Account" := account, "SigningPubKey" := pubKey, "TxnSignature" := sig.hex)
+    )
+
+    // Each Signer fields should be sorted, and the order of Signer in the Signers array nees to be sorted.
+    val updatedArray: Vector[Json] = signer.asJson +: signers
+    val sortedSigners              = updatedArray.sortBy(signerSortBy)
+    val rsTxJson: JsonObject       = rqTxJson.remove("Signers")
+    val sortedTxJson               = sortDeepFields(rsTxJson)
+    val updatedSortedTxJson        = sortFields(sortedTxJson.add("Signers", sortedSigners.asJson))
+    updatedSortedTxJson
+  }
+
+  /**
     * For sorting the Signer  by accounts within Signers array. Signer are fields in singleton object
     * Not sure we can sort on Base58 or need to convert to hex and sort pure numerically
     *
@@ -85,33 +110,14 @@ object SignForRqRsHandler extends HandlerBase with Logging with JsonUtils with R
 
   }
 
-  def buildSuccessResponse(rq: JsonObject,
-                           rqTxJson: JsonObject,
-                           account: String,
-                           sig: TxnSignature,
-                           signedBlob: String,
-                           hash: String,
-                           signPubKey: String): JsonObject = {
-
-    val signers: Vector[Json] = rqTxJson("Signers").flatMap(_.asArray).getOrElse(Vector.empty[Json])
-
-    val signer: JsonObject = JsonObject(
-      "Signer" := JsonObject("Account" := account, "SigningPubKey" := signPubKey, "TxnSignature" := sig.hex)
+  def buildSuccessResponse(id: Option[Json], txJson: JsonObject, txBlob: String, hash: String): JsonObject = {
+    JsonObject(
+      "id"     := id,
+      "result" := JsonObject("tx_blob" := txBlob, "tx_json" := txJson.add("hash", hash.asJson)),
+      "status" := "success",
+      "type"   := "response"
     )
 
-    val updatedArray: Vector[Json] = signer.asJson +: signers
-    val sortedSigners              = updatedArray.sortBy(signerSortBy)
-
-    val rsTxJson: JsonObject = rqTxJson.remove("Signers").add("hash", hash.asJson)
-    val sortedTxJson         = sortDeepFields(rsTxJson)
-    val updatedSortedTxJson  = sortFields(sortedTxJson.add("Signers", sortedSigners.asJson))
-    val result               = JsonObject("tx_blob" := signedBlob, "tx_json" := updatedSortedTxJson)
-
-    JsonObject
-      .singleton("id", rq("id").getOrElse(Json.Null))
-      .add("result", result.asJson)
-      .add("status", Json.fromString("success"))
-      .add("type", Json.fromString("response"))
   }
 
 }

@@ -8,7 +8,6 @@ import scribe.Logging
 
 import com.odenzo.ripple.bincodec.{EncodedSTObject, RippleCodecAPI}
 import com.odenzo.ripple.localops.crypto.RippleFormatConverters
-import com.odenzo.ripple.localops.crypto.core.HashOps
 import com.odenzo.ripple.localops.handlers.{SignForRqRsHandler, SignRqRsHandler}
 import com.odenzo.ripple.localops.utils.ByteUtils
 import com.odenzo.ripple.localops.utils.caterrors.AppError
@@ -27,9 +26,9 @@ object RippleLocalOps extends Logging {
     for {
       sig    ← Signer.signToTxnSignature(tx_json, signingKey)
       txblob ← Signer.createSignedTxBlob(tx_json, sig)
-      txblobHex = ByteUtils.bytes2hex(txblob)
-      hash      = HashOps.sha512(txblob)
-      hashHex   = ByteUtils.bytes2hex(hash)
+      txblobHex    = ByteUtils.bytes2hex(txblob)
+      txBlobUBytes = txblob.map(ByteUtils.byte2ubyte)
+      hashHex      = Signer.createResponseHashHex(txblob) // This was just a Hash512
     } yield (txblobHex, hashHex)
   }
 
@@ -130,6 +129,7 @@ object RippleLocalOps extends Logging {
   /**
     *
     * @param tx_json Fully formed tx_json with all auto-fillable fields etc.
+    *
     * @return Byte Array representing the serialized for signing txn. Essentially TxBlob
     */
   def serializeForSigning(tx_json: JsonObject): Either[AppError, Array[Byte]] = {
