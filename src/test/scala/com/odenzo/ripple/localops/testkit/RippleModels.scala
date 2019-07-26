@@ -5,6 +5,7 @@ import cats.implicits._
 import io.circe._
 import io.circe.generic.semiauto._
 import io.circe.syntax._
+
 /*
   "account_id" : "ra8iBMyU6JrEVLxBBG98sWnmai3fKdTZvd",       AKA: AccountAddress
   "key_type" : "secp256k1",
@@ -61,20 +62,21 @@ object RFC1751 {
 
 object RippleSignature {
 
-  def mask(s: String): String = s.zipWithIndex.map(c => if (c._2 > 4 & c._2 % 2 === 1) '*' else c._1).mkString
-
   implicit val encoder: Encoder[RippleSignature] = Encoder.instance[RippleSignature] {
     case d: RippleSeed => d.asJson
     case d: RippleKey  => d.asJson
   }
+
+  def mask(s: String): String = s.zipWithIndex.map(c => if (c._2 > 4 & c._2 % 2 === 1) '*' else c._1).mkString
 }
 
 /** Represent a ripple public key. There are ones for accounts, and also ones for validation.
   * Both are repesented as this object for now, and must begin with "n"
   * Account Public Keys start with a
   * Note sure the sematics of this and the SigningPublicKey
+  *
   * @param v e.g. "aBPUAJbNXvxP7uiTxmCcCpVgrGjsbJ8f7hQaYPRrdajXNWXuCNLX"
-  **/
+  * */
 case class RipplePublicKey(v: Base58) {}
 
 object RipplePublicKey {
@@ -84,7 +86,8 @@ object RipplePublicKey {
 
 /**
   * Represents a master seed. This is Base58 and starts with "s"
-  * @param v  seed, aka secret  "sn9tYCjBpqXgHKwJeMT1LC4fdC17d",
+  *
+  * @param v seed, aka secret  "sn9tYCjBpqXgHKwJeMT1LC4fdC17d",
   **/
 case class RippleSeed(v: Base58) extends RippleSignature
 
@@ -97,7 +100,7 @@ object RippleSeed {
 /** Represents the RFC-1751 work format of master seeds,
   *
   * @param v RFC-1751 form , e.g.  "FOLD SAT ORGY PRO LAID FACT TWO UNIT MARY SHOD BID BIND"
-  * */
+  **/
 case class RippleKey(v: RFC1751) extends RippleSignature
 
 object RippleKey {
@@ -124,10 +127,6 @@ case class SigningPublicKey(v: Option[RipplePublicKey] = None)
 object SigningPublicKey {
 
   val empty: SigningPublicKey = SigningPublicKey(None)
-
-  def apply(k: RipplePublicKey): SigningPublicKey = SigningPublicKey(Some(k))
-  def apply(k: Base58): SigningPublicKey          = SigningPublicKey(Some(RipplePublicKey(k)))
-
   implicit val encoder: Encoder[SigningPublicKey] = Encoder.instance[SigningPublicKey] {
     case SigningPublicKey(Some(key)) => key.asJson
     case SigningPublicKey(None)      => Json.fromString("")
@@ -146,6 +145,10 @@ object SigningPublicKey {
     }
     .map(opk => SigningPublicKey(opk))
 
+  def apply(k: RipplePublicKey): SigningPublicKey = SigningPublicKey(Some(k))
+
+  def apply(k: Base58): SigningPublicKey = SigningPublicKey(Some(RipplePublicKey(k)))
+
 }
 
 /**
@@ -161,7 +164,7 @@ object SigningPublicKey {
   * "public_key_hex" : "036F89F2B2E5DC47E4F72B7C33169F071E9F476DAD3D20EF39CA3778BC4508F102"
   * }
   *
-
+  *
   */
 case class AccountKeys(
     account_id: AccountAddr,
@@ -198,8 +201,6 @@ object AccountKeys {
 case class JsonReqRes(rq: Json, rs: Json)
 
 object JsonReqRes {
-  def empty = JsonReqRes(Json.Null, Json.Null)
-
   implicit val show: Show[JsonReqRes] = Show.show[JsonReqRes] { rr ⇒
     s"""
        | rq: ${rr.rq.show}
@@ -207,7 +208,8 @@ object JsonReqRes {
      """.stripMargin
 
   }
-
   implicit val encoder: ObjectEncoder[JsonReqRes] = deriveEncoder[JsonReqRes]
   implicit val decoder: Decoder[JsonReqRes]       = deriveDecoder[JsonReqRes]
+
+  def empty = JsonReqRes(Json.Null, Json.Null)
 }

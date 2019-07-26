@@ -6,15 +6,15 @@ import cats.implicits._
 import io.circe.{Json, JsonObject}
 import org.scalatest.FunSuite
 
+import com.odenzo.ripple.localops.impl.utils.{ByteUtils, CirceUtils, JsonUtils}
 import com.odenzo.ripple.localops.testkit.{AccountKeys, FixtureUtils, OTestSpec}
-import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, JsonUtils}
-
 
 class SigningTest extends FunSuite with OTestSpec with ByteUtils with FixtureUtils {
 
-  val txnfixtures: List[(JsonObject, JsonObject)] = loadRequestResponses("/test/myTestData/keysAndTxn/secp256k1_txn.json")
+  val txnfixtures: List[(JsonObject, JsonObject)] = loadRequestResponses(
+    "/test/myTestData/keysAndTxn/secp256k1_txn.json"
+  )
 
-  
   // An inactivated account
   val secp256k1_key = """ {
                         |    "account_id": "rDGnaDqJczDAjrKHKdhGRJh2G7zJfZhj5q",
@@ -66,11 +66,9 @@ class SigningTest extends FunSuite with OTestSpec with ByteUtils with FixtureUti
     logger.debug(s"Account Keys: $acctKeys")
     //val mainHex = getOrLog(BinarySerializerPublic.binarySerialize(json), "All")
     val jobj: JsonObject = getOrLog(JsonUtils.json2object(txjson), "TX_JSON not object")
-    val tx_sig           = getOrLog(RippleLocalOps.serializeForSigning(jobj), "txnscenarios")
+    val tx_sig           = getOrLog(BinCodecProxy.serializeForSigning(jobj), "txnscenarios")
     logger.info(s"TXSIGNATURE: $tx_sig")
 
   }
-
-
 
 }

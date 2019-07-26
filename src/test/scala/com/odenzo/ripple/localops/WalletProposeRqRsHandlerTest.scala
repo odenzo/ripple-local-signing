@@ -4,9 +4,9 @@ import io.circe.syntax._
 import io.circe.{Decoder, Json, JsonObject}
 import org.scalatest.BeforeAndAfter
 
-import com.odenzo.ripple.localops.handlers.WalletProposeRqRsHandler
+import com.odenzo.ripple.localops.impl.messagehandlers.WalletProposeRqRsHandler
+import com.odenzo.ripple.localops.impl.utils.JsonUtils
 import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
-import com.odenzo.ripple.localops.utils.JsonUtils
 
 class WalletProposeRqRsHandlerTest extends OTestSpec with FixtureUtils with BeforeAndAfter {
 

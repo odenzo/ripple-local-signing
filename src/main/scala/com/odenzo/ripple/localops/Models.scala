@@ -5,12 +5,11 @@ import java.security.KeyPair
 import cats._
 import cats.data._
 import cats.implicits._
-import io.circe.{Decoder, Encoder, ObjectEncoder}
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
+import io.circe.{Decoder, Encoder, ObjectEncoder}
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 
-import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException, OError}
-
+/** TODO: Split between exposed Models and internal models */
 object Models {
 
   type TxBlob = String
@@ -30,6 +29,9 @@ object ED25519 extends KeyType {
 }
 
 object KeyType {
+  implicit val decoder: Decoder[KeyType] = Decoder[String].emap(s ⇒ fromText(s).leftMap(_.error))
+  implicit val encoded: Encoder[KeyType] = Encoder[String].contramap[KeyType](kt => kt.txt)
+
   def fromText(s: String): Either[ResponseError, KeyType] = {
     s.toLowerCase() match {
       case ED25519.txt   ⇒ ED25519.asRight
@@ -37,9 +39,6 @@ object KeyType {
       case other         ⇒ ResponseError.invalid(s"Invalid Key Type: $other ").asLeft
     }
   }
-
-  implicit val decoder: Decoder[KeyType] = Decoder[String].emap(s ⇒ fromText(s).leftMap(_.error))
-  implicit val encoded: Encoder[KeyType] = Encoder[String].contramap[KeyType](kt => kt.txt)
 }
 
 /** Allows for precalculation of Signing Key in implementation dependant format
@@ -65,10 +64,6 @@ case class TxnSignature(hex: String)
 case class ResponseError(error: String, error_code: Option[Int], error_message: Option[String])
 
 object ResponseError {
-  def apply(err: String, code: Int, msg: String): ResponseError = ResponseError(err, Some(code), Some(msg))
-
-  def invalid(msg: String): ResponseError = ResponseError("invalidParams", 31, msg)
-
   val kNoTxJson      = invalid("Missing field 'tx_json'")
   val kNoSecret      = invalid("Missing field 'secret'.")
   val kNoCommand     = ResponseError("missingCommand", None, None)
@@ -76,6 +71,10 @@ object ResponseError {
   val kTooMany       = invalid("Exactly one of the following must be specified: passphrase, secret, seed or seed_hex")
   val kSecretAndType = invalid("The secret field is not allowed if key_type is used.")
   val kBadSecret     = ResponseError("badSecret", 41, "Secret does not match account.")
+
+  def apply(err: String, code: Int, msg: String): ResponseError = ResponseError(err, Some(code), Some(msg))
+
+  def invalid(msg: String): ResponseError = ResponseError("invalidParams", 31, msg)
 }
 
 case class WalletProposeResult(

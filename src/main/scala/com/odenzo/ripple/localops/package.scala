@@ -9,6 +9,7 @@ import scribe.{Level, Logging}
 package object localops extends Logging {
 
   scribe.warn("*********** localops package initialization **************")
+
   /** Scala test should manuall control after this */
   lazy val defaultSetup: Unit = {
 
@@ -20,7 +21,7 @@ package object localops extends Logging {
     logger.warn("Done with Default in localops ")
   }
   protected val inCI: Boolean = scala.sys.env.getOrElse("CONTINUOUS_INTEGRATION", "false") === "true"
-  private val touch: Unit = defaultSetup
+  private val touch: Unit     = defaultSetup
 
   /** This sets the handler filter level,  all settings to modifiers are essentially overridden on level,
     * althought the modifiers may filter out additional things.

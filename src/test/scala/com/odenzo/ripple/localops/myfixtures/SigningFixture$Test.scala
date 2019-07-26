@@ -8,11 +8,11 @@ import io.circe.syntax._
 import scribe.{Level, Logging}
 
 import com.odenzo.ripple.bincodec.{EncodedSTObject, RippleCodecAPI}
-import com.odenzo.ripple.localops.handlers.SignForRqRsHandler
+import com.odenzo.ripple.localops.RippleLocalAPI
+import com.odenzo.ripple.localops.impl.messagehandlers.SignForRqRsHandler
+import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
+import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
 import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
-import com.odenzo.ripple.localops.utils.caterrors.AppError
-import com.odenzo.ripple.localops.utils.{ByteUtils, JsonUtils}
-import com.odenzo.ripple.localops.{RippleLocalOps, TxnSignature}
 
 /**
   *  Goes through some server signed txn and results and does local signing to check correct
@@ -43,14 +43,14 @@ class SigningFixture$Test extends OTestSpec with ByteUtils with FixtureUtils wit
         .leftMap(re ⇒ AppError(re.error_message + " : " + re.error + " " + ": " + re.error_code))
     )
 
-    val txnsigFromRs: TxnSignature = getOrLog(RippleLocalOps.signToTxnSignature(kTxJson, key))
-    val txblobFromRs               = getOrLog(RippleLocalOps.signToTxnBlob(kTxJson, key))
-    val cTxBlob: EncodedSTObject   = RippleCodecAPI.binarySerialize(kTxJson).right.value
+    val txnsigFromRs: String     = getOrLog(RippleLocalAPI.signToTxnSignature(kTxJson, key))
+    val txblobFromRs             = getOrLog(RippleLocalAPI.signToTxnBlob(kTxJson, key))
+    val cTxBlob: EncodedSTObject = RippleCodecAPI.binarySerialize(kTxJson).right.value
 
     logger.info(s"=====\nGot/Excpted TxBlob: \n ${cTxBlob.toHex} \n $kTxBlob\n\n")
     cTxBlob.toHex shouldEqual kTxBlob
 
-    txnsigFromRs.hex shouldEqual kTxSig
+    txnsigFromRs shouldEqual kTxSig
     // txnsigFromRq shouldEqual txnsigFromRs   // If not then probably a field not populated (like SigningPubKey!)s
 
     ()

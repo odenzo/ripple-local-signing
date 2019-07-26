@@ -6,13 +6,11 @@ import cats.implicits._
 import io.circe.JsonObject
 import scribe.Logging
 
-import com.odenzo.ripple.bincodec.{EncodedSTObject, RippleCodecAPI}
-import com.odenzo.ripple.localops.crypto.RippleFormatConverters
-import com.odenzo.ripple.localops.handlers.{SignForRqRsHandler, SignRqRsHandler}
-import com.odenzo.ripple.localops.utils.ByteUtils
-import com.odenzo.ripple.localops.utils.caterrors.AppError
+import com.odenzo.ripple.localops.impl.utils.ByteUtils
+import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
+import com.odenzo.ripple.localops.impl.{Signer, Verify, WalletGenerator}
 
-object RippleLocalOps extends Logging {
+trait RippleLocalOps extends Logging {
 
   /** This is the recommended programmatic API for Local Signing. The TxBlob response is
     * the only item needed for subsequent `submit` to XRPL server.
@@ -20,16 +18,33 @@ object RippleLocalOps extends Logging {
     * @param tx_json
     * @param signingKey
     *
-    * @return
+    * @return TxBlob in Hex form suitable for submitting to Rippled XRPL
     */
-  def signToTxnBlob(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, (String, String)] = {
+  def signToTxnBlob(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, String] = {
     for {
       sig    ← Signer.signToTxnSignature(tx_json, signingKey)
       txblob ← Signer.createSignedTxBlob(tx_json, sig)
-      txblobHex    = ByteUtils.bytes2hex(txblob)
-      txBlobUBytes = txblob.map(ByteUtils.byte2ubyte)
-      hashHex      = Signer.createResponseHashHex(txblob) // This was just a Hash512
+      txblobHex = ByteUtils.bytes2hex(txblob)
+    } yield txblobHex
+  }
+
+  /** Signs a txn with the key and returns the tx blob and transaction hash for inclusion in Submit Request
+    * Very little validation or error checking is done, and no enrichment.
+    * On submissions of the resulting txblob to server final validation is done.
+    * The hash is not really needed in most cases, and the submit hash is what is used to track the txn.
+    *
+    * @param tx_json Transaction subsection. No fields will be supplemented, Sequence and Fee should be filled.
+    *
+    * @return (tx_blob, hash)  in hex format. Note that hash of txn is just SHA512 of tx_blob bytes
+    **/
+  def signTxn(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, (String, String)] = {
+    for {
+      sig    ← Signer.signToTxnSignature(tx_json, signingKey)
+      txblob ← Signer.createSignedTxBlob(tx_json, sig)
+      txblobHex = ByteUtils.bytes2hex(txblob)
+      hashHex   = Signer.createResponseHashHex(txblob) // This was just a Hash512
     } yield (txblobHex, hashHex)
+
   }
 
   /**
@@ -47,92 +62,21 @@ object RippleLocalOps extends Logging {
     Verify.verifySigningResponse(tx_json)
   }
 
-  /** Pack a key into internal format. Parameters per WalletProposeRs */
-  def packSigningKey(master_seed_hex: String, key_type: KeyType): Either[AppError, SigningKey] = {
-    Signer.preCalcKeys(master_seed_hex, key_type)
+  def signToTxnSignature(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, String] = {
+    Signer.signToTxnSignature(tx_json, signingKey).map(_.hex)
   }
 
-  /** Pack a key into internal format. Parameters per WalletProposeRs */
-  def packSigningKeyFromB58(master_seed: String, key_type: KeyType): Either[AppError, SigningKey] = {
-    RippleFormatConverters
-      .convertBase58Check2hex(master_seed)
-      .flatMap(packSigningKey(_, key_type))
-  }
-
-  /** Pack a key into internal format. Parameters per WalletProposeRs */
-  def packSigningKeyFromRFC1751(master_key: String, key_type: KeyType): Either[AppError, SigningKey] = {
-    RippleFormatConverters
-      .convertMasterKey2masterSeedHex(master_key)
-      .flatMap(packSigningKey(_, key_type))
-  }
-
-  def sign(signRq: JsonObject): JsonObject = {
-
-    SignRqRsHandler.processSignRequest(signRq) match {
-      case Left(v)  ⇒ v
-      case Right(v) ⇒ v
-    }
-
-  }
-
+  // TODO: Add Wallet and MultiSign API here,
   /**
-    * Mimics a SignRq as much as possible. The SignRs is not returned, instead
-    * just the TxBlob for use in the SubmitRq
-    * Note that the Fee should already be specified, also all the paths.
+    * Generates two sets of keys, but doesn't activate them in any way.
     *
-    * This is for backward compatiability, signToTxnBlob is preferred method for speed
-    *
+    * @return Master and Regular KeyPair based on random seed.
     */
-  def signFor(signRq: JsonObject): JsonObject = {
-
-    SignForRqRsHandler.signFor(signRq) match {
-      case Left(v)  ⇒ v
-      case Right(v) ⇒ v
-    }
-
+  def generateKeys(): Either[AppError, (WalletProposeResult, WalletProposeResult)] = {
+    for {
+      master  <- WalletGenerator.generateWallet()
+      regular ← WalletGenerator.generateWallet()
+    } yield (master, regular)
   }
 
-  def signToTxnSignature(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, TxnSignature] = {
-    Signer.signToTxnSignature(tx_json, signingKey)
-  }
-
-  /**
-    * Expects a top level JsonObject representing a JSON document
-    * that would be sent to rippled server. All isSerializable fields serialized.
-    *
-    * @param jsonObject
-    *
-    * @return Hex string representing the serialization in total.
-    */
-  def binarySerialize(jsonObject: JsonObject): Either[AppError, EncodedSTObject] = {
-    RippleCodecAPI.binarySerialize(jsonObject).leftMap(AppError.wrapCodecError)
-  }
-
-  /**
-    * Expects a top level JsonObject representing a transaction
-    * that would be sent to rippled server. All isSigningField fields serialized.
-    * This and binarySerialize and the only two top level user
-    * FIXME: I am guessing this is the whole transaction because fee_multi_max and other important stuff in top
-    * level
-    *
-    * @param tx_json
-    */
-  def binarySerializeForSigning(tx_json: JsonObject): Either[AppError, EncodedSTObject] = {
-    logger.trace("Serializing for txnscenarios")
-    RippleCodecAPI.binarySerializeForSigning(tx_json).leftMap(AppError.wrapCodecError)
-  }
-
-  def serialize(tx_json: JsonObject): Either[AppError, Array[Byte]] = {
-    RippleCodecAPI.serializedTxBlob(tx_json).leftMap(AppError.wrapCodecError)
-  }
-
-  /**
-    *
-    * @param tx_json Fully formed tx_json with all auto-fillable fields etc.
-    *
-    * @return Byte Array representing the serialized for signing txn. Essentially TxBlob
-    */
-  def serializeForSigning(tx_json: JsonObject): Either[AppError, Array[Byte]] = {
-    RippleCodecAPI.signingTxBlob(tx_json).leftMap(AppError.wrapCodecError)
-  }
 }

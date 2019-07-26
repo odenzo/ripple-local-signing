@@ -3,11 +3,11 @@ package com.odenzo.ripple.localops.verifying
 import io.circe.JsonObject
 import org.scalatest.FunSuite
 
-import com.odenzo.ripple.localops.crypto.core.HashOps
-import com.odenzo.ripple.localops.reference.HashPrefix
+import com.odenzo.ripple.localops.impl.crypto.core.HashOps
+import com.odenzo.ripple.localops.impl.reference.HashPrefix
+import com.odenzo.ripple.localops.impl.utils.{ByteUtils, CirceUtils, JsonUtils}
 import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
-import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, JsonUtils}
-import com.odenzo.ripple.localops.{RippleLocalOps, Verify}
+import com.odenzo.ripple.localops.{BinCodecProxy, RippleLocalAPI}
 
 class VerifyTest extends FunSuite with OTestSpec with JsonUtils with FixtureUtils {
 
@@ -39,15 +39,14 @@ class VerifyTest extends FunSuite with OTestSpec with JsonUtils with FixtureUtil
 
     // First lets see if we can get the hash
     for {
-      all        <- RippleLocalOps.binarySerialize(tx)
+      all <- BinCodecProxy.binarySerialize(tx)
       allHash    = hashOp((HashPrefix.transactionID.v ::: all.rawBytes).map(_.toByte))
       allHashHex = ByteUtils.bytes2hex(allHash)
       _          = logger.info(s"AllHash ${ByteUtils.bytes2hex(allHash)}")
       _          = allHashHex shouldEqual kHash
     } yield all
 
-
-    val ok = Verify.verifySigningResponse(tx)
+    val ok = RippleLocalAPI.verify(tx)
     logger.info(s"OK: $ok")
     ok.right.value shouldBe true
 

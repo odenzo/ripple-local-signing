@@ -12,10 +12,10 @@ import scribe.{Level, Logger, Logging, Priority}
 
 import com.odenzo.ripple.bincodec
 import com.odenzo.ripple.bincodec.LoggingConfig
-import com.odenzo.ripple.localops.utils.CirceUtils
-import com.odenzo.ripple.localops.utils.caterrors.AppError.dump
-import com.odenzo.ripple.localops.utils.caterrors.CatsTransformers.ErrorOr
-import com.odenzo.ripple.localops.utils.caterrors.{AppError, AppException}
+import com.odenzo.ripple.localops.impl.utils.CirceUtils
+import com.odenzo.ripple.localops.impl.utils.caterrors.AppError.dump
+import com.odenzo.ripple.localops.impl.utils.caterrors.CatsTransformers.ErrorOr
+import com.odenzo.ripple.localops.impl.utils.caterrors.{AppError, AppException}
 
 trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with OTestLogging {
 
@@ -23,7 +23,6 @@ trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with OTestL
 
   Security.addProvider(new BouncyCastleProvider)
   val provider: Provider = Security.getProvider("BC")
-
 
   def loadJsonResource(path: String): Either[AppError, Json] = {
     AppException.wrap(s"Getting Resource $path") {
@@ -36,11 +35,11 @@ trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with OTestL
 
   /** Construct a Cats Resource with the JSON parsed from the named Java resource
     *
-    **/
+    * */
   def makeJsonResource(path: String): ErrorOr[Json] = {
 
     val url: URL = getClass.getResource(path)
-    val acquire = IO( Source.fromURL(url))
+    val acquire  = IO(Source.fromURL(url))
     val resource = Resource.fromAutoCloseable(acquire)
 
     val json = resource.use { src ⇒
@@ -50,7 +49,6 @@ trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with OTestL
     json.unsafeRunSync()
 
   }
-
 
   def getOrLog[T](ee: Either[AppError, T], msg: String = "Error: ", myLog: Logger = logger): T = {
     if (ee.isLeft) {
@@ -85,14 +83,14 @@ object OTestSpec extends Logging {
       )
       val pri = Priority.High // unnecessary since clearing existing modifiers, but handy for future.
       scribe.Logger.root
-      .clearModifiers()
-      .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
-      .replace()
+        .clearModifiers()
+        .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
+        .replace()
 
       Logger.root
-      .clearModifiers()
-      .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
-      .replace()
+        .clearModifiers()
+        .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
+        .replace()
 
     } else {
       logger.warn("Regular Testing")
@@ -107,9 +105,9 @@ object OTestSpec extends Logging {
         .replace()
 
       Logger.root
-      .clearModifiers()
-      .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
-      .replace()
+        .clearModifiers()
+        .withModifier(LoggingConfig.excludePackageSelction(packagesToMute, Level.Warn, pri))
+        .replace()
 
     }
 
@@ -121,6 +119,7 @@ object OTestSpec extends Logging {
 
 /**
   * Common to have object with binary and json in test files.
+  *
   * @param binary
   * @param json
   */

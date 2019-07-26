@@ -6,11 +6,12 @@ import cats.implicits._
 import io.circe.JsonObject
 import org.scalatest.FunSuite
 
-import com.odenzo.ripple.localops.crypto.core.{ED25519CryptoBC, Secp256K1CryptoBC}
-import com.odenzo.ripple.localops.crypto.{AccountFamily, RippleFormatConverters}
+import com.odenzo.ripple.localops.impl.WalletGenerator
+import com.odenzo.ripple.localops.impl.crypto.RippleFormatConverters
+import com.odenzo.ripple.localops.impl.crypto.core.ED25519CryptoBC
+import com.odenzo.ripple.localops.impl.utils.caterrors.CatsTransformers.ErrorOr
+import com.odenzo.ripple.localops.impl.utils.{CirceUtils, Formatter, JsonUtils}
 import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
-import com.odenzo.ripple.localops.utils.caterrors.CatsTransformers.ErrorOr
-import com.odenzo.ripple.localops.utils.{ByteUtils, CirceUtils, Formatter, JsonUtils}
 
 /** This tests functionality for wallet generation, WalletPropose.
   * It exercises the routines to generate account key pairs from seed and other conversions.

@@ -1,14 +1,13 @@
 package com.odenzo.ripple.localops
 
-import org.scalatest.FunSuite
 import spire.math.UByte
 
-import com.odenzo.ripple.localops.Signer.bytes2hex
-import com.odenzo.ripple.localops.crypto.core.HashOps
-import com.odenzo.ripple.localops.reference.HashPrefix
+import com.odenzo.ripple.localops.impl.Signer
+import com.odenzo.ripple.localops.impl.Signer.bytes2hex
+import com.odenzo.ripple.localops.impl.crypto.core.HashOps
+import com.odenzo.ripple.localops.impl.reference.HashPrefix
+import com.odenzo.ripple.localops.impl.utils.ByteUtils
 import com.odenzo.ripple.localops.testkit.OTestSpec
-import com.odenzo.ripple.localops.utils.ByteUtils
-import com.odenzo.ripple.localops.utils.caterrors.AppError
 
 class SignerTest extends OTestSpec {
 

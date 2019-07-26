@@ -5,10 +5,8 @@ import cats.implicits._
 import scribe.Level.Warn
 import scribe.{Level, Logging, Priority}
 
-import com.odenzo.ripple.bincodec.LoggingConfig
-import com.odenzo.ripple.bincodec.reference.FieldMetaData
+import com.odenzo.ripple.localops.impl.utils.ScribeLogUtils
 import com.odenzo.ripple.localops.testkit.OTestLogging.setTestLogLevel
-import com.odenzo.ripple.localops.utils.ScribeLogUtils
 
 trait OTestLogging extends Logging {
 
@@ -36,8 +34,6 @@ object DefaultSettings extends ScribeLogUtils {
 
   scribe.warn("DefaultSettings Object Initialized")
 
-  private val inCI: Boolean = scala.sys.env.getOrElse("CONTINUOUS_INTEGRATION", "false") === "true"
-
   /** Scala test should manuall control after this. Executed only once, lazy and memoized */
   val defaultSetup: Eval[Level] = Eval.later {
 
@@ -60,6 +56,7 @@ object DefaultSettings extends ScribeLogUtils {
     applyFilter(excludeByClass(classOf[OTestLogging], Level.Debug))
     threshold
   }
+  private val inCI: Boolean = scala.sys.env.getOrElse("CONTINUOUS_INTEGRATION", "false") === "true"
 }
 
 object OTestLogging extends OTestLogging {
