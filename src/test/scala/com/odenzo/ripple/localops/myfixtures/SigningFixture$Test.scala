@@ -44,7 +44,7 @@ class SigningFixture$Test extends OTestSpec with ByteUtils with FixtureUtils wit
     )
 
     val txnsigFromRs: String     = getOrLog(RippleLocalAPI.signToTxnSignature(kTxJson, key))
-    val txblobFromRs             = getOrLog(RippleLocalAPI.signToTxnBlob(kTxJson, key))
+    val txblobFromRs             = getOrLog(RippleLocalAPI.signTxn(kTxJson, key))
     val cTxBlob: EncodedSTObject = RippleCodecAPI.binarySerialize(kTxJson).right.value
 
     logger.info(s"=====\nGot/Excpted TxBlob: \n ${cTxBlob.toHex} \n $kTxBlob\n\n")

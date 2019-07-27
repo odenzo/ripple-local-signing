@@ -10,12 +10,6 @@ import io.circe.{Decoder, Encoder, ObjectEncoder}
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 
 /** TODO: Split between exposed Models and internal models */
-object Models {
-
-  type TxBlob = String
-
-}
-
 sealed trait KeyType {
   val txt: String
 
@@ -52,6 +46,26 @@ sealed trait SigningKey {
 case class SigningKeyEd25519(kp: AsymmetricCipherKeyPair, signPubKey: String) extends SigningKey
 case class SigningKeySecp256(kp: KeyPair, signPubKey: String)                 extends SigningKey
 
+// This is currently public, but better to return as JsonObject IMHO.
+case class WalletProposeResult(
+    account_id: String,
+    key_type: KeyType,
+    master_key: String,
+    master_seed: String,
+    master_seed_hex: String,
+    public_key: String,
+    public_key_hex: String
+)
+
+object WalletProposeResult {
+
+  implicit val encoder: ObjectEncoder[WalletProposeResult] = deriveEncoder[WalletProposeResult]
+  implicit val decoder: Decoder[WalletProposeResult]       = deriveDecoder[WalletProposeResult]
+
+}
+
+/// Private below here, or not exported as part of standard interoperable stuff.
+
 case class Base58(v: String)
 case class Base58Check(v: String)
 case class TxnSignature(hex: String)
@@ -75,21 +89,4 @@ object ResponseError {
   def apply(err: String, code: Int, msg: String): ResponseError = ResponseError(err, Some(code), Some(msg))
 
   def invalid(msg: String): ResponseError = ResponseError("invalidParams", 31, msg)
-}
-
-case class WalletProposeResult(
-    account_id: String,
-    key_type: KeyType,
-    master_key: String,
-    master_seed: String,
-    master_seed_hex: String,
-    public_key: String,
-    public_key_hex: String
-) {}
-
-object WalletProposeResult {
-
-  implicit val encoder: ObjectEncoder[WalletProposeResult] = deriveEncoder[WalletProposeResult]
-  implicit val decoder: Decoder[WalletProposeResult]       = deriveDecoder[WalletProposeResult]
-
 }

@@ -40,10 +40,8 @@ object SignForRqRsHandler extends HandlerBase with Logging with JsonUtils with R
       key         <- extractKey(rq) // One of the multisigners.
       signingAcct ← findStringField("account", rq).leftMap(err ⇒ ResponseError.invalid("Missing account field"))
       tx_json     ← JsonUtils.findObjectField("tx_json", rq).leftMap(err ⇒ ResponseError.kNoTxJson)
-
-      sig <- Signer.signForToTxnSignature(tx_json, key, signingAcct).leftMap(err ⇒ ResponseError.kBadSecret)
-      // Empty Signing public key, but TxBlox needs Signers fields
-      tx_jsonOut = createSuccessTxJson(tx_json, signingAcct, sig, key.signPubKey)
+      sig         <- Signer.signForTxnSignature(tx_json, key, signingAcct).leftMap(err ⇒ ResponseError.kBadSecret)
+      tx_jsonOut = Signer.createSuccessTxJson(tx_json, signingAcct, sig, key.signPubKey)
       txBlob ← BinCodecProxy.serialize(tx_jsonOut).leftMap(err ⇒ ResponseError.invalid(s"Internal Error ${err.msg}"))
       blobhex = ByteUtils.bytes2hex(txBlob)
       hash    = Signer.createResponseHashHex(txBlob)
@@ -55,9 +53,10 @@ object SignForRqRsHandler extends HandlerBase with Logging with JsonUtils with R
   }
 
   def validateAutofillFields(tx_json: JsonObject): Either[OError, JsonObject] = {
-    List("Sequence", "Fee")
-    if (tx_json.contains("Sequence") && tx_json.contains("Fee")) tx_json.asRight
-    else AppError(s"Sequence and Fee must be present in tx_json").asLeft
+    List("Sequence", "Fee").forall(tx_json.contains) match {
+      case true  ⇒ tx_json.asRight
+      case false ⇒ AppError(s"Sequence and Fee must be present in tx_json").asLeft
+    }
   }
 
   /** Should requre Sequence and Fee too */
@@ -69,46 +68,6 @@ object SignForRqRsHandler extends HandlerBase with Logging with JsonUtils with R
         case "sign_for" ⇒ "sign_for".asRight
         case other      ⇒ ResponseError.kBadCommand.asLeft
       }
-  }
-
-  /**
-    *
-    * @param rqTxJson The Request TxJson -- this may or may not have Signers filled in.
-    *
-    * @return Response tx_json supplemented with single SignFor (no hash)
-    */
-  def createSuccessTxJson(rqTxJson: JsonObject, account: String, sig: TxnSignature, pubKey: String): JsonObject = {
-
-    val signers: Vector[Json] = rqTxJson("Signers").flatMap(_.asArray).getOrElse(Vector.empty[Json])
-
-    val signer: JsonObject = JsonObject(
-      "Signer" := JsonObject("Account" := account, "SigningPubKey" := pubKey, "TxnSignature" := sig.hex)
-    )
-
-    // Each Signer fields should be sorted, and the order of Signer in the Signers array nees to be sorted.
-    val updatedArray: Vector[Json] = signer.asJson +: signers
-    val sortedSigners              = updatedArray.sortBy(signerSortBy)
-    val rsTxJson: JsonObject       = rqTxJson.remove("Signers")
-    val sortedTxJson               = sortDeepFields(rsTxJson)
-    val updatedSortedTxJson        = sortFields(sortedTxJson.add("Signers", sortedSigners.asJson))
-    updatedSortedTxJson
-  }
-
-  /**
-    * For sorting the Signer  by accounts within Signers array. Signer are fields in singleton object
-    * Not sure we can sort on Base58 or need to convert to hex and sort pure numerically
-    *
-    * @param wrappedObject
-    *
-    * @return
-    */
-  def signerSortBy(wrappedObject: Json): Option[String] = {
-    for {
-      obj     ← wrappedObject.asObject
-      signer  ← obj("Signer").flatMap(_.asObject)
-      account ← signer("Account").flatMap(_.asString)
-    } yield account
-
   }
 
   def buildSuccessResponse(id: Option[Json], txJson: JsonObject, txBlob: String, hash: String): JsonObject = {

@@ -20,12 +20,16 @@ trait RippleLocalOps extends Logging {
     *
     * @return TxBlob in Hex form suitable for submitting to Rippled XRPL
     */
-  def signToTxnBlob(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, String] = {
+  def signTxn(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, String] = {
     for {
       sig    ← Signer.signToTxnSignature(tx_json, signingKey)
       txblob ← Signer.createSignedTxBlob(tx_json, sig)
       txblobHex = ByteUtils.bytes2hex(txblob)
     } yield txblobHex
+  }
+
+  def signToTxnSignature(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, String] = {
+    Signer.signToTxnSignature(tx_json, signingKey).map(_.hex)
   }
 
   /** Signs a txn with the key and returns the tx blob and transaction hash for inclusion in Submit Request
@@ -36,8 +40,8 @@ trait RippleLocalOps extends Logging {
     * @param tx_json Transaction subsection. No fields will be supplemented, Sequence and Fee should be filled.
     *
     * @return (tx_blob, hash)  in hex format. Note that hash of txn is just SHA512 of tx_blob bytes
-    **/
-  def signTxn(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, (String, String)] = {
+    * */
+  def signTxnWithHash(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, (String, String)] = {
     for {
       sig    ← Signer.signToTxnSignature(tx_json, signingKey)
       txblob ← Signer.createSignedTxBlob(tx_json, sig)
@@ -45,6 +49,26 @@ trait RippleLocalOps extends Logging {
       hashHex   = Signer.createResponseHashHex(txblob) // This was just a Hash512
     } yield (txblobHex, hashHex)
 
+  }
+
+  def signFor(tx_json: JsonObject, key: SigningKey, signingAcct: String): Either[Throwable, JsonObject] = {
+    Signer.signFor(tx_json, key, signingAcct)
+  }
+
+  /**
+    * Takes a request style tx_json and a list of Siger fields and produces a tx_Json suitable for submission.
+    * The hash field is not calculated for the result tx_json
+    *
+    * @param tx_json    tx_json, a copy of whose  Signers list will be replaced and hash field removed
+    * @param signerList A list of Signer fields that will be combined in Signers and inserted into tx_json, hash added
+    *
+    * @return tx_json suitable for multisign submission (with no hash field)
+    */
+  def combineSigners(tx_json: JsonObject, signerList: List[JsonObject]): JsonObject = {
+    val signers = Signer.combineSignerObjects(signerList)
+    tx_json.remove("Signers").remove("hash").add("Signers", signers)
+
+    // Note we are not recaulculating the tx_json hash
   }
 
   /**
@@ -60,23 +84,6 @@ trait RippleLocalOps extends Logging {
     */
   def verify(tx_json: JsonObject): Either[AppError, Boolean] = {
     Verify.verifySigningResponse(tx_json)
-  }
-
-  def signToTxnSignature(tx_json: JsonObject, signingKey: SigningKey): Either[AppError, String] = {
-    Signer.signToTxnSignature(tx_json, signingKey).map(_.hex)
-  }
-
-  // TODO: Add Wallet and MultiSign API here,
-  /**
-    * Generates two sets of keys, but doesn't activate them in any way.
-    *
-    * @return Master and Regular KeyPair based on random seed.
-    */
-  def generateKeys(): Either[AppError, (WalletProposeResult, WalletProposeResult)] = {
-    for {
-      master  <- WalletGenerator.generateWallet()
-      regular ← WalletGenerator.generateWallet()
-    } yield (master, regular)
   }
 
 }

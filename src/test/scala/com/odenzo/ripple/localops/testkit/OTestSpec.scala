@@ -114,6 +114,7 @@ object OTestSpec extends Logging {
     Logger.root.orphan() // Fully detach from console output
     Logger.logger.orphan()
     scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Error)).replace()
+    ()
   }
 }
 

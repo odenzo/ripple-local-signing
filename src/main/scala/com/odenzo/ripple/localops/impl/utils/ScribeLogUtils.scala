@@ -16,7 +16,26 @@ import com.odenzo.ripple.bincodec.LoggingConfig
   * The default config fvor scribe is INFO
   * See com.odenzo.ripple.bincodec package information for usage.
   */
-trait ScribeLogUtils extends Logger {
+trait ScribeLogUtils {
+
+  def inCITesting: Boolean = {
+    scala.sys.env.getOrElse("CONTINUOUS_INTEGRATION", "false") === "true"
+  }
+
+  /** This sets the handler filter level,  all settings to modifiers are essentially overridden on level,
+    * althought the modifiers may filter out additional things.
+    * This is a no op if we think we are in continuous integration build
+    * */
+  def setTestLogLevel(l: Level): Unit = {
+    if (!inCITesting) setLogLevel(l)
+    ()
+  }
+
+  def setLogLevel(l: Level): Logger = {
+    scribe.warn(s"Setting all to log level $l")
+    // replace is needed.
+    scribe.Logger.root.clearHandlers().withHandler(minimumLevel = Some(l)).replace()
+  }
 
   /** Helper to filter out messages in the packages given below the given level
     * I am not sure this works with the global scribe object or not.
@@ -24,7 +43,7 @@ trait ScribeLogUtils extends Logger {
     * select(
     *packageName.startsWith("no.officenet"),
     *packageName.startsWith("com.visena")
-    * ).boosted(Level.Trace, Level.Info)
+    * )
     * Usage:
     * {{{
     *   scribe.
@@ -61,11 +80,11 @@ trait ScribeLogUtils extends Logger {
   }
 
   /** FilterBuilder is a LogModifier */
-  def applyFilter(filter: FilterBuilder) = {
+  def applyFilter(filter: FilterBuilder): Logger = {
     applyLogModifier(filter)
   }
 
-  def applyLogModifier(mod: LogModifier) = {
+  def applyLogModifier(mod: LogModifier): Logger = {
     scribe.Logger.root.withModifier(mod).replace() // Not sure why the replace is needed, or if it is needed!?
   }
 
@@ -77,8 +96,11 @@ trait ScribeLogUtils extends Logger {
   def replaceModifiers(packages: List[String], l: Level): Unit = {
     scribe.info(s"Setting Packages Level to $l")
     val pri = Priority.Normal // unnecessary since clearing existing modifiers, but handy for future.
-    scribe.Logger.root.clearModifiers().withModifier(LoggingConfig.excludePackageSelction(packages, l, pri)).replace()
-
+    val replaced = scribe.Logger.root
+      .clearModifiers()
+      .withModifier(LoggingConfig.excludePackageSelction(packages, l, pri))
+      .replace()
+    ()
   }
 }
 

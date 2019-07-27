@@ -10,7 +10,7 @@ import com.odenzo.ripple.localops.testkit.OTestSpec
 /**
   * From signing-data-encoding-test.js
   */
-class TxnSigningTest extends FunSuite with OTestSpec {
+class TxnSigningTest extends OTestSpec {
 
   import scala.collection.JavaConverters._
   // Lets try and run Javascript!

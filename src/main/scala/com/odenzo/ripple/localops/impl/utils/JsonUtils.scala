@@ -4,6 +4,7 @@ import cats.implicits._
 import io.circe.syntax._
 import io.circe.{Json, JsonObject}
 
+import com.odenzo.ripple.localops.impl.Signer.{json2array, json2object}
 import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 
 trait JsonUtils extends CirceUtils {
@@ -38,6 +39,10 @@ trait JsonUtils extends CirceUtils {
 
   def json2array(json: Json): Either[AppError, List[Json]] = {
     Either.fromOption(json.asArray.map(_.toList), AppError("Expected JSON Array", json))
+  }
+
+  def json2arrayOfObjects(json: Json): Either[AppError, List[JsonObject]] = {
+    json2array(json).flatMap(ls ⇒ ls.traverse(json2object))
   }
 
   def json2string(json: Json): Either[AppError, String] = {

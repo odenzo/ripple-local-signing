@@ -24,24 +24,21 @@ class SignerTest extends OTestSpec {
       "12001022800000002400000002201B0077911368400000000000000C694000000005F5E100732103B6FCD7FAC4F665FE92415DD6E8450AD90F7D6B3D45A6CFCF2E359045FF4BB400744630440220181FE2F945EBEE632966D5FB03114611E3047ACD155AA1BDB9DF8545C7A2431502201E873A4B0D177AB250AF790CE80621E16F141506CF507586038FC4A8E95887358114735FF88E5269C80CD7F7AF10530DAB840BBF6FDF8314A8B6B9FF3246856CADC4A0106198C066EA1F9C39"
     val expHash = "C0B27D20669BAB837B3CDF4B8148B988F17CE1EF8EDF48C806AE9BF69E16F441"
 
-    val blob: List[UByte] = getOrLog(ByteUtils.hex2ubytes(txblob))
-    logger.warn(
-      s" txId Prefix: ${HashPrefix.transactionID.asBytes.toList.map(_.toChar)} " + HashPrefix.transactionID.asHex
-    )
+    val blob: List[UByte]    = getOrLog(ByteUtils.hex2ubytes(txblob))
     val payload: List[UByte] = HashPrefix.transactionID.v ::: blob
     val hashBytes: Seq[Byte] = HashOps.sha512Half(payload.map(_.toByte))
 
     val hashHex = bytes2hex(hashBytes)
-    logger.warn(s"HashHex: \n $hashHex \n $expHash ")
+    logger.debug(s"HashHex: \n $hashHex \n $expHash ")
     hashHex shouldEqual expHash
 
     val okHex = Signer.createResponseHashHex(blob.map(_.toByte).toArray)
-    logger.warn(s"OK HASH: $okHex")
+    logger.debug(s"OK HASH: $okHex")
     okHex shouldEqual hashHex
 
   }
 
-  def makeHash(txBlob: String) = {
+  def makeHash(txBlob: String): String = {
 
     // return new Hash256(sha512Half(HashPrefix.transactionID, serialized));
     val blob = getOrLog(ByteUtils.hex2bytes(txBlob))

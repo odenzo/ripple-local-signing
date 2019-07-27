@@ -12,7 +12,7 @@ import com.odenzo.ripple.localops.impl.crypto.core.{ED25519CryptoBC, Secp256K1Cr
 import com.odenzo.ripple.localops.impl.crypto.{AccountFamily, RFC1751Keys, RippleFormatConverters}
 import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, Hex}
-import com.odenzo.ripple.localops.{ED25519, SECP256K1, WalletProposeResult}
+import com.odenzo.ripple.localops.{ED25519, KeyType, SECP256K1, WalletProposeResult}
 
 /** In Progress */
 object WalletGenerator extends Logging with ByteUtils {
@@ -23,8 +23,13 @@ object WalletGenerator extends Logging with ByteUtils {
     * Note: ed25519 keys do not work with Payment Channels (yet?) according to Ripple
     *
     */
-  def generateWallet(): Either[AppError, WalletProposeResult] = {
-    generateSeed().flatMap(generateEdKeys)
+  def generateWallet(keytype: KeyType): Either[AppError, WalletProposeResult] = {
+    generateSeed().flatMap { seed ⇒
+      keytype match {
+        case ED25519   ⇒ generateEdKeys(seed)
+        case SECP256K1 ⇒ generateSecpKeys(seed)
+      }
+    }
   }
 
   /** Generates a wallet using Java SecureRandom.  */

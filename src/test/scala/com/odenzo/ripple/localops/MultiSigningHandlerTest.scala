@@ -151,7 +151,7 @@ class MultiSigningHandlerTest extends FunSuite with OTestSpec with ByteUtils wit
     *
     * @return
     */
-  private def checkResults(got: JsonObject, expected: JsonObject) = {
+  private def checkResults(got: JsonObject, expected: JsonObject): Unit = {
 
     val expResult        = getOrLog(findObjectField("result", expected))
     val exTxBlob: String = getOrLog(findStringField("tx_blob", expResult))
@@ -159,17 +159,17 @@ class MultiSigningHandlerTest extends FunSuite with OTestSpec with ByteUtils wit
     val cResultObj      = getOrLog(findObjectField("result", got))
     val cTxBlob: String = getOrLog(findStringField("tx_blob", cResultObj))
 
-    logger.info(s"Got  vs Expected Blob Len: ${cTxBlob.length} and Got ${exTxBlob.length}")
+    logger.debug(s"Got  vs Expected Blob Len: ${cTxBlob.length} and Got ${exTxBlob.length}")
 
-    logger.info(s"Got vs Expected Blob \n $cTxBlob \n $exTxBlob")
+    logger.debug(s"Got vs Expected Blob \n $cTxBlob \n $exTxBlob")
 
     val target: List[Decoded] = getOrLog(TxBlobBuster.bust(exTxBlob).leftMap(e ⇒ AppError(s"Busting ${e.msg}")))
 
-    logger.info(s"Got vs Targert Str: \n $cTxBlob \n $exTxBlob")
+    logger.debug(s"Got vs Targert Str: \n $cTxBlob \n $exTxBlob")
     val gotEnc = getOrLog(TxBlobBuster.bust(cTxBlob).leftMap(e ⇒ AppError(s"Busting ${e.msg}")))
 
-    gotEnc.foreach(dec ⇒ logger.info(s"TxBlob Got    Field: " + dec.show))
-    target.foreach(dec ⇒ logger.info(s"TxBlob Target Field: " + dec.show))
+    gotEnc.foreach(dec ⇒ logger.debug(s"TxBlob Got    Field: " + dec.show))
+    target.foreach(dec ⇒ logger.debug(s"TxBlob Target Field: " + dec.show))
     // TODO: Fix this assertion
     // got shouldEqual expected.result.remove("deprecated")
 

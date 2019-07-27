@@ -5,7 +5,7 @@ import cats.data._
 import cats.implicits._
 import scribe.Logging
 
-import com.odenzo.ripple.localops.impl.Signer
+import com.odenzo.ripple.localops.impl.{Signer, WalletGenerator}
 import com.odenzo.ripple.localops.impl.crypto.RippleFormatConverters
 import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 
@@ -15,6 +15,21 @@ import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
   * This currently leaks AppError which is OK.
   */
 trait SecretKeyOps extends Logging {
+
+  // TODO: Add more Wallet API (maybe only for re-viving an existing one or letting people do their own random
+
+  /**
+    * Generates two sets of keys, but doesn't activate them in any way.
+    *
+    * @return Master and Regular KeyPair based on random seed.
+    */
+  def generateKeys(keyType: KeyType): Either[AppError, (WalletProposeResult, WalletProposeResult)] = {
+
+    for {
+      master  <- WalletGenerator.generateWallet(keyType)
+      regular ← WalletGenerator.generateWallet(keyType)
+    } yield (master, regular)
+  }
 
   /**
     * Wrapws keypair in SigningKey for optimzed usage. Typically client cache's this.
