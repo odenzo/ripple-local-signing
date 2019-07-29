@@ -1,32 +1,54 @@
 import MyCompileOptions._
 import sbt.Keys.resolvers
 
+
+lazy val supportedScalaVersions = List("2.13.0", "2.12.8")
+//scalaVersion := crossScalaVersions.value.head
+
+
 ThisBuild / organization := "com.odenzo"
-ThisBuild / scalaVersion := "2.12.8"
-ThisBuild / version := "0.0.2"
+ThisBuild / scalaVersion := supportedScalaVersions.head
+version in ThisBuild := "0.0.3"
+name in ThisBuild := "ripple-local-signing"
 
-name := "ripple-local-signing"
 
-scalacOptions ++= Seq("-feature",
-                      "-deprecation",
-                      "-unchecked",
-                      "-language:postfixOps",
-                      "-language:higherKinds",
-                      "-Ypartial-unification")
+coverageMinimum := 70
+coverageFailOnMinimum := false
+coverageHighlighting := true
 
-lazy val signing = (project in file("."))
+publishArtifact in Test := false
+parallelExecution in Test := false
+
+
+lazy val ripple_local_signing = (project in file("."))
+  .aggregate(signing)
   .settings(
-    commonSettings,
-    devSettings,
-    scalacOptions ++= opts ++ warnings ++ linters
-  )
+    crossScalaVersions := Nil,
+    publish / skip := true
+    )
 
-resolvers += Resolver.bintrayRepo("odenzoorg", "odenzooss")
-resolvers += Resolver.jcenterRepo // Will be moving there soon
-libraryDependencies += "com.odenzo" %% "ripple-binary-codec" % "0.2.5"
+
+lazy val signing = (project in file("modules/shared"))
+  .settings(
+    resolvers in ThisBuild += Resolver.bintrayRepo("odenzooss", "maven"),
+    resolvers in ThisBuild += Resolver.bintrayIvyRepo("odenzooss", "maven"),
+    crossScalaVersions := supportedScalaVersions,
+    name := "ripple-local-signing",
+
+    scalacOptions := (CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, n)) if n <= 12 => optsV12 ++ warningsV12 ++ lintersV12
+      case Some((2, n)) if n >= 13 => optsV13 ++ warningsV13 ++ lintersV13
+      case _                       => Seq("-Yno-adapted-args")
+    }),
+    commonSettings,
+    libraryDependencies += "com.odenzo" %% "ripple-binary-codec" % "0.2.7",
+    libraryDependencies ++= xlibs ++ lib_bouncycastle,
+    devSettings,
+    )
+
 
 lazy val commonSettings = Seq(
-  libraryDependencies ++= libs ++ lib_circe ++ lib_cats ++ lib_spire ++ lib_bouncycastle ++ lib_scribe,
+
 )
 val devSettings = Seq(
   Test / logBuffered := false,
@@ -34,48 +56,28 @@ val devSettings = Seq(
 )
 
 
-val libs = {
-  Seq(
-    "org.scalatest"              %% "scalatest"      % "3.0.8" % Test,
-    "org.scalacheck"             %% "scalacheck"     % "1.14.0" % Test,
+
+val circeVersion  = "0.12.0-M4"
+val catsVersion   = "2.0.0-M4"
+val spireVersion  = "0.17.0-M1"
+val scribeVersion = "2.7.9"
+
+
+// These are my standard stack and are all ScalaJS enabled.
+val xlibs = Seq(
+  "org.scalatest" %% "scalatest" % "3.0.8" % Test,
+  "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
+  "io.circe" %% "circe-core" % circeVersion,
+  "io.circe" %% "circe-generic" % circeVersion,
+  "io.circe" %% "circe-parser" % circeVersion,
+  "org.typelevel" %% "cats-core" % catsVersion,
+  "org.typelevel" %% "cats-effect" % catsVersion,
+  "org.typelevel" %% "spire" % spireVersion,
+  "com.outr" %% "scribe" % scribeVersion
   )
-}
-
-/** JSON Libs == Circe and Associated Support Libs */
-val lib_circe = {
-  val circeVersion = "0.11.1"
-
-  Seq(
-    "io.circe" %% "circe-core"           % circeVersion,
-    "io.circe" %% "circe-generic"        % circeVersion,
-    "io.circe" %% "circe-java8"          % circeVersion,
-    "io.circe" %% "circe-parser"         % circeVersion,
-    "io.circe" %% "circe-generic-extras" % circeVersion,
-    )
-
-}
-
-val lib_cats = {
-  val catsVersion = "1.6.1"
-  Seq(
-    "org.typelevel" %% "cats-core"   % catsVersion, // Cats is pulled in via Circe for now
-    "org.typelevel" %% "cats-effect" % "1.3.1" withSources () withJavadoc ()
-  )
-}
-
-val lib_spire = {
-  Seq(
-    "org.typelevel" %% "spire" % "0.16.2"
-  )
-}
 
 
-
-val lib_scribe = {
-  Seq("com.outr" %% "scribe" % "2.7.9")
-}
-
-
+// Java Only Crypto Library
 val lib_bouncycastle = {
   val version = "1.62"
   Seq(
