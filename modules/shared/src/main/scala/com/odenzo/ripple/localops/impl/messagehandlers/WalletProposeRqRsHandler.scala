@@ -1,7 +1,5 @@
 package com.odenzo.ripple.localops.impl.messagehandlers
 
-import cats._
-import cats.data._
 import cats.implicits._
 import io.circe.syntax._
 import io.circe.{Json, JsonObject}
@@ -9,10 +7,10 @@ import io.circe.{Json, JsonObject}
 import com.odenzo.ripple.localops.impl.WalletGenerator
 import com.odenzo.ripple.localops.impl.utils.JsonUtils
 import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
-import com.odenzo.ripple.localops.{ResponseError, WalletProposeResult}
+import com.odenzo.ripple.localops.models.{ResponseError, WalletProposeResult}
 
 /**
-  * This is for the case where we wish to mimic XRPL WebSocket API
+  * Mimic XRPL WebSocket API, accepting the full request for Wallet Propose
   */
 trait WalletProposeRqRsHandler extends HandlerBase with JsonUtils {
 

@@ -1,10 +1,10 @@
 package com.odenzo.ripple.localops.impl
 
 import java.security.SecureRandom
-
 import cats._
 import cats.data._
 import cats.implicits._
+
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 import scribe.Logging
 
@@ -12,7 +12,7 @@ import com.odenzo.ripple.localops.impl.crypto.core.{ED25519CryptoBC, Secp256K1Cr
 import com.odenzo.ripple.localops.impl.crypto.{AccountFamily, RFC1751Keys, RippleFormatConverters}
 import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, Hex}
-import com.odenzo.ripple.localops.{ED25519, KeyType, SECP256K1, WalletProposeResult}
+import com.odenzo.ripple.localops.models.{ED25519, KeyType, SECP256K1, WalletProposeResult}
 
 /** In Progress */
 object WalletGenerator extends Logging with ByteUtils {
@@ -94,16 +94,15 @@ object WalletGenerator extends Logging with ByteUtils {
 
       addr <- RippleFormatConverters.accountpubkey2address(pubBin)
       masterKey = RFC1751Keys.bytesToEnglish(bytes.toArray)
-    } yield
-      WalletProposeResult(
-        account_id = addr.v,
-        key_type = ED25519,
-        master_key = masterKey,
-        master_seed = seedB58.v,
-        master_seed_hex = seedHex,
-        public_key = pubB58.v,
-        public_key_hex = pubHex
-      )
+    } yield WalletProposeResult(
+      account_id = addr.v,
+      key_type = ED25519,
+      master_key = masterKey,
+      master_seed = seedB58.v,
+      master_seed_hex = seedHex,
+      public_key = pubB58.v,
+      public_key_hex = pubHex
+    )
   }
 
   def generateSecpKeys(bytes: List[Byte]): Either[AppError, WalletProposeResult] = {
@@ -119,16 +118,15 @@ object WalletGenerator extends Logging with ByteUtils {
 
       addr <- RippleFormatConverters.accountpubkey2address(pubBin.toIndexedSeq)
       masterKey = RFC1751Keys.bytesToEnglish(bytes.toArray)
-    } yield
-      WalletProposeResult(
-        account_id = addr.v,
-        key_type = SECP256K1,
-        master_key = masterKey,
-        master_seed = seedB58.v,
-        master_seed_hex = seedHex,
-        public_key = pubB58.v,
-        public_key_hex = pubHex
-      )
+    } yield WalletProposeResult(
+      account_id = addr.v,
+      key_type = SECP256K1,
+      master_key = masterKey,
+      master_seed = seedB58.v,
+      master_seed_hex = seedHex,
+      public_key = pubB58.v,
+      public_key_hex = pubHex
+    )
   }
 
 }

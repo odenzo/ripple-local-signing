@@ -11,6 +11,7 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.3.25")
 // bintrayWhoami
 addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.5")
 
+// https://github.com/sbt/sbt-git
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0")
 
 // --------------- Documentation Goodies --------------
@@ -57,3 +58,11 @@ script:
 after_success:
   - sbt coveralls
  */
+
+
+//Cross-building in addition to SBT Cross-Project Stuff - this isn't for Scala version x-project
+// https://github.com/portable-scala/sbt-crossproject
+//addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject"      % "0.6.1")
+//addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "0.6.1")
+//addSbtPlugin("org.scala-js"       % "sbt-scalajs"                   % "0.6.23")
+//addSbtPlugin("org.scala-native"   % "sbt-scala-native"              % "0.3.7")

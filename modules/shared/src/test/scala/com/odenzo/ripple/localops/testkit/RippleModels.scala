@@ -19,7 +19,7 @@ import io.circe.syntax._
 Base58 -- Like Ripple Address , Public Key, Validation Seed
 RFC-1751 -- like master_key and validation_key
 
-TODO: Define base types like these in seperate file.
+ Same hacks copied in from old models to make parsing fixtures easier.
 
  *
  *

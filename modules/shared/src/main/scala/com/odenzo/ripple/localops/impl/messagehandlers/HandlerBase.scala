@@ -1,17 +1,16 @@
 package com.odenzo.ripple.localops.impl.messagehandlers
 
-import cats._
-import cats.data._
 import cats.implicits._
 import io.circe.syntax._
 import io.circe.{Json, JsonObject}
 import scribe.Logging
 
+import com.odenzo.ripple.localops.SecretKeyOps
 import com.odenzo.ripple.localops.impl.crypto.RippleFormatConverters
 import com.odenzo.ripple.localops.impl.messagehandlers.SignForRqRsHandler.getFieldAsString
 import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 import com.odenzo.ripple.localops.impl.utils.{CirceUtils, JsonUtils}
-import com.odenzo.ripple.localops.{KeyType, ResponseError, SECP256K1, SecretKeyOps, SigningKey}
+import com.odenzo.ripple.localops.models.{KeyType, ResponseError, SECP256K1, SigningKey}
 
 trait HandlerBase extends Logging with RippleFormatConverters {
 

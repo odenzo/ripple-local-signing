@@ -1,12 +1,10 @@
-package com.odenzo.ripple.localops
+package com.odenzo.ripple.localops.models
 
 import java.security.KeyPair
 
-import cats._
-import cats.data._
 import cats.implicits._
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.{Decoder, Encoder, ObjectEncoder}
+import io.circe.{Decoder, Encoder}
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 
 /** TODO: Split between exposed Models and internal models */

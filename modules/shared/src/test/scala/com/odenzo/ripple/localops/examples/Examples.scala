@@ -7,7 +7,8 @@ import scribe.Logging
 
 import com.odenzo.ripple.localops.impl.utils.CirceUtils
 import com.odenzo.ripple.localops.impl.utils.caterrors.CatsTransformers.ErrorOr
-import com.odenzo.ripple.localops.{RippleLocalAPI, SECP256K1}
+import com.odenzo.ripple.localops.RippleLocalAPI
+import com.odenzo.ripple.localops.models.SECP256K1
 
 object Examples extends App with RippleLocalAPI with Logging {
 

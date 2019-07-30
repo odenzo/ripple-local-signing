@@ -12,6 +12,7 @@ import com.odenzo.ripple.localops.impl.Signer
 import com.odenzo.ripple.localops.impl.crypto.RippleFormatConverters
 import com.odenzo.ripple.localops.impl.utils.caterrors.{AppError, OError}
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
+import com.odenzo.ripple.localops.models.ResponseError
 
 /**
   * The details of how this works are not documented, so I am assuming similar to Sign.
@@ -34,7 +35,7 @@ object SignForRqRsHandler extends HandlerBase with Logging with JsonUtils with R
     * @return Left is error response SignRs, Right is success response
     */
   def signFor(rq: JsonObject): Either[JsonObject, JsonObject] = {
-
+    logger.debug(s"signFor Rq: \n ${rq.asJson.spaces4}")
     val ok: Either[ResponseError, JsonObject] = for {
       _           <- validateRequest(rq)
       key         <- extractKey(rq) // One of the multisigners.

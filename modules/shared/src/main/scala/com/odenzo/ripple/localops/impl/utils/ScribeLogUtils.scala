@@ -4,21 +4,34 @@ import cats._
 import cats.data._
 import cats.implicits._
 import scribe.filter._
-import scribe.modify.LogModifier
+import scribe.modify.{LevelFilter, LogModifier}
 import scribe.{Level, Logger, Priority}
 
 /**
   * Scribe has run-time configuration.
   * This is designed to control when developing the codec library and also when using.
   * This is my experiment and learning on how to control
-  * The default config fvor scribe is INFO
+  * The default config favor scribe is INFO
   * See com.odenzo.ripple.bincodec package information for usage.
+  * Want to find a stack based way or chaning logger config on root and popping back to previous
   */
 trait ScribeLogUtils {
 
+  /** We want to be very quiet in CI builds and don't let debugging logging interfere */
   def inCITesting: Boolean = {
-    scala.sys.env.getOrElse("CONTINUOUS_INTEGRATION", "false") === "true"
+    val travisTag = scala.sys.env.getOrElse("CONTINUOUS_INTEGRATION", "false")
+    val localTag  = scala.sys.env.getOrElse("CI", "false")
+    (localTag === "true" || travisTag === "true")
   }
+
+  def defaultLevel(): Level.Warn.type = {
+    Level.Warn
+  }
+
+  val runtimeLogging: LevelFilter   = LevelFilter.>=(Level.Warn)
+  val ciLogging: LevelFilter        = LevelFilter.>=(Level.Warn)
+  val testLogging: LevelFilter      = LevelFilter.>=(Level.Warn)
+  val testDebugLogging: LevelFilter = LevelFilter.>=(Level.Debug)
 
   /** This sets the handler filter level,  all settings to modifiers are essentially overridden on level,
     * althought the modifiers may filter out additional things.

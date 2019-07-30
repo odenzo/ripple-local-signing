@@ -21,8 +21,6 @@ import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
   */
 class SigningFixture$Test extends OTestSpec with ByteUtils with FixtureUtils with JsonUtils with Logging {
 
-  logger.withMinimumLevel(Level.Warn).replace()
-
   def testJustSigning(rq: JsonObject, rs: JsonObject): Unit = {
     // This assumes all required fields are filled in.
     logger.info(s"Signing Rq ${rq.asJson.spaces4}")

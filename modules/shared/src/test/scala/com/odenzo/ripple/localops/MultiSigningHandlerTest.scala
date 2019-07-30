@@ -8,7 +8,7 @@ import cats.implicits._
 import io.circe.generic.semiauto._
 import io.circe.syntax._
 import io.circe.{Decoder, JsonObject}
-import org.scalatest.FunSuite
+import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import scribe.Level
 
 import com.odenzo.ripple.bincodec.Decoded
@@ -20,7 +20,8 @@ import com.odenzo.ripple.localops.impl.utils.{ByteUtils, CirceUtils}
 import com.odenzo.ripple.localops.testkit.{AccountKeys, FixtureUtils, JsonReqRes, OTestLogging, OTestSpec}
 
 class MultiSigningHandlerTest extends FunSuite with OTestSpec with ByteUtils with FixtureUtils {
-  val tracer =
+
+  private val tracer =
     """
       |  {
       |    "account" : {
@@ -176,7 +177,7 @@ class MultiSigningHandlerTest extends FunSuite with OTestSpec with ByteUtils wit
   }
 
   test("signFor TDP") {
-    OTestLogging.setTestLogLevel(Level.Debug)
+    //OTestLogging.setTestLogLevel(Level.Debug)
     val trace: MultiSignTrace = getOrLog(CirceUtils.parseAndDecode(tracer, MultiSignTrace.decoder))
 
     val firstRq        = getOrLog(json2object(trace.signFors.head.rq))
@@ -200,7 +201,7 @@ class MultiSigningHandlerTest extends FunSuite with OTestSpec with ByteUtils wit
     //
     //    checkResults(result)
 
-    OTestLogging.setTestLogLevel(Level.Warn)
+    //OTestLogging.setTestLogLevel(Level.Warn)
   }
 
   // Always tracing these with master key only.
@@ -219,4 +220,7 @@ class MultiSigningHandlerTest extends FunSuite with OTestSpec with ByteUtils wit
     implicit val decoder: Decoder[FKP] = deriveDecoder[FKP]
   }
 
+  override def beforeAll(): Unit = setTestLogLevel(Level.Debug)
+
+  override def afterAll(): Unit = setTestLogLevel(Level.Warn)
 }

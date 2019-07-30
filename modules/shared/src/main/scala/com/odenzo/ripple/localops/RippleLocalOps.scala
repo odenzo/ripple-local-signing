@@ -9,6 +9,7 @@ import scribe.Logging
 import com.odenzo.ripple.localops.impl.utils.ByteUtils
 import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 import com.odenzo.ripple.localops.impl.{Signer, Verify, WalletGenerator}
+import com.odenzo.ripple.localops.models.SigningKey
 
 trait RippleLocalOps extends Logging {
 

@@ -14,6 +14,15 @@ import com.odenzo.ripple.localops.impl.crypto.core.{ED25519CryptoBC, HashOps, Se
 import com.odenzo.ripple.localops.impl.reference.HashPrefix
 import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
+import com.odenzo.ripple.localops.models.{
+  ED25519,
+  KeyType,
+  SECP256K1,
+  SigningKey,
+  SigningKeyEd25519,
+  SigningKeySecp256,
+  TxnSignature
+}
 
 /** This takes a message and signs it. Returning the TxBlob
   *
@@ -48,8 +57,7 @@ object Signer extends Logging with BinCodecProxy with JsonUtils with ByteUtils {
     for {
       encoded <- binarySerializeForSigning(tx_json)
       binBytes = encoded.toBytes
-      payload  = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction
-
+      payload  = HashPrefix.transactionSig.asBytes ++ binBytes.toIndexedSeq // Inner Transaction
       ans <- key match {
         case k: SigningKeyEd25519 => signEd(k, payload)
         case k: SigningKeySecp256 => signSecp(k, payload)

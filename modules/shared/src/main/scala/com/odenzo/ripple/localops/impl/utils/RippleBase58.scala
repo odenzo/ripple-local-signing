@@ -37,7 +37,9 @@ object RippleBase58 extends Logging {
       def encode1(current: BigInteger): Unit = current match {
         case BigInteger.ZERO => ()
         case _ =>
-          val Array(x, remainder) = current.divideAndRemainder(BigInteger.valueOf(58L))
+          val res: Array[BigInteger] = current.divideAndRemainder(BigInteger.valueOf(58L))
+          val x                      = res(0)
+          val remainder              = res(1)
           builder.append(alphabet.charAt(remainder.intValue))
           encode1(x)
       }

@@ -5,6 +5,8 @@ import cats.data._
 import cats.implicits._
 import io.circe.JsonObject
 import io.circe.syntax._
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
+import scribe.Level
 
 import com.odenzo.ripple.bincodec.syntax.debugging._
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
@@ -14,10 +16,10 @@ import com.odenzo.ripple.localops.{BinCodecProxy, MessageBasedAPI}
 /**
   *  Goes through some server signed txn and results and does local signing udsing the SignRq / SignRs
   */
-class SigningRqFixture$Test extends OTestSpec with ByteUtils with FixtureUtils with JsonUtils {
+class SigningRqFixture$Test extends OTestSpec with ByteUtils with FixtureUtils with JsonUtils with BeforeAndAfterAll {
 
   def runOne(rq: JsonObject, rs: JsonObject): Unit = {
-
+    logger.debug(s"Signing Rq: ${rs.asJson.spaces4}")
     val rsResultTx = findRequiredObject("tx_json", findRequiredObject("result", rs))
     val rsDump     = BinCodecProxy.binarySerialize(rsResultTx)
     scribe.info(s"Binary Serialized Rs Result: ${rsDump.show}")

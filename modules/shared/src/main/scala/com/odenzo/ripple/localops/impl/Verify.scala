@@ -57,7 +57,7 @@ trait Verify extends Logging with JsonUtils with ByteUtils {
   }
 
   protected def secp256k1(signature: String, pubkeyraw: String, payload: Seq[Byte]): Either[AppError, Boolean] = {
-    val hash = HashOps.sha512Half(payload)
+    val hash: IndexedSeq[Byte] = HashOps.sha512Half(payload)
     for {
       pubkey <- hex2bytes(pubkeyraw).map(v => Secp256K1CryptoBC.decompressPublicKey(v.toArray))
       sig    <- DERSignature.fromHex(signature)

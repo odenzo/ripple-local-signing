@@ -37,7 +37,7 @@ object MessageBasedAPI extends Logging {
     * just the TxBlob for use in the SubmitRq
     * Note that the Fee should already be specified, also all the paths.
     *
-    * @return SignForRs as documented at  https://xrpl.org/sign_for.html
+    * @return SignForRs as documented at  https://xrpl.org/sign_for.html  (Error or Success)
     *
     */
   def signFor(signForRq: JsonObject): JsonObject = {
@@ -53,6 +53,7 @@ object MessageBasedAPI extends Logging {
     * This takes a list of seperate signFor and combined the Signers from each, sorts and prepares a submit request.
     * In most cases each signFor response will have one Signer, but it handles 1+ Signer in each request.
     * You may want to supplement/update the message replacing id and/or fail_hard
+    * todo: Add Example
     *
     * @param signed A list of signFor responses.
     *

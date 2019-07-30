@@ -7,7 +7,7 @@ import scala.io.{BufferedSource, Source}
 import cats.effect.{IO, Resource}
 import io.circe.{Decoder, Json, JsonObject}
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.scalatest.{EitherValues, FunSuiteLike, Matchers}
+import org.scalatest.{BeforeAndAfterAll, EitherValues, FunSuiteLike, Matchers}
 import scribe.{Level, Logger, Logging, Priority}
 
 import com.odenzo.ripple.bincodec
@@ -16,7 +16,7 @@ import com.odenzo.ripple.localops.impl.utils.caterrors.AppError.dump
 import com.odenzo.ripple.localops.impl.utils.caterrors.CatsTransformers.ErrorOr
 import com.odenzo.ripple.localops.impl.utils.caterrors.{AppError, AppException}
 
-trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with OTestLogging {
+trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with OTestLogging with BeforeAndAfterAll {
 
   // Well, it seems that each test is getting built/instanciated before runing.
 
@@ -64,6 +64,16 @@ trait OTestSpec extends FunSuiteLike with Matchers with EitherValues with OTestL
     }
   }
 
+  protected val customLogLevel: Option[Level] = None
+
+  override def beforeAll(): Unit = {
+    customLogLevel.foreach(setTestLogLevel)
+  }
+
+  override def afterAll(): Unit = {
+    setTestLogLevel(Level.Warn)
+  }
+
 }
 
 object OTestSpec extends Logging {
@@ -81,7 +91,7 @@ object OTestSpec extends Logging {
 
       val packagesToMute: List[String] = List(
         "com.odenzo.ripple.bincodec",
-        "com.odenzo.ripple.localops",
+        "com.odenzo.ripple.localops"
       )
       val pri = Priority.High // unnecessary since clearing existing modifiers, but handy for future.
       scribe.Logger.root
@@ -98,7 +108,7 @@ object OTestSpec extends Logging {
       logger.warn("Regular Testing")
       val packagesToMute: List[String] = List(
         "com.odenzo.ripple.bincodec",
-        "com.odenzo.ripple.localops",
+        "com.odenzo.ripple.localops"
       )
       val pri = Priority.High // unnecessary since clearing existing modifiers, but handy for future.
       scribe.Logger.root
@@ -113,8 +123,6 @@ object OTestSpec extends Logging {
 
     }
 
-    Logger.root.orphan() // Fully detach from console output
-    Logger.logger.orphan()
     scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(Level.Error)).replace()
     ()
   }

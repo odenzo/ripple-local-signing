@@ -12,6 +12,7 @@ import com.odenzo.ripple.localops.impl.crypto.RippleFormatConverters
 import com.odenzo.ripple.localops.impl.utils.caterrors.{AppError, OError}
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
 import com.odenzo.ripple.localops._
+import com.odenzo.ripple.localops.models.{KeyType, ResponseError, SECP256K1, SigningKey, TxnSignature}
 
 object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverters {
 
@@ -26,7 +27,7 @@ object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverter
     //validateRequest(rq)
 
     val ok: Either[ResponseError, JsonObject] = for {
-      valid   <- validateRequest(rq)
+      _       <- validateRequest(rq)
       key     <- extractKey(rq)
       tx_json <- JsonUtils.findObjectField("tx_json", rq).leftMap(err => ResponseError.kNoTxJson)
       withPubKey = tx_json.add("SigningPubKey", key.signPubKey.asJson)
@@ -71,12 +72,14 @@ object SignRqRsHandler extends Logging with JsonUtils with RippleFormatConverter
 
   }
 
-  def buildSuccessResponse(rq: JsonObject,
-                           rqTxJson: JsonObject,
-                           sig: TxnSignature,
-                           signedBlob: String,
-                           hash: String,
-                           signPubKey: String): JsonObject = {
+  def buildSuccessResponse(
+      rq: JsonObject,
+      rqTxJson: JsonObject,
+      sig: TxnSignature,
+      signedBlob: String,
+      hash: String,
+      signPubKey: String
+  ): JsonObject = {
 
     val rsTxJson: JsonObject = rqTxJson
       .remove("SigningPubKey")

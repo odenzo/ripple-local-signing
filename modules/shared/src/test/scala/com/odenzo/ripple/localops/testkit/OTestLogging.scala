@@ -33,7 +33,7 @@ object DefaultTestLogging extends ScribeLogUtils {
     } else {
       Warn // On Assumption we are in library mode, not testing, which will override.
     }
-    setLogLevel(threshold)
+    setLogLevel(threshold) // Sets even if in Continuous Integration mode
 
     val makeQuiet = List(
       "com.odenzo.ripple.bincodec.decoding.TxBlobBuster",
@@ -44,7 +44,7 @@ object DefaultTestLogging extends ScribeLogUtils {
     scribe.warn(s"Muting Packages:\n" + makeQuiet.mkString("\n"))
     applyFilter(excludePackageSelction(makeQuiet, Level.Warn, Priority.Highest))
 
-    applyFilter(excludeByClass(classOf[OTestLogging], Level.Debug))
+    applyFilter(excludeByClass(classOf[OTestLogging], Level.Warn))
     threshold
   }
 

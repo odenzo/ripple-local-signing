@@ -33,6 +33,9 @@ trait HashOps {
     * @return 64-byte SHA512 hash with no salt added.
     */
   def sha512(bytes: Seq[Byte]): IndexedSeq[Byte] = {
+    // toIndexedSeq will do a copy, enforcing immutable
+    // unsafeArray  on  ArraySeq will not copy, and give the underlying mutable array
+    // toArray also does a copy since Seq is immutable
     MessageDigest.getInstance("SHA-512").digest(bytes.toArray).toIndexedSeq
   }
 

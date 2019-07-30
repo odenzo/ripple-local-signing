@@ -4,10 +4,10 @@ import cats._
 import cats.data._
 import cats.implicits._
 
-import com.odenzo.ripple.localops.Base58Check
 import com.odenzo.ripple.localops.impl.crypto.AccountFamily.{ripemd160, sha256, sha512}
 import com.odenzo.ripple.localops.impl.utils.caterrors.{AppError, AppException}
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, Hex, RippleBase58}
+import com.odenzo.ripple.localops.models.Base58Check
 
 trait RippleFormatConverters {
 

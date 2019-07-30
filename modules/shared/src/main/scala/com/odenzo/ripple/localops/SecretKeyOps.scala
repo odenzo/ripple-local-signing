@@ -8,6 +8,7 @@ import scribe.Logging
 import com.odenzo.ripple.localops.impl.{Signer, WalletGenerator}
 import com.odenzo.ripple.localops.impl.crypto.RippleFormatConverters
 import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
+import com.odenzo.ripple.localops.models.{KeyType, SigningKey, WalletProposeResult}
 
 /**
   * Contains functions to pre-process Ripple secret key information into SigningKey objects

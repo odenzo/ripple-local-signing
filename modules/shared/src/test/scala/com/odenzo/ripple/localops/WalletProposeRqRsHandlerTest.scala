@@ -6,6 +6,7 @@ import org.scalatest.BeforeAndAfter
 
 import com.odenzo.ripple.localops.impl.messagehandlers.WalletProposeRqRsHandler
 import com.odenzo.ripple.localops.impl.utils.JsonUtils
+import com.odenzo.ripple.localops.models.WalletProposeResult
 import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 
 class WalletProposeRqRsHandlerTest extends OTestSpec with FixtureUtils with BeforeAndAfter {
