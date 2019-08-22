@@ -11,7 +11,7 @@ organization in ThisBuild := "com.odenzo"
 version in ThisBuild      := "0.0.5"
 name in ThisBuild         := "ripple-local-signing"
 
-val circeVersion      = "0.12.0-RC1"
+val circeVersion      = "0.12.0-RC3"
 val catsVersion       = "2.0.0-RC1"
 val catsEffectVersion = "2.0.0-RC1"
 val spireVersion      = "0.17.0-M1"
