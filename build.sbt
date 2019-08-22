@@ -8,7 +8,7 @@ lazy val supportedScalaVersions = List("2.13.0", "2.12.9")
 
 scalaVersion in ThisBuild := supportedScalaVersions.head
 organization in ThisBuild := "com.odenzo"
-version in ThisBuild      := "0.0.5"
+version in ThisBuild      := "0.1.0"
 name in ThisBuild         := "ripple-local-signing"
 
 val circeVersion      = "0.12.0-RC3"
@@ -50,7 +50,7 @@ lazy val ripple_local_signing = (project in file("."))
       case Some((2, n)) if n >= 13 => optsV13 ++ warningsV13 ++ lintersV13
       case _                       => Seq("-Yno-adapted-args")
     }),
-    libraryDependencies += "com.odenzo" %% "ripple-binary-codec" % "0.2.9",
+    libraryDependencies += "com.odenzo" %% "ripple-binary-codec" % "0.1.0",
     libraryDependencies ++= xlibs ++ lib_bouncycastle,
     devSettings
   )
