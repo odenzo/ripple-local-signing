@@ -4,6 +4,7 @@ import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 import org.bouncycastle.crypto.params.{AsymmetricKeyParameter, Ed25519PublicKeyParameters}
 import org.scalatest.FunSuite
 
+import com.odenzo.ripple.localops.RippleLocalAPI
 import com.odenzo.ripple.localops.impl.BinCodecProxy
 import com.odenzo.ripple.localops.impl.crypto.core.{ED25519CryptoBC, HashOps}
 import com.odenzo.ripple.localops.impl.reference.HashPrefix
@@ -43,102 +44,17 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
       |
     """.stripMargin
 
-  val walletResult                       = CirceUtils.parseAsJsonObject(wallet)
-  val txjsonResult                       = CirceUtils.parseAsJsonObject(txjson)
+  val walletResult                       = CirceUtils.parseAsJson(wallet)
+  val txjsonResult                       = CirceUtils.parseAsJson(txjson)
   val secretkey                          = "ANTE TUFT MEG CHEN CRAB DUMB COW OWNS ROOF FRED EDDY FORD"
   val seedB58                            = "spqnjaMMxPSvtaD4nevqqdjj4kzie"
   val seedHex                            = "09A117434757F90BF0BED6B29F185E4D"
   val signPubKey                         = "EDC5349AD8114DCDA07A355AA850FABE710CEE8FCBD891F1B919A6F6713C7BABA0"
   val sender                             = "rn4gsh2qp8842mTA5HfwGT3L1XepQCpqiu"
   val pubKeyHex                          = "C5349AD8114DCDA07A355AA850FABE710CEE8FCBD891F1B919A6F6713C7BABA0" // ED removed
-  val kTxnSig                            = txjsonResult.flatMap(findStringField("TxnSignature", _))
-  val kHash                              = txjsonResult.flatMap(findStringField("hash", _))
+  val kTxnSig                            = txjsonResult.flatMap(findFieldAsString("TxnSignature", _))
+  val kHash                              = txjsonResult.flatMap(findFieldAsString("hash", _))
   val newKeyPar: AsymmetricCipherKeyPair = ED25519CryptoBC.generateKeyPair()
-
-  test("Private Key KeyPair") {
-    val kp                               = getOrLog(ED25519CryptoBC.generateKeyPairFromHex(seedHex))
-    val akPublic: AsymmetricKeyParameter = kp.getPublic
-    val edPublic                         = akPublic.asInstanceOf[Ed25519PublicKeyParameters]
-    val pubEnc: Array[Byte]              = edPublic.getEncoded
-    val pubHex                           = bytes2hex(pubEnc)
-    logger.info(s"PubHex Generated from Seed $pubHex")
-    pubHex shouldEqual signPubKey.drop(2)
-  }
-
-  test("Hash Computation") {
-
-    // First lets see if we can get the hash
-    for {
-      tx_json <- txjsonResult
-      all     <- BinCodecProxy.binarySerialize(tx_json)
-      allHash    = HashOps.sha512Half((HashPrefix.transactionID.v ::: all.rawBytes).map(_.toByte).toArray)
-      allHashHex = ByteUtils.bytes2hex(allHash)
-      _          = logger.info(s"AllHash ${ByteUtils.bytes2hex(allHash)}")
-      _          = allHashHex shouldEqual getOrLog(kHash)
-    } yield all
-
-  }
-
-  test("Verification") {
-    val ok = for {
-      tx_json <- txjsonResult
-      keyPair <- ED25519CryptoBC.generateKeyPairFromHex(seedHex)
-      pubHex  <- ED25519CryptoBC.publicKey2Hex(keyPair.getPublic)
-      calcPub <- ED25519CryptoBC.signingPubKey2KeyParameter(signPubKey)
-
-      _ = pubHex shouldEqual signPubKey
-      binBytes <- BinCodecProxy.serializeForSigning(tx_json)
-      toHash = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction! 0x53545800L
-
-      sig      <- kTxnSig
-      sigBytes <- hex2bytes(sig)
-      pubKey = keyPair.getPublic.asInstanceOf[Ed25519PublicKeyParameters]
-      _      = calcPub.getEncoded shouldEqual pubKey.getEncoded
-      verfied <- ED25519CryptoBC.verify(toHash.toArray, sigBytes.toArray, calcPub)
-    } yield verfied
-    val passed: Boolean = getOrLog(ok)
-    passed shouldEqual true
-
-  }
-
-  test("Sign to TxnSignature") {
-    val txnsig = for {
-      tx_json  <- txjsonResult
-      keyPair  <- ED25519CryptoBC.generateKeyPairFromHex(seedHex)
-      binBytes <- BinCodecProxy.serializeForSigning(tx_json)
-      toHash = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction! 0x53545800L
-
-      sigBytes <- ED25519CryptoBC.sign(toHash.toArray, keyPair)
-      sigHex = bytes2hex(sigBytes)
-      _      = logger.info(s"EDSignature Len: ${sigBytes.length}")
-    } yield sigHex
-    getOrLog(txnsig)
-    txnsig shouldEqual kTxnSig
-  }
-
-  test("Self txnscenarios And Verify") {
-    // This produces repeatable signatures for given private key
-    val keyPair = newKeyPar
-
-    val sigVerified = for {
-      tx_json <- txjsonResult
-
-      binBytes <- BinCodecProxy.serializeForSigning(tx_json)
-      toHash = HashPrefix.transactionSig.asBytes ++ binBytes // Inner Transaction! 0x53545800L
-      hashed = HashOps.sha512Half(toHash.toArray)
-      sigBytes <- ED25519CryptoBC.sign(hashed.toArray, keyPair)
-      sign2    <- ED25519CryptoBC.sign(hashed.toArray, keyPair)
-      sigHex  = bytes2hex(sigBytes)
-      sig2Hex = bytes2hex(sign2)
-      _       = assert(sig2Hex === sigHex)
-      pubKey  = keyPair.getPublic.asInstanceOf[Ed25519PublicKeyParameters]
-      verfied <- ED25519CryptoBC.verify(hashed.toArray, sigBytes.toArray, pubKey)
-      _ = assert(verfied)
-    } yield (sigHex, verfied)
-    val (sig, ok) = getOrLog(sigVerified)
-    logger.info(s"Verified; $ok")
-    logger.info(s"Signature: $sig")
-  }
 
   test("BC") {
     import java.nio.charset.StandardCharsets

@@ -5,12 +5,11 @@ import scala.collection.immutable
 import cats._
 import cats.data._
 import cats.implicits._
-
 import org.scalatest.FunSuite
 import scribe.Level
 import spire.math._
 
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
+import com.odenzo.ripple.localops.LocalOpsError
 import com.odenzo.ripple.localops.testkit.OTestSpec
 
 class ByteUtilsTest extends OTestSpec with ByteUtils {

@@ -1,31 +1,38 @@
 package com.odenzo.ripple.localops.impl
 
-import cats._
-import cats.data._
-import cats.implicits._
+import io.circe.optics.JsonPath
 import io.circe.syntax._
 import io.circe.{Json, JsonObject}
 
-import com.odenzo.ripple.localops.impl.Sign.signForTxnSignature
+import cats._
+import cats.data._
+import cats.implicits._
+import monocle.{Optional, Traversal}
+
+import com.odenzo.ripple.bincodec.RippleCodecAPI
+import com.odenzo.ripple.localops.impl.Sign.binarySerializeForSigning
+import com.odenzo.ripple.localops.impl.reference.HashPrefix
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils, RippleBase58}
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
-import com.odenzo.ripple.localops.models.SigningKey
+import com.odenzo.ripple.localops.models.{SigningKey, TxnSignature}
+import com.odenzo.ripple.localops.{LOpException, LocalOpsError}
 
 /**
   * Multisigning functions. signForSignerOnly does the actual work.
   * The rest of the routines are just for manipulating Json messages.
+  * Needs a real cleanup
   **/
 trait SignFor extends JsonUtils {
 
-  /** Multisigns a tx_json returning the new Signer object.
-    *  */
-  def signForSignerOnly(tx_json: JsonObject, key: SigningKey, addr: String): Either[Throwable, JsonObject] = {
-    signForTxnSignature(tx_json, key, addr).map { sig =>
-      JsonObject(
-        "Signer" := JsonObject("Account" := addr, "SigningPubKey" := key.signPubKey, "TxnSignature" := sig.hex)
-      )
-    }
-  }
+  val txjsonGetLens: Traversal[Json, JsonObject] = JsonPath.root.Signers.each.obj
+
+  // Want to work if not present but we
+  val txjsonSetLens: Optional[Json, Vector[Json]] = JsonPath.root.Signers.arr
+  val txjsonPubKeyAdd: Json => Json = JsonPath.root
+    .at("SigningPubKey")
+    .modify(opt => Json.fromString("").some)
+
+  val replyGetLens: Traversal[Json, JsonObject]  = JsonPath.root.result.tx_json.Signers.each.obj
+  val replySetLens: Optional[Json, Vector[Json]] = JsonPath.root.result.tx_json.Signers.arr
 
   /**
     *  This *adds* a Singer to the Signers field value array of the given tx_json
@@ -35,13 +42,74 @@ trait SignFor extends JsonUtils {
     * @param signAddrB58Check
     * @return updated tx_json  with new Signer, the hash is not updated
     */
-  def signFor(tx_json: JsonObject, key: SigningKey, signAddrB58Check: String): Either[Throwable, JsonObject] = {
+  def signFor(tx_json: Json, key: SigningKey, signAddrB58Check: String) = {
+    val root = txjsonPubKeyAdd(tx_json)
     for {
-      signer <- signForSignerOnly(tx_json, key, signAddrB58Check)
-      existingSigners = extractSignersFromTxJson(tx_json)
-      updatedArray    = (signer :: existingSigners).sortBy(signerSortBy)
-      rsTxJson        = JsonUtils.replaceField("Signers", tx_json, updatedArray.asJson)
-    } yield sortFields(rsTxJson)
+
+      signer <- signForSignerOnly(root, key, signAddrB58Check)
+      existingSigners = txjsonGetLens.getAll(root).map(_.asJson)
+      updatedArray    = (signer :: existingSigners).distinct
+      sorted <- sortSigners(updatedArray)
+      hacked   = ensureSignersField(root)
+      rsTxJson = JsonPath.root.Signers.arr.set(sorted.toVector)(hacked)
+      reply <- json2object(rsTxJson).map(sortFields)
+    } yield reply.asJson
+  }
+
+  protected def ensureSignersField(json: Json): Json = {
+    json.mapObject { obj =>
+      if (obj.contains("Signers")) obj
+      else obj.add("Signers", List.empty[Json].asJson)
+    }
+  }
+
+  /** Multisigns a tx_json returning the new Signer object.
+    *  */
+  protected def signForSignerOnly(tx_json: Json, key: SigningKey, addr: String): Either[Throwable, Json] = {
+    // This will add the account address at the end. Not sure why I split across files.
+    signForTxnSignature(tx_json, key, addr).map { sig =>
+      JsonObject(
+        "Signer" := JsonObject("Account" := addr, "SigningPubKey" := key.signPubKey, "TxnSignature" := sig.hex)
+      ).asJson
+    }
+  }
+
+  /**
+    * Hmmm...  This is for the internal Signer TxnSignature
+    * IT hases multisign hash prefix and appends the signer account before signing
+    * @param tx_json of the requested txn, optionally with Existing Signers
+    * @return TxnSignature which includes the the Signer account
+    * */
+  def signForTxnSignature(tx_json: Json, key: SigningKey, signerAddr: String): Either[Throwable, TxnSignature] = {
+
+    // Well, first, we need to use different hash prefix. (transactionMultiSig)
+    // Then a suffix is encoding of the signingAccount as bytes.
+    // Also should make sure SigningPubKey="" is in tx_Json
+
+    for {
+      encoded <- binarySerializeForSigning(tx_json).leftMap(e => LocalOpsError("Error Serializing", e))
+      address <- RippleCodecAPI
+        .serializedAddress(signerAddr)
+        .leftMap(e => LocalOpsError(s"Serializing Addr  $signerAddr", e))
+      binBytes = encoded.toBytes
+      payload  = HashPrefix.transactionMultiSig.asByteArray ++ binBytes ++ address
+      ans <- Sign.signPayload(payload, key)
+    } yield ans
+
+  }
+
+  /** Generates the TxBlob for fully multi-signed tx_json */
+  def generateTxBlob(tx_json: Json): Either[LOpException, String] = {
+    for {
+      encoded <- BinCodecProxy.binarySerialize(tx_json).leftMap(e => LocalOpsError("Error Serializing", e))
+      binBytes = encoded.toHex
+    } yield binBytes
+  }
+
+  def sortSigners(encObj: List[Json]): Either[LocalOpsError, List[Json]] = {
+    LocalOpsError.wrapPure("Sorting Signers") {
+      encObj.sortBy(v => unsafeSortFn(v))
+    }
   }
 
   /**
@@ -52,77 +120,24 @@ trait SignFor extends JsonUtils {
     *
     * @return
     */
-  protected def signerSortBy(enclosingObj: JsonObject): String = {
-    //FIXME: Hack so enclosing object containing Signer or the Signer obj value passed in
-    val signer = findObjectField("Signer", enclosingObj).getOrElse(enclosingObj)
-    val key = for {
-      account <- findStringField("Account", signer)
-      binary  <- RippleBase58.decode(account)
-    } yield binary
-    key match {
-      case Right(v) => ByteUtils.bytes2hex(v.toIterable) // Scala 13 fix is not Scala 12 compatable
-      case Left(err) =>
-        val err = AppError("Signers Sort By Failed to Find Account", enclosingObj.asJson)
-        logger.error(s"Hack Failed: Throwing ${err.show}")
-        throw err
+  protected def signerSortBy(enclosingObj: Json): Either[LocalOpsError, String] = {
+    // Want to sort by the decoded account in each signer
+    // Our "cursor" is the top object in Signers array (anonymous json object)
+
+    // I wonder how long it takes to "build" the Optional before applying?
+    logger.debug(s"Sorting By With Root ${enclosingObj.spaces4}")
+    val path: Optional[Json, String] = JsonPath.root.Signer.Account.string
+    for {
+      acct   <- lensGetOpt(path)(enclosingObj)
+      binary <- RippleBase58.decode(acct)
+    } yield ByteUtils.bytes2hex(binary)
+  }
+
+  protected def unsafeSortFn(j: Json): String = {
+    signerSortBy(j) match {
+      case Left(err) => throw err
+      case Right(v)  => v
     }
-  }
-
-  /**
-    *   Extraact Signer enclosing objects from result.
-    *   It is mandatory at least one Signer enclosing object is present and must have Signer field
-    *
-    * @param signForRs
-    */
-  def extractSignersFromSignFor(signForRs: JsonObject): Either[AppError, List[JsonObject]] = {
-    for {
-      txjson <- findResultTxJson(signForRs)
-      signers <- extractSignersFromTxJson(txjson) match {
-        case Nil => AppError("No Signers fields found", signForRs.asJson).asLeft
-        case ll =>
-          if (ll.forall(_.contains("Signer"))) ll.asRight
-          else AppError("Signers object had no Signer Field", signForRs.asJson).asLeft
-      }
-    } yield signers
-  }
-
-  /** Pulls the Signer field value from the tx_json.
-    * @return If Signers field is not present or empty empty list is return
-    * else it is an List of the Signer enclosing object (with Singer field inside) */
-  def extractSignersFromTxJson(tx_json: JsonObject): List[JsonObject] = {
-    // This is because this is applied to both request and response SignFor tx_json
-    val signers: List[JsonObject] =
-      findField("Signers", tx_json)
-        .flatMap(json2arrayOfObjects)
-        .getOrElse(List.empty[JsonObject])
-    signers
-  }
-
-  /**
-    *  Quick Lens like have,(TODO: make a real lens)
-    *  Looks for result/tx_json and creates or replaces the existing Signers field with array of signers
-    * @param newVal The array of Signers to set Singers field value to.
-    * @param fullRs Full object to lens into at location ./result/tx_json/Signers
-    * @return
-    */
-  def replaceSignersInFull(newVal: Json, fullRs: JsonObject): Either[Throwable, JsonObject] = {
-    for {
-      result <- findObjectField("result", fullRs)
-      txjson <- findObjectField("tx_json", result)
-      upTxjson = JsonUtils.replaceField("Signers", txjson, newVal)
-      full <- replaceTxJsonInResult(fullRs, upTxjson.asJson)
-    } yield full
-  }
-
-  def replaceTxJsonInResult(fullRs: JsonObject, updatedTxJson: Json): Either[Throwable, JsonObject] = {
-    val jsonIn = fullRs.asJson
-    jsonIn.hcursor
-      .downField("result")
-      .downField("tx_json")
-      .set(updatedTxJson)
-      .top
-      .toRight(AppError("Trouble Replacing tx_json field", jsonIn))
-      .flatMap(json2jsonObject)
   }
 
   /**
@@ -133,17 +148,31 @@ trait SignFor extends JsonUtils {
     * @param responses List of full response messages from sign_for commands
     * @return tx_json from first responses with aggregrated Signers field.
     */
-  def mergeMultipleFullResponses(responses: List[JsonObject]): Either[Throwable, JsonObject] = {
-    val txjsons = responses.traverse(findResultTxJson)
-    txjsons.flatMap {
-      case Nil         => AppError("Cannot combine empty list").asLeft
-      case head :: Nil => head.asRight
-      case fulllist @ head :: tail =>
-        val signers: List[JsonObject] = fulllist.flatMap(extractSignersFromTxJson).distinct
-        val sorted: List[JsonObject]  = signers.sortBy(signerSortBy)
-        replaceSignersInFull(sorted.asJson, head)
-    }
+  def mergeMultipleFullResponses(responses: List[Json]): Either[LocalOpsError, Json] = {
 
+    responses match {
+      case Nil                     => LocalOpsError("Cannot combine empty list").asLeft
+      case head :: Nil             => head.asRight
+      case fulllist @ head :: tail =>
+        // Each response may have multiple Signer in general case
+        val signers: List[Json] = fulllist.flatMap(rs => replyGetLens.getAll(rs.asJson)).distinct.map(_.asJson)
+        sortSigners(signers).map(sl => replySetLens.set(sl.toVector)(head.asJson))
+    }
+  }
+
+  /** Accepts tx_json instead of full responses
+    * TODO: This is obtuse, switch to optics or re-write somehow.
+    * @return  The first tx_json with updated Signers
+    */
+  def mergeMultipleTxJsonResponses(txjsonRs: List[Json]): Either[LocalOpsError, Json] = {
+    txjsonRs match {
+      case Nil                     => LocalOpsError("Cannot combine empty list").asLeft
+      case head :: Nil             => head.asRight
+      case fulllist @ head :: tail =>
+        // Each response may have multiple Signer in general case
+        val signers: List[Json] = fulllist.flatMap(rs => replyGetLens.getAll(rs.asJson)).distinct.map(_.asJson)
+        sortSigners(signers).map(sl => replySetLens.set(sl.toVector)(head.asJson))
+    }
   }
 
 }

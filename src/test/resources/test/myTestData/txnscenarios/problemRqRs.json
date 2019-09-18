@@ -1,0 +1,96 @@
+[
+  {
+    "rq": {
+      "command": "sign",
+      "tx_json": {
+        "TransactionType": "Payment",
+        "Account": "r4fwfyWgy25tjsb7YqMaRhBkanroZ7rDqr",
+        "Amount": {
+          "value": "10",
+          "currency": "NZD",
+          "issuer": "rsPEGecnKhQ3bkH3co1uRSD3tUwHDrDz1T"
+        },
+        "Destination": "rfDnjX6LYsv1Uo6RodimJy5KpQk543TKMT",
+        "DestinationTag": null,
+        "InvoiceID": null,
+        "Paths": [
+          [
+            {
+              "account": "rGrg8a65omKD6F4moDXRiS82XMXtpM996Z",
+              "currency": null,
+              "issuer": null
+            },
+            {
+              "account": null,
+              "currency": "NZD",
+              "issuer": "rsPEGecnKhQ3bkH3co1uRSD3tUwHDrDz1T"
+            }
+          ]
+        ],
+        "SendMax": {
+          "value": "20",
+          "currency": "USD",
+          "issuer": "rGrg8a65omKD6F4moDXRiS82XMXtpM996Z"
+        },
+        "DeliverMin": null,
+        "Flags": 0,
+        "Fee": "50",
+        "Sequence": null,
+        "AccountTxnID": null,
+        "LastLedgerSequence": 4294967295,
+        "Memos": null
+      },
+      "seed_hex": "3631029462AB142110489E5819F69616",
+      "key_type": "ed25519",
+      "offline": false,
+      "build_path": null,
+      "fee_multi_max": 1000,
+      "fee_div_max": null
+    },
+    "rs": {
+      "result": {
+        "deprecated": "This command has been deprecated and will be removed in a future version of the server. Please migrate to a standalone signing tool.",
+        "tx_blob": "12000022000000002400000003201BFFFFFFFF61D4C38D7EA4C680000000000000000000000000004E5A4400000000001A255086B5137A6E57079B1B4FFF4F75C61B4F7F68400000000000003269D4C71AFD498D00000000000000000000000000005553440000000000A4AB176547A22ED23E6D8C3138780526830081D27321EDF0B6D83E34724369D0B1064FE2B944843E8B5AF1EA0BBB889E0F70BEA2B3F771744099B1A429D1B48E82EC97D3D1B1DA2268BD5EB53F42C33FE50494853310B6885B4DC7E969AC42F9E5F4D1F069D01CA4641B805DCB6B0FBC2BD9BA355F360FEA078114E784C01C1F30F461ED92E6CBC96A177AA8822DB283144419B287060B8112B323AF730A8B1DF254DD6470011201A4AB176547A22ED23E6D8C3138780526830081D2300000000000000000000000004E5A4400000000001A255086B5137A6E57079B1B4FFF4F75C61B4F7F00",
+        "tx_json": {
+          "Account": "r4fwfyWgy25tjsb7YqMaRhBkanroZ7rDqr",
+          "Amount": {
+            "currency": "NZD",
+            "issuer": "rsPEGecnKhQ3bkH3co1uRSD3tUwHDrDz1T",
+            "value": "10"
+          },
+          "Destination": "rfDnjX6LYsv1Uo6RodimJy5KpQk543TKMT",
+          "Fee": "50",
+          "Flags": 0,
+          "LastLedgerSequence": 4294967295,
+          "Paths": [
+            [
+              {
+                "account": "rGrg8a65omKD6F4moDXRiS82XMXtpM996Z",
+                "type": 1,
+                "type_hex": "0000000000000001"
+              },
+              {
+                "currency": "NZD",
+                "issuer": "rsPEGecnKhQ3bkH3co1uRSD3tUwHDrDz1T",
+                "type": 48,
+                "type_hex": "0000000000000030"
+              }
+            ]
+          ],
+          "SendMax": {
+            "currency": "USD",
+            "issuer": "rGrg8a65omKD6F4moDXRiS82XMXtpM996Z",
+            "value": "20"
+          },
+          "Sequence": 3,
+          "SigningPubKey": "EDF0B6D83E34724369D0B1064FE2B944843E8B5AF1EA0BBB889E0F70BEA2B3F771",
+          "TransactionType": "Payment",
+          "TxnSignature": "99B1A429D1B48E82EC97D3D1B1DA2268BD5EB53F42C33FE50494853310B6885B4DC7E969AC42F9E5F4D1F069D01CA4641B805DCB6B0FBC2BD9BA355F360FEA07",
+          "hash": "2BA9A0A613E1C724A13EA92417A2907A5D6C6472FE2D30A209E20E8325BE8016"
+        }
+      },
+      "status": "success",
+      "type": "response"
+    }
+  }
+]

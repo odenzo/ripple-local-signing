@@ -1,8 +1,9 @@
 package com.odenzo.ripple.localops
 
+import io.circe.Json
+
 import cats._
 import cats.data._
-import io.circe.{Json, JsonObject}
 import scribe.Logging
 
 import com.odenzo.ripple.localops.impl.messagehandlers.{SignForMsg, SignMsg, WalletProposeMsg}
@@ -19,8 +20,9 @@ object MessageBasedAPI extends Logging {
     * @param signRq Full Request
     * @return Either a success or error JSON Object per Response Format
     */
-  def sign(signRq: JsonObject): JsonObject = {
-    SignMsg.processSignRequest(signRq).fold(identity, identity)
+  def sign(signRq: Json): Json = {
+    val actioned: Either[Json, Json] = SignMsg.processSignRequest(signRq)
+    actioned.fold(identity, identity)
   }
 
   /**
@@ -28,27 +30,15 @@ object MessageBasedAPI extends Logging {
     * @return SignForRs Note that hash and tx_blob not updated yet
     *
     */
-  def signFor(signForRq: Json): JsonObject = {
+  def signFor(signForRq: Json): Json = {
     SignForMsg.signFor(signForRq).fold(identity, identity)
-  }
-
-  /**
-    * In some cases you can sign_for tx_json with existing Signer fields, which aggregated.
-    * If doing N seperate sign_for each with 1 or more Signer in result, then this
-    * can be used to aggregate all the Signer(s) and return submit_multisigned request.
-    * @param signed A list of signFor responses.
-    *
-    * @return a submit_multsigned request message. In exceptional cases error on the left.
-    */
-  def createSubmitMultiSignedRq(signed: List[JsonObject]): Either[Throwable, JsonObject] = {
-    SignForMsg.createSubmitMultiSignedRq(signed)
   }
 
   /**
     *  Full message based interface per https://xrpl.org/wallet_propose.html
     *
     */
-  def generateWallet(walletProposeRq: JsonObject): JsonObject = {
+  def walletPropose(walletProposeRq: Json): Json = {
     WalletProposeMsg.propose(walletProposeRq).fold(identity, identity)
   }
 }

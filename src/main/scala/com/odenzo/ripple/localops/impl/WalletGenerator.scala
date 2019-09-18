@@ -1,16 +1,16 @@
 package com.odenzo.ripple.localops.impl
 
 import java.security.SecureRandom
+
 import cats._
 import cats.data._
 import cats.implicits._
-
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 import scribe.Logging
 
+import com.odenzo.ripple.localops.LocalOpsError
 import com.odenzo.ripple.localops.impl.crypto.core.{ED25519CryptoBC, Secp256K1CryptoBC}
 import com.odenzo.ripple.localops.impl.crypto.{AccountFamily, RFC1751Keys, RippleFormatConverters}
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, Hex}
 import com.odenzo.ripple.localops.models.{ED25519, KeyType, SECP256K1, WalletProposeResult}
 
@@ -23,7 +23,7 @@ object WalletGenerator extends Logging with ByteUtils {
     * Note: ed25519 keys do not work with Payment Channels (yet?) according to Ripple
     *
     */
-  def generateWallet(keytype: KeyType): Either[AppError, WalletProposeResult] = {
+  def generateWallet(keytype: KeyType): Either[LocalOpsError, WalletProposeResult] = {
     generateSeed().flatMap { seed =>
       keytype match {
         case ED25519   => generateEdKeys(seed)
@@ -33,10 +33,10 @@ object WalletGenerator extends Logging with ByteUtils {
   }
 
   /** Generates a wallet using Java SecureRandom.  */
-  def generateSeed(): Either[AppError, IndexedSeq[Byte]] = {
+  def generateSeed(): Either[LocalOpsError, IndexedSeq[Byte]] = {
     val ranBytes = new Array[Byte](16)
     SecureRandom.getInstanceStrong.nextBytes(ranBytes)
-    ranBytes.toIndexedSeq.asRight[AppError]
+    ranBytes.toIndexedSeq.asRight[LocalOpsError]
   }
 
   /**
@@ -44,7 +44,7 @@ object WalletGenerator extends Logging with ByteUtils {
     *
     * @param someSeed
     */
-  def generateSeedBySniffing(someSeed: String): Either[AppError, IndexedSeq[Byte]] = {
+  def generateSeedBySniffing(someSeed: String): Either[LocalOpsError, IndexedSeq[Byte]] = {
     // Try and sniff the seed type and delegate, most specific to least with fallback
     // Order is important, ie valid SecretKey cannot be any other thing
     // Valid Hex cannot be valid B58Check. Also need to negative test all those routines.
@@ -56,7 +56,7 @@ object WalletGenerator extends Logging with ByteUtils {
 
   }
 
-  def generateSeedFromSecretKey(wordsRFC1751: String): Either[AppError, IndexedSeq[Byte]] = {
+  def generateSeedFromSecretKey(wordsRFC1751: String): Either[LocalOpsError, IndexedSeq[Byte]] = {
     for {
       seedHex <- RippleFormatConverters.convertMasterKey2masterSeedHex(wordsRFC1751)
       bytes   <- hex2bytes(seedHex)
@@ -68,13 +68,13 @@ object WalletGenerator extends Logging with ByteUtils {
     *
     * @param hex 16 bytes hex
     */
-  def generateSeedFromHex(hex: String): Either[AppError, IndexedSeq[Byte]] = hex2bytes(hex).map(_.toIndexedSeq)
+  def generateSeedFromHex(hex: String): Either[LocalOpsError, IndexedSeq[Byte]] = hex2bytes(hex).map(_.toIndexedSeq)
 
-  def generateSeedFromSeedB58(b58Check: String): Either[AppError, IndexedSeq[Byte]] = {
+  def generateSeedFromSeedB58(b58Check: String): Either[LocalOpsError, IndexedSeq[Byte]] = {
     RippleFormatConverters.convertBase58Check2bytes(b58Check).map(_.toIndexedSeq)
   }
 
-  def generateSeedFromPassword(password: String): Either[AppError, IndexedSeq[Byte]] = {
+  def generateSeedFromPassword(password: String): Either[LocalOpsError, IndexedSeq[Byte]] = {
     RippleFormatConverters.convertPassword2bytes(password).map(_.toIndexedSeq)
   }
 
@@ -83,7 +83,7 @@ object WalletGenerator extends Logging with ByteUtils {
     *
     * @param bytes This requires exactly 16 bytes
     */
-  def generateEdKeys(bytes: IndexedSeq[Byte]): Either[AppError, WalletProposeResult] = {
+  def generateEdKeys(bytes: IndexedSeq[Byte]): Either[LocalOpsError, WalletProposeResult] = {
 
     val kp: AsymmetricCipherKeyPair = ED25519CryptoBC.generateKeyPairFromBytes(bytes.toArray)
     for {
@@ -105,7 +105,7 @@ object WalletGenerator extends Logging with ByteUtils {
     )
   }
 
-  def generateSecpKeys(bytes: IndexedSeq[Byte]): Either[AppError, WalletProposeResult] = {
+  def generateSecpKeys(bytes: IndexedSeq[Byte]): Either[LocalOpsError, WalletProposeResult] = {
 
     for {
       kp <- AccountFamily.rebuildAccountKeyPairFromSeed(bytes)

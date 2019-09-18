@@ -1,22 +1,19 @@
 package com.odenzo.ripple.localops
 
 import io.circe.Decoder.Result
-import org.scalatest.FunSuite
-import io.circe._
 import io.circe.syntax._
 
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
-import com.odenzo.ripple.localops.models.{ED25519, KeyType, SECP256K1, WalletProposeResult}
+import com.odenzo.ripple.localops.models._
 import com.odenzo.ripple.localops.testkit.OTestSpec
 
-/**
-  *  Load wallet creation fixture and test each function
-  */
-class SecretKeyOpsTest extends OTestSpec with SecretKeyOps {
+class GenerateAccountKeysTest extends OTestSpec with RippleLocalAPI {
 
   test("Generate Keys") {
-    val (edMaster, edReg)       = getOrLog(super.generateKeys(ED25519))
-    val (secMaster, secRegular) = getOrLog(generateKeys(SECP256K1))
+    val edReg    = getOrLog(super.generateAccountKeys(ED25519.txt))
+    val edMaster = getOrLog(super.generateAccountKeys(ED25519.txt))
+
+    val secMaster  = getOrLog(generateAccountKeys(SECP256K1.txt))
+    val secRegular = getOrLog(generateAccountKeys(SECP256K1.txt))
 
     getOrLog(doOneTest(edMaster))
     getOrLog(doOneTest(secMaster))
@@ -42,10 +39,10 @@ class SecretKeyOpsTest extends OTestSpec with SecretKeyOps {
 
   }
 
-  def doOneTest(wallet: WalletProposeResult) = {
-    packSigningKey(wallet.master_seed_hex, wallet.key_type)
-    packSigningKeyFromB58(wallet.master_seed, wallet.key_type)
-    packSigningKeyFromRFC1751(wallet.master_key, wallet.key_type)
+  def doOneTest(wallet: WalletProposeResult): Either[LocalOpsError, SigningKey] = {
+    packSigningKey(wallet.master_seed_hex, wallet.key_type.txt)
+    packSigningKeyFromB58(wallet.master_seed, wallet.key_type.txt)
+    packSigningKeyFromRFC1751(wallet.master_key, wallet.key_type.txt)
   }
 
 }

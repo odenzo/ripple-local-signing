@@ -8,7 +8,7 @@ import cats.data._
 import cats.implicits._
 import scribe.Logging
 
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
+import com.odenzo.ripple.localops.LocalOpsError
 
 // Based on
 // https://github.com/ACINQ/bitcoin-lib/blob/master/src/main/scala/fr/acinq/bitcoin/Base58.scala
@@ -59,19 +59,20 @@ object RippleBase58 extends Logging {
     *
     * @return the decoded data
     */
-  def decode(input: String): Either[AppError, Iterator[Byte]] = {
-    AppError.wrapPure(s"B58 Decoding $input") {
+  def decode(input: String): Either[LocalOpsError, IndexedSeq[Byte]] = {
+    LocalOpsError.wrapPure(s"B58 Decoding $input") {
 
       val zeroes: Iterator[Byte] = input.takeWhile(_ === '1').iterator.map(_ => 0.toByte)
       val trim: String           = input.dropWhile(_ === '1')
 
       val zeroBI: BigInt = BigInt(0)
-      trim match {
+      val res = trim match {
         case str if str.isEmpty => zeroes
         case str =>
           val decoded: BigInt = trim.foldLeft(zeroBI)((a, b) => (a * BigInt(58L)) + base58Map(b))
           zeroes ++ decoded.toByteArray.dropWhile(_ === 0) // BigInteger.toByteArray may add a leading 0x00
       }
+      res.toIndexedSeq
 
     }
   }

@@ -14,23 +14,28 @@ import org.bouncycastle.crypto.signers.{ECDSASigner, HMacDSAKCalculator}
 import org.bouncycastle.jcajce.provider.asymmetric.ec.{BCECPrivateKey, BCECPublicKey}
 import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.interfaces.ECPublicKey
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.spec.{ECNamedCurveParameterSpec, ECPrivateKeySpec, ECPublicKeySpec}
 import org.bouncycastle.math.ec
 import org.bouncycastle.math.ec.ECPoint
 import scribe.Logging
 
+import com.odenzo.ripple.localops.LocalOpsError
 import com.odenzo.ripple.localops.impl.crypto.DERSignature
 import com.odenzo.ripple.localops.impl.utils.ByteUtils
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 
 /**
   * This is focussed just on getting Secp256k1 txnscenarios and Verification Working.
   * TODO: Trim this down to used functions
   **/
 object Secp256K1CryptoBC extends Logging with ByteUtils {
+
+  Security.addProvider(new BouncyCastleProvider)
+  private val providerName = "BC"
+  val provider: Provider   = Security.getProvider(providerName)
+
   private val curveName      = "secp256k1"
   private val keyType        = "ECDSA"
-  private val provider       = "BC"
   val params: X9ECParameters = SECNamedCurves.getByName(curveName)
 
   private val domainParams: ECDomainParameters =
@@ -51,8 +56,8 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
     * @param message This is the Hash value to sign, for Ripple the (HashPrefix ++ SerializedForSigning(tx_json))
     *                applied to SHA512Half (I am pretty sure)
     * */
-  def verify(message: Array[Byte], sig: DERSignature, pubKey: PublicKey): Either[AppError, Boolean] = {
-    AppError.wrap("SECP Verify") {
+  def verify(message: Array[Byte], sig: DERSignature, pubKey: PublicKey): Either[LocalOpsError, Boolean] = {
+    LocalOpsError.wrap("SECP Verify") {
       pubKey match {
         case bcecKey: BCECPublicKey =>
           val signer                        = new ECDSASigner
@@ -61,14 +66,14 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
           signer.init(false, params)
           signer.verifySignature(message, sig.r.asBigInteger, sig.s.asBigInteger).asRight
 
-        case other => AppError(s"Illegal Public Key Type: ${other.getClass}").asLeft
+        case other => LocalOpsError(s"Illegal Public Key Type: ${other.getClass}").asLeft
       }
     }
   }
 
   /** Currently using this, slightly painful to extract D, from the ripple-lib Java */
-  def sign(hash: Array[Byte], secret: KeyPair): Either[AppError, DERSignature] = {
-    AppError.wrap("SECP SIGN") {
+  def sign(hash: Array[Byte], secret: KeyPair): Either[LocalOpsError, DERSignature] = {
+    LocalOpsError.wrap("SECP SIGN") {
 
       val kCalc: HMacDSAKCalculator = new HMacDSAKCalculator(new SHA256Digest)
       val signer                    = new ECDSASigner(kCalc)
@@ -92,7 +97,7 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
     * @return Generates a JCA KeyPair for secp256k1 in its own packaging
     */
   def generateNewKeyPair(): KeyPair = {
-    val kpg: KeyPairGenerator = KeyPairGenerator.getInstance(keyType, provider)
+    val kpg: KeyPairGenerator = KeyPairGenerator.getInstance(keyType, providerName)
     kpg.initialize(ecSpec, new SecureRandom())
     val pair: KeyPair = kpg.generateKeyPair
     pair
@@ -151,7 +156,7 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
   def decompressPublicKey(compressKey: Array[Byte]): PublicKey = {
     val point: ec.ECPoint              = ecSpec.getCurve.decodePoint(compressKey)
     val Q                              = point
-    val eckf: KeyFactory               = KeyFactory.getInstance("EC", "BC")
+    val eckf: KeyFactory               = KeyFactory.getInstance("EC", providerName)
     val publicKeySpec: ECPublicKeySpec = new ECPublicKeySpec(Q, ecSpec)
     val exPublicKey: PublicKey         = eckf.generatePublic(publicKeySpec)
     exPublicKey
@@ -183,10 +188,10 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
     *
     * @return The D value of the private key.
     */
-  def privateKey2D(priv: PrivateKey): Either[AppError, BigInteger] = {
+  def privateKey2D(priv: PrivateKey): Either[LocalOpsError, BigInteger] = {
     priv match {
       case k: BCECPrivateKey => k.getD.asRight
-      case other             => AppError(s"PrivateKey ${other.getClass} wasnt BCECPrivateKey").asLeft
+      case other             => LocalOpsError(s"PrivateKey ${other.getClass} wasnt BCECPrivateKey").asLeft
     }
 
   }

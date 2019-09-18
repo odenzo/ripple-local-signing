@@ -1,14 +1,16 @@
 package com.odenzo.ripple.localops
 
 import io.circe.{Json, JsonObject}
+
 import spire.math.UByte
 
-import com.odenzo.ripple.localops.impl.{BinCodecProxy, Sign}
+import com.odenzo.ripple.bincodec.testkit.AccountKeys
 import com.odenzo.ripple.localops.impl.Sign.bytes2hex
 import com.odenzo.ripple.localops.impl.crypto.core.HashOps
 import com.odenzo.ripple.localops.impl.reference.HashPrefix
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, CirceUtils, JsonUtils}
-import com.odenzo.ripple.localops.testkit.{AccountKeys, OTestSpec}
+import com.odenzo.ripple.localops.impl.{BinCodecProxy, Sign}
+import com.odenzo.ripple.localops.testkit.OTestSpec
 
 class SignTest extends OTestSpec {
 
@@ -62,8 +64,7 @@ class SignTest extends OTestSpec {
 
     logger.debug(s"Account Keys: $acctKeys")
     //val mainHex = getOrLog(BinarySerializerPublic.binarySerialize(json), "All")
-    val jobj: JsonObject = getOrLog(JsonUtils.json2object(txjson), "TX_JSON not object")
-    val tx_sig           = getOrLog(BinCodecProxy.serializeForSigning(jobj), "txnscenarios")
+    val tx_sig = getOrLog(BinCodecProxy.serializeForSigning(txjson), "txnscenarios")
     logger.info(s"TXSIGNATURE: $tx_sig")
 
   }

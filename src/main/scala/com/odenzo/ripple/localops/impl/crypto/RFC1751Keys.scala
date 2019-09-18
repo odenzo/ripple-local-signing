@@ -4,8 +4,8 @@ import scala.collection.mutable.ArrayBuffer
 
 import cats.implicits._
 
+import com.odenzo.ripple.localops.LocalOpsError
 import com.odenzo.ripple.localops.impl.utils.ByteUtils
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 
 /**
   * Converting to Scala (crudely) 128 bits <-> 12 words.
@@ -277,23 +277,23 @@ object RFC1751Keys {
   }
 
   /** Six Words to Binary in some tortured Scala mutable code */
-  def etob(vsHuman: List[String]): Either[AppError, Array[Byte]] = {
+  def etob(vsHuman: List[String]): Either[LocalOpsError, Array[Byte]] = {
 
     assert(vsHuman.length === 6)
 
     /* These bytes will be mutated in the array itself */
     val bytes: ArrayBuffer[Byte] = ArrayBuffer.fill[Byte](11)(0.toByte)
 
-    val binary: Either[AppError, ArrayBuffer[Byte]] = vsHuman.zipWithIndex
+    val binary: Either[LocalOpsError, ArrayBuffer[Byte]] = vsHuman.zipWithIndex
       .traverse {
         case (strWord, indx) =>
           val l = strWord.length
           if (l > 4 || l < 1) {
-            AppError(s"Word $strWord not 1...4 characters").asLeft
+            LocalOpsError(s"Word $strWord not 1...4 characters").asLeft
           } else {
             val stdWord: String = standard(strWord)
             val v               = indexOf(WORDLIST, stdWord, 0)
-            if (v < 0) Left(AppError(s"Word $stdWord not in dictionay"))
+            if (v < 0) Left(LocalOpsError(s"Word $stdWord not in dictionay"))
 
             // Our nasty side effect will update the mutable bytes
             insert(bytes, v, indx * 11, 11)
@@ -306,7 +306,7 @@ object RFC1751Keys {
       val ab     = b.toArray
       val parity = computeParity(ab)
       if ((parity & 3) =!= extract(ab, 64, 2).toInt) {
-        Left(AppError(s"Parity Check Failed"))
+        Left(LocalOpsError(s"Parity Check Failed"))
       } else {
         ab.take(8).asRight
       }
@@ -316,8 +316,8 @@ object RFC1751Keys {
 
   /** 16 bytes to twelve words. Note this reverses the order of bytes per Ripple.
     * Some examples on net don't seem to do this. */
-  def bytesToEnglish(seedHexAsBytes: Array[Byte]): Either[AppError, String] = {
-    AppError.wrapPure("seedBytes to English") {
+  def bytesToEnglish(seedHexAsBytes: Array[Byte]): Either[LocalOpsError, String] = {
+    LocalOpsError.wrapPure("seedBytes to English") {
       val bytes = seedHexAsBytes.reverse
       val upper = btoe(org.bouncycastle.util.Arrays.copyOf(bytes, 8))
       val lower = btoe(org.bouncycastle.util.Arrays.copyOfRange(bytes, 8, 16))
@@ -326,15 +326,15 @@ object RFC1751Keys {
   }
 
   /** Ripple case, 12 RFX words to 128 bits in hex form (seed_hex) */
-  def twelveWordsToHex(strHuman: String): Either[AppError, String] = {
+  def twelveWordsToHex(strHuman: String): Either[LocalOpsError, String] = {
 
     val words: List[String] = strHuman.trim().split(" ").toList
 
-    if (words.length =!= 12) AppError(s"${words.length} not  12 ").asLeft
+    if (words.length =!= 12) LocalOpsError(s"${words.length} not  12 ").asLeft
     else {
-      val strFirst: Either[AppError, Array[Byte]]  = etob(words.slice(0, 6))
-      val strSecond: Either[AppError, Array[Byte]] = etob(words.slice(6, 12))
-      val strKey: Either[AppError, Array[Byte]]    = (strFirst, strSecond).mapN(_ ++ _)
+      val strFirst: Either[LocalOpsError, Array[Byte]]  = etob(words.slice(0, 6))
+      val strSecond: Either[LocalOpsError, Array[Byte]] = etob(words.slice(6, 12))
+      val strKey: Either[LocalOpsError, Array[Byte]]    = (strFirst, strSecond).mapN(_ ++ _)
       val seedHex = strKey
         .map(_.reverse)
         .map(v => ByteUtils.bytes2hex(v))

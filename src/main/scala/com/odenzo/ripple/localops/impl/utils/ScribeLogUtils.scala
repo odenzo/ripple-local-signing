@@ -43,23 +43,10 @@ trait ScribeLogUtils {
   }
 
   def setLogLevel(l: Level): Logger = {
-    scribe.warn(s"Setting all to log level $l")
-    // replace is needed.
     scribe.Logger.root.clearHandlers().withHandler(minimumLevel = Some(l)).replace()
   }
 
-  /** Helper to filter out messages in the packages given below the given level
-    * I am not sure this works with the global scribe object or not.
-    *
-    * select(
-    *packageName.startsWith("no.officenet"),
-    *packageName.startsWith("com.visena")
-    * )
-    * Usage:
-    * {{{
-    *   scribe.
-    * }}}
-    *
+  /**
     * @return a filter that can be used with .withModifier() */
   def excludePackageSelction(packages: List[String], atOrAboveLevel: Level, priority: Priority): FilterBuilder = {
     val ps: List[Filter] = packages.map(p => packageName.startsWith(p))
@@ -68,8 +55,7 @@ trait ScribeLogUtils {
   }
 
   def excludeByClasses(clazzes: List[Class[_]], minLevel: Level): FilterBuilder = {
-    val names = clazzes.map(_.getName)
-    scribe.info(s"Filtering Classes: $names to $minLevel")
+    val names   = clazzes.map(_.getName)
     val filters = names.map(n => className(n))
     select(filters: _*).include(level >= minLevel)
   }
@@ -84,8 +70,7 @@ trait ScribeLogUtils {
     * @return
     */
   def excludeByClass(clazz: Class[_], minLevel: Level): FilterBuilder = {
-    val name = clazz.getName
-    scribe.warn(s"Filtering Class: $name to $minLevel")
+    val name   = clazz.getName
     val filter = className(name)
     select(filter).exclude(level < minLevel).priority(Priority.Highest)
   }
@@ -105,7 +90,7 @@ trait ScribeLogUtils {
   // We want to filter the debug messages just for com.odenzo.ripple.bincodec.reference.FieldInfo
   // method encodeFieldID but do just for package s
   def replaceModifiers(packages: List[String], l: Level): Unit = {
-    scribe.info(s"Setting Packages Level to $l")
+    scribe.debug(s"Setting Packages Level to $l")
     val pri = Priority.Normal // unnecessary since clearing existing modifiers, but handy for future.
     val replaced = scribe.Logger.root
       .clearModifiers()
@@ -113,6 +98,9 @@ trait ScribeLogUtils {
       .replace()
     ()
   }
+
+  def mutePackages(l: List[String]): Logger = applyFilter(excludePackageSelction(l, Level.Warn, Priority.Highest))
+
 }
 
 object ScribeLogUtils extends ScribeLogUtils

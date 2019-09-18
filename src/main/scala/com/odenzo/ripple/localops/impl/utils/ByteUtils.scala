@@ -6,7 +6,7 @@ import cats.implicits._
 import scribe.Logging
 import spire.math.{UByte, UInt, ULong}
 
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
+import com.odenzo.ripple.localops.LocalOpsError
 
 trait BinaryValue
 
@@ -72,21 +72,21 @@ trait ByteUtils extends Logging {
     }
   }
 
-  def ensureMaxLength[T](l: List[T], len: Int): Either[AppError, List[T]] = {
-    if (l.length > len) AppError(s"List too long.. ${l.length} > $len").asLeft
+  def ensureMaxLength[T](l: List[T], len: Int): Either[LocalOpsError, List[T]] = {
+    if (l.length > len) LocalOpsError(s"List too long.. ${l.length} > $len").asLeft
     else l.asRight
   }
 
-  def hex2bytes(hex: String): Either[AppError, List[Byte]] = {
+  def hex2bytes(hex: String): Either[LocalOpsError, List[Byte]] = {
     // sliding changing in 2.13
-    val even: String                        = zeroEvenPadHex(hex)
-    val listOf2: List[String]               = even.grouped(2).toList
-    val bytes: Either[AppError, List[Byte]] = listOf2.traverse(hex2byte)
+    val even: String                             = zeroEvenPadHex(hex)
+    val listOf2: List[String]                    = even.grouped(2).toList
+    val bytes: Either[LocalOpsError, List[Byte]] = listOf2.traverse(hex2byte)
     bytes
   }
 
   /** For when we need to move to Array[Byte] (but want immutability) */
-  def hex2byteArray(hex: String): Either[AppError, IndexedSeq[Byte]] = hex2bytes(hex).map(_.toIndexedSeq)
+  def hex2byteArray(hex: String): Either[LocalOpsError, IndexedSeq[Byte]] = hex2bytes(hex).map(_.toIndexedSeq)
 
   def bigint2bytes(bi: BigInt): Array[Byte] = bi.toByteArray
 
@@ -97,8 +97,8 @@ trait ByteUtils extends Logging {
     *
     * @return
     */
-  def hex2byte(v: String): Either[AppError, Byte] = {
-    AppError.wrap(s"$v hex to Byte") {
+  def hex2byte(v: String): Either[LocalOpsError, Byte] = {
+    LocalOpsError.wrap(s"$v hex to Byte") {
       java.lang.Short.parseShort(v, 16).toByte.asRight
     }
   }
@@ -122,7 +122,7 @@ trait ByteUtils extends Logging {
     * Takes an arbitrary length string and returns an listed of unsigned bytes
     * If the number of hex digits is odd, is padded with zero on left.
     */
-  def hex2ubytes(v: String): Either[AppError, List[UByte]] = {
+  def hex2ubytes(v: String): Either[LocalOpsError, List[UByte]] = {
     val padded: String = v.length % 2 match {
       case 0 => v
       case 1 => '0' +: v
@@ -152,13 +152,13 @@ trait ByteUtils extends Logging {
     *
     * @return
     */
-  def hex2ubyte(v: String): Either[AppError, UByte] = {
+  def hex2ubyte(v: String): Either[LocalOpsError, UByte] = {
     hex2byte(v).map(UByte(_))
   }
 
   /** Quicky to take 16 hex chars and turn into ULong. Hex prefixed with 0x if missing */
-  def hex2ulong(hex: String): Either[AppError, ULong] = {
-    AppError.wrapPure(s"Parsing ULong from $hex") {
+  def hex2ulong(hex: String): Either[LocalOpsError, ULong] = {
+    LocalOpsError.wrapPure(s"Parsing ULong from $hex") {
       ULong(java.lang.Long.parseUnsignedLong(hex, 16))
     }
   }

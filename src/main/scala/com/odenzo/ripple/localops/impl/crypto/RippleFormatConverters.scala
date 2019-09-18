@@ -4,8 +4,8 @@ import cats._
 import cats.data._
 import cats.implicits._
 
+import com.odenzo.ripple.localops.LocalOpsError
 import com.odenzo.ripple.localops.impl.crypto.AccountFamily.{ripemd160, sha256, sha512}
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, Hex, RippleBase58}
 import com.odenzo.ripple.localops.models.Base58Check
 
@@ -22,11 +22,11 @@ trait RippleFormatConverters {
     * @return Ripple Account Address Base58 encoded with leading r
     *
     */
-  def accountpubkey2address(publicKey: Seq[Byte]): Either[AppError, Base58Check] = {
+  def accountpubkey2address(publicKey: Seq[Byte]): Either[LocalOpsError, Base58Check] = {
     // Should start with ED if 32 byte  Ed25519
-    val accountId: IndexedSeq[Byte]                 = ripemd160(sha256(publicKey.toArray).toArray)
-    val prefix: Either[AppError, Byte]              = ByteUtils.hex2byte(accountPrefix.v)
-    val payload: Either[AppError, IndexedSeq[Byte]] = prefix.map(_ +: accountId)
+    val accountId: IndexedSeq[Byte]                      = ripemd160(sha256(publicKey.toArray).toArray)
+    val prefix: Either[LocalOpsError, Byte]              = ByteUtils.hex2byte(accountPrefix.v)
+    val payload: Either[LocalOpsError, IndexedSeq[Byte]] = prefix.map(_ +: accountId)
     payload.map(base58Checksum)
 
   }
@@ -38,7 +38,7 @@ trait RippleFormatConverters {
     *
     * @return 16 bytes in hex form suitable to use as master_seed_hex (if password is good)
     */
-  def convertPassword2hex(password: String): Either[AppError, String] = {
+  def convertPassword2hex(password: String): Either[LocalOpsError, String] = {
     convertPassword2bytes(password).map(v => ByteUtils.bytes2hex(v.toIterable))
   }
 
@@ -49,8 +49,8 @@ trait RippleFormatConverters {
     *
     * @return 16 bytes suitable to use as master_seed_hex (if password is good)
     */
-  def convertPassword2bytes(password: String): Either[AppError, IndexedSeq[Byte]] = {
-    sha512(password.getBytes("UTF-8")).take(16).asRight[AppError]
+  def convertPassword2bytes(password: String): Either[LocalOpsError, IndexedSeq[Byte]] = {
+    sha512(password.getBytes("UTF-8")).take(16).asRight[LocalOpsError]
   }
 
   /** This trims off the first *byte* and the last four checksum bytes from
@@ -60,8 +60,8 @@ trait RippleFormatConverters {
     *
     * @return
     */
-  def convertBase58Check2hex(rippleB58: String): Either[AppError, String] = {
-    AppError.wrap(s"Converting Base58Check $rippleB58 to plain hex ") {
+  def convertBase58Check2hex(rippleB58: String): Either[LocalOpsError, String] = {
+    LocalOpsError.wrap(s"Converting Base58Check $rippleB58 to plain hex ") {
       for {
         trimmed <- convertBase58Check2bytes(rippleB58)
         hex = ByteUtils.bytes2hex(trimmed)
@@ -69,8 +69,8 @@ trait RippleFormatConverters {
     }
   }
 
-  def convertBase58Check2bytes(rippleB58: String): Either[AppError, List[Byte]] = {
-    AppError.wrap(s"Converting Base58Check $rippleB58 to Plain Bytes") {
+  def convertBase58Check2bytes(rippleB58: String): Either[LocalOpsError, List[Byte]] = {
+    LocalOpsError.wrap(s"Converting Base58Check $rippleB58 to Plain Bytes") {
       for {
         bytes <- RippleBase58.decode(rippleB58)
         trimmed = bytes.toList.drop(1).dropRight(4)
@@ -79,12 +79,12 @@ trait RippleFormatConverters {
   }
 
   /** Converts Master Seed Hex to Riopple Base58Check encoding */
-  def convertSeedHexToB58Check(seedhex: Hex): Either[AppError, Base58Check] = {
+  def convertSeedHexToB58Check(seedhex: Hex): Either[LocalOpsError, Base58Check] = {
     convertHex2seedB58Check(seedValuePrefix, seedhex)
   }
 
   /** Converts Public Key Hex to Riopple Base58Check encoding */
-  def convertPubKeyHexToB58Check(pubkeyhex: Hex): Either[AppError, Base58Check] = {
+  def convertPubKeyHexToB58Check(pubkeyhex: Hex): Either[LocalOpsError, Base58Check] = {
     convertHex2seedB58Check(publicKeyPrefix, pubkeyhex)
   }
 
@@ -95,8 +95,8 @@ trait RippleFormatConverters {
     *
     * @return Pure format conversion from RFC1751 human words to hex seed
     */
-  def convertMasterKey2masterSeedHex(masterKeyRFC1751: String): Either[AppError, String] = {
-    AppError.wrap("RFC1751 to Master Seed Hex") {
+  def convertMasterKey2masterSeedHex(masterKeyRFC1751: String): Either[LocalOpsError, String] = {
+    LocalOpsError.wrap("RFC1751 to Master Seed Hex") {
       RFC1751Keys.twelveWordsToHex(masterKeyRFC1751)
     }
   }
@@ -108,7 +108,7 @@ trait RippleFormatConverters {
   }
 
   /** You will have to add prefix per https://xrpl.org/base58-encodings.html */
-  protected def convertHex2seedB58Check(prefix: Hex, hex: Hex): Either[AppError, Base58Check] = {
+  protected def convertHex2seedB58Check(prefix: Hex, hex: Hex): Either[LocalOpsError, Base58Check] = {
     // This is pure conversion, no family stuff. Adds s and checksum
     for {
       header <- ByteUtils.hex2byte(prefix.v)

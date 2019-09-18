@@ -1,9 +1,10 @@
 package com.odenzo.ripple.localops.models
 
+import io.circe.{Decoder, Encoder}
+
 import cats._
 import cats.data._
 import cats.implicits._
-import io.circe.{Decoder, Encoder}
 
 sealed trait KeyType {
   val txt: String

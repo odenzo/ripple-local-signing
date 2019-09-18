@@ -1,7 +1,7 @@
 package com.odenzo.ripple.localops.impl.crypto.core
 
 import java.math.BigInteger
-import java.security.SecureRandom
+import java.security.{Provider, SecureRandom}
 
 import cats._
 import cats.data._
@@ -14,8 +14,8 @@ import org.bouncycastle.crypto.signers.Ed25519Signer
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import scribe.Logging
 
+import com.odenzo.ripple.localops.LocalOpsError
 import com.odenzo.ripple.localops.impl.utils.ByteUtils
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 
 /**
   *
@@ -26,8 +26,9 @@ import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 object ED25519CryptoBC extends Logging with ByteUtils {
 
   import java.security.Security
-
   Security.addProvider(new BouncyCastleProvider)
+  val provider: Provider = Security.getProvider("BC")
+
   private val curve: X9ECParameters = CustomNamedCurves.getByName("curve25519")
 
   val order: BigInteger = curve.getCurve.getOrder
@@ -36,8 +37,8 @@ object ED25519CryptoBC extends Logging with ByteUtils {
   //    new ECDomainParameters(curve.getCurve, curve.getG, curve.getN, curve.getH)
 
   /** Generate signature using Bouncy Castle Directly */
-  def sign(payload: Array[Byte], kp: AsymmetricCipherKeyPair): Either[AppError, IndexedSeq[Byte]] = {
-    AppError.wrapPure("ED25519 Sign") {
+  def sign(payload: Array[Byte], kp: AsymmetricCipherKeyPair): Either[LocalOpsError, IndexedSeq[Byte]] = {
+    LocalOpsError.wrapPure("ED25519 Sign") {
       val edSigner: Ed25519Signer = new Ed25519Signer()
       edSigner.init(true, kp.getPrivate)
       edSigner.update(payload, 0, payload.length)
@@ -47,8 +48,12 @@ object ED25519CryptoBC extends Logging with ByteUtils {
   }
 
   // 64 byte signatures are compressed versions, 64 bytes are output
-  def verify(payload: Array[Byte], sig: Array[Byte], pubKey: Ed25519PublicKeyParameters): Either[AppError, Boolean] = {
-    AppError.wrapPure("ED25519 Verify") {
+  def verify(
+      payload: Array[Byte],
+      sig: Array[Byte],
+      pubKey: Ed25519PublicKeyParameters
+  ): Either[LocalOpsError, Boolean] = {
+    LocalOpsError.wrapPure("ED25519 Verify") {
       val edSigner: Ed25519Signer = new Ed25519Signer()
       edSigner.init(false, pubKey)
       edSigner.update(payload, 0, payload.length)
@@ -73,7 +78,7 @@ object ED25519CryptoBC extends Logging with ByteUtils {
     *
     * @return A KeyPair but not class related to general ECKeyPair or KeyPair
     */
-  def generateKeyPairFromHex(seedHex: String): Either[AppError, AsymmetricCipherKeyPair] = {
+  def generateKeyPairFromHex(seedHex: String): Either[LocalOpsError, AsymmetricCipherKeyPair] = {
     hex2byteArray(seedHex).map(is => generateKeyPairFromBytes(is.toArray))
   }
 
@@ -97,18 +102,18 @@ object ED25519CryptoBC extends Logging with ByteUtils {
     *
     * @return THe public key, 33 bytes with ED prefix like Ripple does it
     */
-  def publicKey2Hex(pubParams: AsymmetricKeyParameter): Either[AppError, String] = {
-    AppError.wrap("ed publickey to hex") {
+  def publicKey2Hex(pubParams: AsymmetricKeyParameter): Either[LocalOpsError, String] = {
+    LocalOpsError.wrap("ed publickey to hex") {
       val key = pubParams.asInstanceOf[Ed25519PublicKeyParameters]
       if (key.isPrivate) {
-        Left(AppError("Expected PublicKey but was Private"))
+        Left(LocalOpsError("Expected PublicKey but was Private"))
       } else {
         Right("ED" + ByteUtils.bytes2hex(key.getEncoded))
       }
     }
   }
 
-  def signingPubKey2KeyParameter(pubKeyHex: String): Either[AppError, Ed25519PublicKeyParameters] = {
+  def signingPubKey2KeyParameter(pubKeyHex: String): Either[LocalOpsError, Ed25519PublicKeyParameters] = {
     hex2bytes(pubKeyHex.drop(2)).map(b => new Ed25519PublicKeyParameters(b.toArray, 0))
   }
 

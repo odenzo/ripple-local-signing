@@ -3,17 +3,17 @@ package com.odenzo.ripple.localops.testkit
 import java.net.URL
 import scala.io.{BufferedSource, Source}
 
+import io.circe.syntax._
+import io.circe.{Decoder, Json, JsonObject}
+
 import cats._
 import cats.data._
 import cats.effect.{IO, Resource}
 import cats.implicits._
-import io.circe.syntax._
-import io.circe.{Decoder, Json, JsonObject}
 
-import com.odenzo.ripple.bincodec.Decoded
-import com.odenzo.ripple.bincodec.decoding.TxBlobBuster
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
-import com.odenzo.ripple.localops.impl.utils.caterrors.ErrorHandling.ErrorOr
+import com.odenzo.ripple.bincodec.testkit.{AccountKeys, FKP, JsonReqRes}
+import com.odenzo.ripple.localops.ErrorHandling.ErrorOr
+import com.odenzo.ripple.localops.LocalOpsError
 import com.odenzo.ripple.localops.impl.utils.{CirceUtils, JsonUtils}
 
 /** Fixture utils that help load or create fixture files.
@@ -21,8 +21,8 @@ import com.odenzo.ripple.localops.impl.utils.{CirceUtils, JsonUtils}
   */
 trait FixtureUtils extends JsonUtils {
 
-  def loadJsonResource(path: String): Either[AppError, Json] = {
-    AppError.wrap(s"Getting Resource $path") {
+  def loadJsonResource(path: String): Either[LocalOpsError, Json] = {
+    LocalOpsError.wrap(s"Getting Resource $path") {
       val resource: URL          = getClass.getResource(path)
       val source: BufferedSource = Source.fromURL(resource)
       val data: String           = source.getLines().mkString("\n")
@@ -54,7 +54,7 @@ trait FixtureUtils extends JsonUtils {
     *
     * @return List of JSONObject tuple for each request and response
     */
-  def loadRqRsResource(resource: String): Either[AppError, List[JsonReqRes]] = {
+  def loadRqRsResource(resource: String): Either[LocalOpsError, List[JsonReqRes]] = {
     for {
       json <- loadJsonResource(resource)
       objs <- CirceUtils.decode(json, Decoder[List[JsonReqRes]])
@@ -64,7 +64,7 @@ trait FixtureUtils extends JsonUtils {
   /**
     * @return List of FullKeyPairs from array of objects containing master and possible regular key AccountKeys
     */
-  def loadKeysResource(resource: String): Either[AppError, List[FKP]] = {
+  def loadKeysResource(resource: String): Either[LocalOpsError, List[FKP]] = {
     for {
       json <- loadJsonResource(resource)
       objs <- CirceUtils.decode(json, Decoder[List[FKP]])
@@ -78,18 +78,20 @@ trait FixtureUtils extends JsonUtils {
     *
     * @return
     */
-  def loadWalletRqRs(resource: String): Either[AppError, List[(JsonObject, AccountKeys)]] = {
+  def loadWalletRqRs(resource: String): Either[LocalOpsError, List[(Json, AccountKeys)]] = {
 
     for {
-      rr <- loadRqRsResource(resource)
-      rqKeys <- rr.traverse { v =>
-        CirceUtils.decode(v.rs, AccountKeys.decoder).tupleLeft(v.rq)
-      }
+      rr     <- loadRqRsResource(resource)
+      rqKeys <- rr.traverse(v => CirceUtils.decode(v.rs, AccountKeys.decoder).tupleLeft(v.rq))
     } yield rqKeys
   }
 
-  def loadFixtureSubset(resource: String, start: Int, number: Int = 1): Either[AppError, List[(JsonReqRes, Int)]] = {
-    val result: Either[AppError, List[(JsonReqRes, Int)]] = for {
+  def loadFixtureSubset(
+      resource: String,
+      start: Int,
+      number: Int = 1
+  ): Either[LocalOpsError, List[(JsonReqRes, Int)]] = {
+    val result: Either[LocalOpsError, List[(JsonReqRes, Int)]] = for {
       zip <- loadFixture(resource)
       _      = logger.info(s"Limiting to Range $start -> ${start + number - 1}")
       subset = zip.slice(start, start + number)
@@ -98,8 +100,8 @@ trait FixtureUtils extends JsonUtils {
 
   }
 
-  def loadFixture(resource: String): Either[AppError, List[(JsonReqRes, Int)]] = {
-    val result: Either[AppError, List[(JsonReqRes, Int)]] = for {
+  def loadFixture(resource: String): Either[LocalOpsError, List[(JsonReqRes, Int)]] = {
+    val result: Either[LocalOpsError, List[(JsonReqRes, Int)]] = for {
       data <- loadRqRsResource(resource)
       _   = logger.debug(s"Rq Rs Resource $resource has ${data.size} elements.")
       zip = data.zipWithIndex
@@ -128,7 +130,7 @@ trait FixtureUtils extends JsonUtils {
     * @param fn
     * @return
     */
-  def loadAndExecuteFixture[T](resource: String)(fn: (JsonReqRes => T)): Either[AppError, List[T]] = {
+  def loadAndExecuteFixture[T](resource: String)(fn: (JsonReqRes => T)): Either[LocalOpsError, List[T]] = {
     loadFixture(resource).map((v: List[(JsonReqRes, Int)]) => executeFixture(v)(fn))
   }
 
