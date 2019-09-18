@@ -1,12 +1,14 @@
 package com.odenzo.ripple.localops.impl.crypto
 
+import io.circe.{Decoder, Json}
+
 import cats._
 import cats.data._
 import cats.implicits._
-import io.circe.{Decoder, Json}
 
+import com.odenzo.ripple.bincodec.testkit.AccountKeys
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, CirceUtils, Hex}
-import com.odenzo.ripple.localops.testkit.{AccountKeys, FixtureUtils, OTestSpec}
+import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 
 class RippleFormatConvertersTest extends OTestSpec with FixtureUtils with ByteUtils with RippleFormatConverters {
 

@@ -34,13 +34,16 @@ object HashPrefix extends Logging {
   /**  inner transaction to single signed, before signing */
   val transactionSig: HashPrefix = fromHex("53545800")
 
-  // inner transaction to sign
+  /** Transaction for MultiSigning */
   val transactionMultiSig: HashPrefix = fromHex("534D5400")
-  // validation for signing
+
+  /**  validation for signing (validator?) */
   val validation: HashPrefix = fromHex("56414C00")
-  // proposal for signing
+
+  /**  proposal for signing, not sure what kind of porposal */
   val proposal: HashPrefix = fromHex("50525000")
-  // payment channel claim
+
+  /* payment channel claim */
   val paymentChannelClaim: HashPrefix = fromHex("434C4D00")
 
   /** None of these overflow signed I think */

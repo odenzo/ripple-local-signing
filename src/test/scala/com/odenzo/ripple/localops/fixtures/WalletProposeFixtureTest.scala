@@ -1,18 +1,23 @@
-package com.odenzo.ripple.localops
+package com.odenzo.ripple.localops.fixtures
 
+import io.circe.Json
 import cats._
 import cats.data._
-import io.circe.JsonObject
-import org.scalatest.FunSuite
+import cats.implicits._
 
+import org.scalatest.FunSuite
+import scribe.Level
+
+import com.odenzo.ripple.bincodec.testkit.JsonReqRes
+import com.odenzo.ripple.localops.{LocalOpsError, MessageBasedAPI}
 import com.odenzo.ripple.localops.impl.crypto.RippleFormatConverters
 import com.odenzo.ripple.localops.impl.crypto.core.ED25519CryptoBC
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
-import com.odenzo.ripple.localops.testkit.{FixtureUtils, JsonReqRes, OTestSpec}
+import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 
 /**
-  * * TODO: Implement true WalletPropose local and test sample responses with me processing same requests.
+  *  Need more than non-trivial requests. This exercises some internals plus the Public Message API
+  *  processing same requests.
   */
 class WalletProposeFixtureTest
     extends FunSuite
@@ -22,7 +27,7 @@ class WalletProposeFixtureTest
     with RippleFormatConverters {
 
   /** This is used to test a variety of RippleFormat things */
-  def testKeyAgnostic(w: JsonObject): Unit = {
+  def testKeyAgnostic(w: Json): Unit = {
     val kMaster       = findRequiredStringField("master_key", w)
     val kSeed         = findRequiredStringField("master_seed", w)
     val kSeedHex      = findRequiredStringField("master_seed_hex", w)
@@ -51,8 +56,6 @@ class WalletProposeFixtureTest
   }
 
   def checkDerivedKeyEd(seedHex: String, accountPublicKeyHex: String): Unit = {
-    // Okay, this is the mystery. We DO NOT use AccountFamily generator etc.
-    // I *think* this is the account keypair for ed
     val keypair = getOrLog(ED25519CryptoBC.generateKeyPairFromHex(seedHex))
     val pubHex  = getOrLog(ED25519CryptoBC.publicKey2Hex(keypair.getPublic))
     pubHex shouldEqual accountPublicKeyHex
@@ -60,21 +63,39 @@ class WalletProposeFixtureTest
 
   }
 
+  /** Message based should be ok if a seed of some type is passed in else skip this as randmon generation
+    * is only testable that it succeeded. */
+  def messageApi(rr: JsonReqRes) = {
+
+    val seedCount: Int = List("seed", "seed_hex", "passphrase").count(v => findFieldAsString(v, rr.rq).isRight)
+
+    val rs = MessageBasedAPI.walletPropose(rr.rq)
+    logger.debug(s"In Request: ${rs.spaces4}")
+    if (seedCount > 0) {
+      rs shouldEqual removeDeprecated(rr.rs)
+    } else {
+      // Can only check it succeeded.
+      findFieldAsString("status", rs) shouldEqual Right("success")
+    }
+  }
+
   /** WalletPropose Rq and Rs for any key_typeds
     * Assumes they are all positive success cases.
     * */
-  def doWalletFixture(resource: String): Either[AppError, List[Unit]] = {
+  def doWalletFixture(resource: String): Either[LocalOpsError, List[Unit]] = {
     loadAndExecuteFixture(resource) { rr: JsonReqRes =>
-      findObjectField("result", rr.rs).foreach(testKeyAgnostic)
+      findField("result", rr.rs).foreach(testKeyAgnostic)
+      messageApi(rr)
     }
   }
 
   test("SECP Fixture") {
-    getOrLog(doWalletFixture("/test/myTestData/keysAndTxn/secp256k1_wallets.json"))
+    setTestLogLevel(Level.Debug)
+    getOrLog(doWalletFixture("/test/myTestData/wallets/secp256k1_wallets.json"))
 
   }
   test("ED Fixture") {
-    getOrLog(doWalletFixture("/test/myTestData/keysAndTxn/ed25519_wallets.json"))
+    getOrLog(doWalletFixture("/test/myTestData/wallets/ed25519_wallets.json"))
 
   }
 }

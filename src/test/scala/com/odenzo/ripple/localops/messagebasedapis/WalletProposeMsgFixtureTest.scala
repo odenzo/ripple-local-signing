@@ -3,12 +3,12 @@ package com.odenzo.ripple.localops.messagebasedapis
 import io.circe.syntax._
 import io.circe.{Decoder, Json, JsonObject}
 
-import com.odenzo.ripple.localops.MessageBasedAPI
+import com.odenzo.ripple.bincodec.testkit.JsonReqRes
 import com.odenzo.ripple.localops.impl.messagehandlers.WalletProposeMsg
 import com.odenzo.ripple.localops.impl.utils.JsonUtils
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 import com.odenzo.ripple.localops.models.WalletProposeResult
-import com.odenzo.ripple.localops.testkit.{FixtureUtils, JsonReqRes, OTestSpec}
+import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
+import com.odenzo.ripple.localops.{LocalOpsError, MessageBasedAPI}
 
 class WalletProposeMsgFixtureTest extends OTestSpec with FixtureUtils {
 
@@ -20,27 +20,30 @@ class WalletProposeMsgFixtureTest extends OTestSpec with FixtureUtils {
    */
 
   //override val customLogLevel = Some(Level.Debug)
-  private lazy val ed: Either[AppError, List[JsonReqRes]] = loadRqRsResource(
-    "/test/myTestData/keysAndTxn/ed25519_wallets.json"
+  private lazy val ed: Either[LocalOpsError, List[JsonReqRes]] = loadRqRsResource(
+    "/test/myTestData/wallets/ed25519_wallets.json"
   )
 
-  private lazy val secp: Either[AppError, List[JsonReqRes]] = loadRqRsResource(
-    "/test/myTestData/keysAndTxn/secp256k1_wallets.json"
+  private lazy val secp: Either[LocalOpsError, List[JsonReqRes]] = loadRqRsResource(
+    "/test/myTestData/wallets/secp256k1_wallets.json"
   )
 
   test("Each Secret for Each Message") {
     val rr: List[JsonReqRes] = getOrLog(ed) ::: getOrLog(secp)
-    rr.foreach(walletpropose)
+    rr.foreach(walletproposeRegime)
 
   }
 
   test("ID Scenarios") {
     val rrs: List[JsonReqRes] = getOrLog(ed) ::: getOrLog(secp)
-    // Make sure non-string and also no id works ok. id = null will be returned in object,
-    // but serialized with non-null printer is ok ( "x" = null   =!=  no field x present)
-    rrs.take(1).foreach { rr =>
-      walletpropose(JsonReqRes(rr.rq.remove("id"), rr.rs.remove("id").add("id", Json.Null)))
-      walletpropose(JsonReqRes(rr.rq.add("id", 666.asJson), rr.rs.add("id", 666.asJson)))
+
+    val idsToTest          = List(None, Some(666.asJson), Some("my id".asJson), Some(Json.Null))
+    val onCase: JsonReqRes = rrs.head
+
+    idsToTest.foreach { id =>
+      walletproposeRegime(
+        JsonReqRes(setId(id, onCase.rq), setId(id, onCase.rs))
+      )
     }
 
     // Lets do a few error cases
@@ -54,16 +57,16 @@ class WalletProposeMsgFixtureTest extends OTestSpec with FixtureUtils {
   test("Bad Request A") {
     val rrs: List[JsonReqRes] = getOrLog(ed)
     rrs.take(1).foreach { rrs =>
-      val request                      = rrs.rq.add("seed", "Garbage".asJson)
-      val result                       = MessageBasedAPI.generateWallet(request)
-      val st: Either[AppError, String] = findStringField("status", result)
+      val request                           = rrs.rq.mapObject(_.add("seed", "Garbage".asJson))
+      val result                            = MessageBasedAPI.walletPropose(request)
+      val st: Either[LocalOpsError, String] = findFieldAsString("status", result)
       getOrLog(st) shouldEqual "error"
 
     }
   }
 
   /** Goes through all the possible test cases we can mimic and get the same result. */
-  def walletpropose(rr: JsonReqRes): Unit = {
+  def walletproposeRegime(rr: JsonReqRes): Unit = {
 
     val result: JsonObject        = findRequiredObject("result", rr.rs)
     val keys: WalletProposeResult = getOrLog(JsonUtils.decode(result, Decoder[WalletProposeResult]))
@@ -79,8 +82,8 @@ class WalletProposeMsgFixtureTest extends OTestSpec with FixtureUtils {
     ).foreach {
       case (fieldName: String, fieldVal: String) =>
         logger.debug(s"Injecting $fieldName => $fieldVal")
-        val injected             = rr.rq.add(fieldName, fieldVal.asJson)
-        val response: JsonObject = MessageBasedAPI.generateWallet(injected)
+        val injected       = rr.rq.mapObject(_.add(fieldName, fieldVal.asJson))
+        val response: Json = MessageBasedAPI.walletPropose(injected)
         logger.debug(s"Response:\n${response.asJson.spaces4}")
         response.asJson shouldEqual rr.rs.asJson.dropNullValues
     }

@@ -2,21 +2,25 @@ package com.odenzo.ripple.localops
 
 import java.util.UUID
 
-import cats._
-import cats.data._
-import cats.implicits._
-
+import io.circe.optics.{JsonPath, JsonTraversalPath}
 import io.circe.syntax._
 import io.circe.{Decoder, Json, JsonObject}
 
+import cats._
+import cats.data._
+import cats.implicits._
+import monocle.{Optional, PSetter, Traversal}
+import scribe.Level
+
+import com.odenzo.ripple.bincodec.testkit.{FKP, MultiSignTrace, Signer, Signers}
 import com.odenzo.ripple.localops.impl.SignFor
 import com.odenzo.ripple.localops.impl.messagehandlers.SignForMsg
-import com.odenzo.ripple.localops.impl.utils.{ByteUtils, CirceUtils}
-import com.odenzo.ripple.localops.testkit.{FKP, MultiSignTrace, OTestSpec, Signer, Signers}
+import com.odenzo.ripple.localops.impl.utils.{ByteUtils, CirceUtils, ScribeLogUtils}
+import com.odenzo.ripple.localops.testkit.OTestSpec
 
 class SignForTest extends OTestSpec with ByteUtils with SignFor {
 
-  private val tracer =
+  private val tracer: String =
     """
       |  {
       |    "account" : {
@@ -120,7 +124,7 @@ class SignForTest extends OTestSpec with ByteUtils with SignFor {
       |""".stripMargin
 
   /** Single Signing of tx_json returning the entire result response */
-  def signFor(tx_json: JsonObject, fkp: FKP): JsonObject = {
+  def signFor(tx_json: JsonObject, fkp: FKP): Json = {
 
     val rq = JsonObject(
       "id"       := UUID.randomUUID(),
@@ -131,11 +135,11 @@ class SignForTest extends OTestSpec with ByteUtils with SignFor {
       "tx_json"  := tx_json
     )
 
-    val rqTrimmed = droppingNullsSortedPrinter.pretty(rq.asJson)
+    val rqTrimmed = droppingNullsSortedPrinter.print(rq.asJson)
 
     logger.info("Request Object (First): " + rqTrimmed)
-    val rs             = SignForMsg.signFor(rq.asJson.dropNullValues)
-    val ok: JsonObject = rs.fold(a => a, b => b) // Shortcut Left or Right?
+    val rs = SignForMsg.signFor(rq.asJson.dropNullValues)
+    val ok = rs.fold(a => a, b => b)
     ok
   }
 
@@ -146,10 +150,10 @@ class SignForTest extends OTestSpec with ByteUtils with SignFor {
     //OTestLogging.setTestLogLevel(Level.Debug)
     val trace: MultiSignTrace = getOrLog(CirceUtils.parseAndDecode(tracer, MultiSignTrace.decoder))
 
-    val firstRq        = trace.signFors.head.rq
-    val firstRs        = trace.signFors.head.rs
-    val rs             = SignForMsg.signFor(firstRq.asJson)
-    val ok: JsonObject = rs.fold(a => a, b => b)
+    val firstRq  = trace.signFors.head.rq
+    val firstRs  = trace.signFors.head.rs
+    val rs       = SignForMsg.signFor(firstRq.asJson)
+    val ok: Json = rs.fold(a => a, b => b)
 
     checkResults(ok, firstRs)
 
@@ -173,9 +177,9 @@ class SignForTest extends OTestSpec with ByteUtils with SignFor {
   test("Sorting") {
     // This is pre-sorted correctly from a Ripple Response message.
     val signersTxt =
-      """
-        |[
-        |                                       {
+      """              [           {
+        |
+        |
         |                            "Signer" : {
         |                                "Account" : "rUCwgzripA7QLETs34WDRzNSxdQHsVbnNH",
         |                                "SigningPubKey" : "ED15C69519E06E55B68723E95184B49762205F74ED0426B1653E04570060D46D1B",
@@ -208,15 +212,104 @@ class SignForTest extends OTestSpec with ByteUtils with SignFor {
     val json             = getOrLog(parseAsJson(signersTxt))
     val signers: Signers = getOrLog(decode(json, Decoder[Signers]))
 
-    val expected: List[JsonObject] = getOrLog(decode(json, Decoder[List[JsonObject]]))
+    val expected: List[Json] = getOrLog(decode(json, Decoder[List[Json]]))
 
-    expected.sortBy(signerSortBy) shouldEqual expected
+    getOrLog(sortSigners(expected)) shouldEqual expected
 
     // Okay, lets sort a few more in differint order.
     signers.signers.permutations.foreach { lst: List[Signer] =>
-      val json: List[JsonObject] = lst.map(_.asJsonObject)
-      json.sortBy(signerSortBy)
+      val json: List[Json] = lst.map(signer => JsonObject.singleton("Signer", signer.asJson).asJson)
+
+      val sorted: Either[LocalOpsError, List[Json]] = sortSigners(json)
+      getOrLog(sorted) shouldEqual expected
     }
 
+  }
+
+  test("mergeMultipleTxJson") {
+
+    val testStr =
+      """
+          [
+    {
+        "TransactionType" : "Payment",
+        "Account" : "r46hj59wGxHgZCFBHCk9hBtSMRqA28unxW",
+        "Amount" : "500",
+        "Destination" : "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+        "Flags" : 0,
+        "Fee" : "20",
+        "Sequence" : 2,
+        "LastLedgerSequence" : 109,
+        "Signers" : [
+            {
+                "Signer" : {
+                    "Account" : "rw7i3pQBU7MNq6WnN7jCDmtP8fQX4xhTtG",
+                    "SigningPubKey" : "ED9DA4F0EA089E95E77479054763E3C33987E48816C544000D8466CDB22BBF2C6F",
+                    "TxnSignature" : "4DE3F065D04CC95A829D7131A8C4007C16FFABC2C9B48FB7EAD0EDBD26080692BBE02FD1B2452B69EE1684B37EB836B3EB69310B62EAABCFCC76E24099EC4202"
+                }
+            }
+        ]
+    },
+    {
+        "TransactionType" : "Payment",
+        "Account" : "r46hj59wGxHgZCFBHCk9hBtSMRqA28unxW",
+        "Amount" : "500",
+        "Destination" : "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+        "Flags" : 0,
+        "Fee" : "20",
+        "Sequence" : 2,
+        "LastLedgerSequence" : 109,
+        "Signers" : [
+            {
+                "Signer" : {
+                    "Account" : "rJHkW3yGRwkHNmNs5sv27bQTS8M8gpoZzM",
+                    "SigningPubKey" : "ED2903D0683AD095C1A95AAEEA35D4571EC1F78BFED99F3E9CC9EB39C8EF5793BD",
+                    "TxnSignature" : "FC0831E8C04665F7F10144B3C0BFCE4EFD94EDC922C8A916A10FCE8AEF665CB98186C241249C4F8847BAC4F00BEB81294C203E70D3DA3242F340133DAABD0E0C"
+                }
+            }
+        ]
+    },
+    {
+        "TransactionType" : "Payment",
+        "Account" : "r46hj59wGxHgZCFBHCk9hBtSMRqA28unxW",
+        "Amount" : "500",
+        "Destination" : "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+        "Flags" : 0,
+        "Fee" : "20",
+        "Sequence" : 2,
+        "LastLedgerSequence" : 109,
+        "Signers" : [
+            {
+                "Signer" : {
+                    "Account" : "rKx4CbyLzWzRGpobHTPSs3NSvfraxHULN9",
+                    "SigningPubKey" : "EDA8C3A3CDF8EA701EF933876A2165E37E4F6D9C681639B41E46A8333DFCC7F3EB",
+                    "TxnSignature" : "C5CD48ADA351F7934C759AE7C874020789B262D35429C3B69F22B11EB9A79BE6085EE614CA0BBAE9F2FDB84A0DBDE4DDA5DDD9370D970764DCAC353C0A21FB01"
+                }
+            }
+        ]
+    }
+]
+        """
+    setTestLogLevel(Level.Debug)
+    val attempted = for {
+      txjsons <- parseAndDecode(testStr, Decoder[List[Json]])
+      merged  <- mergeMultipleTxJsonResponses(txjsons)
+      _ = logger.debug(s"Merged \n ${merged.asJson.spaces4}")
+    } yield merged
+    getOrLog(attempted)
+  }
+  test("Optics") {
+    val json: Json                  = getOrLog(parseAsJson(tracer))
+    val baseToRs: JsonTraversalPath = JsonPath.root.signFors.each.rs
+    val rsToTx: JsonPath            = JsonPath.root.result.tx_json
+    val rsLens: List[JsonObject]    = JsonPath.root.signFor.each.rs.result.tx_json.Signers.each.obj.getAll(json)
+    ScribeLogUtils.setLogLevel(Level.Debug)
+    val repeated: List[JsonObject] = rsLens ::: rsLens ::: rsLens
+    logger.info(s"\n${rsLens.asJson.spaces4} \n ${repeated.asJson.spaces4}")
+
+    val tx_jsons: List[JsonObject] = JsonPath.root.signFors.each.rs.result.tx_json.obj.getAll(json)
+    val replacer: Json => Json     = JsonPath.root.Signers.arr.set(repeated.map(_.asJson).toVector)
+    val wiped: List[Json]          = tx_jsons.map(jobj => replacer(jobj.asJson))
+    logger.info(s"Deleted Signers Arary (emptied) ${wiped.asJson.spaces4}")
   }
 }

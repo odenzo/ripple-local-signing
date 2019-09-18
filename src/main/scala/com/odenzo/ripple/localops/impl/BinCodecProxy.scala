@@ -1,15 +1,15 @@
 package com.odenzo.ripple.localops.impl
 
+import io.circe.Json
+
 import cats._
 import cats.data._
 import cats.implicits._
-import io.circe.JsonObject
 import scribe.Logging
 
 import com.odenzo.ripple.bincodec.decoding.TxBlobBuster
-import com.odenzo.ripple.bincodec.utils.caterrors.RippleCodecError
-import com.odenzo.ripple.bincodec.{Decoded, EncodedSTObject, RippleCodecAPI}
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
+import com.odenzo.ripple.bincodec.{Decoded, EncodedSTObject, RippleCodecAPI, RippleCodecDebugAPI}
+import com.odenzo.ripple.localops.LocalOpsError
 
 /** Production level proxying to ripple-binary-codec routines just to add a layer and error conversion.
   * Error conversion done because we want ripple-binary-codec to be usable without any binding into this lib.
@@ -26,8 +26,8 @@ trait BinCodecProxy extends Logging {
     * @return Hex string representing the serialization in total.
     */
   @inline
-  final def binarySerialize(jsonObject: JsonObject): Either[AppError, EncodedSTObject] = {
-    RippleCodecAPI.binarySerialize(jsonObject).leftMap(AppError.wrapBinaryCodecError)
+  final def binarySerialize(jsonObject: Json): Either[LocalOpsError, EncodedSTObject] = {
+    RippleCodecDebugAPI.binarySerialize(jsonObject).leftMap(LocalOpsError.wrapBinaryCodecError)
   }
 
   /**
@@ -39,8 +39,8 @@ trait BinCodecProxy extends Logging {
     *
     */
   @inline
-  final def binarySerializeForSigning(tx_json: JsonObject): Either[AppError, EncodedSTObject] = {
-    RippleCodecAPI.binarySerializeForSigning(tx_json).leftMap(AppError.wrapBinaryCodecError)
+  final def binarySerializeForSigning(tx_json: Json): Either[LocalOpsError, EncodedSTObject] = {
+    RippleCodecDebugAPI.binarySerializeForSigning(tx_json).leftMap(LocalOpsError.wrapBinaryCodecError)
   }
 
   /**
@@ -50,9 +50,8 @@ trait BinCodecProxy extends Logging {
     *
     * @return Serialized form for signing, but without the HashPrefix.
     */
-  @inline
-  final def serialize(tx_json: JsonObject): Either[AppError, Array[Byte]] = {
-    RippleCodecAPI.serializedTxBlob(tx_json).leftMap(AppError.wrapBinaryCodecError)
+  final def serialize(tx_json: Json): Either[LocalOpsError, Array[Byte]] = {
+    RippleCodecAPI.serializedTxBlob(tx_json).leftMap(LocalOpsError.wrapBinaryCodecError)
   }
 
   /**
@@ -61,20 +60,19 @@ trait BinCodecProxy extends Logging {
     *
     * @return Byte Array representing the serialized for signing txn. Essentially TxBlob
     */
-  @inline
-  final def serializeForSigning(tx_json: JsonObject): Either[AppError, Array[Byte]] = {
-    RippleCodecAPI.signingTxBlob(tx_json).leftMap(AppError.wrapBinaryCodecError)
+  final def serializeForSigning(tx_json: Json): Either[LocalOpsError, Array[Byte]] = {
+    RippleCodecAPI.signingTxBlob(tx_json).leftMap(LocalOpsError.wrapBinaryCodecError)
   }
 
   /** Details here. Use case and function. Used for sorting Signer fields, does/should it strip prefix and suffix or
     * not */
-  def serializeAddress(signAddrB58Check: String): Either[RippleCodecError, Array[Byte]] = {
-    RippleCodecAPI.serializedAddress(signAddrB58Check)
+  def serializeAddress(signAddrB58Check: String): Either[LocalOpsError, Array[Byte]] = {
+    RippleCodecAPI.serializedAddress(signAddrB58Check).leftMap(LocalOpsError.wrapBinaryCodecError)
   }
 
   /** Debugging Routine mostly... */
-  def decodeBlob(blob: String): Either[AppError, List[Decoded]] = {
-    TxBlobBuster.bust(blob).leftMap(AppError.wrapBinaryCodecError)
+  def decodeBlob(blob: String): Either[LocalOpsError, List[Decoded]] = {
+    TxBlobBuster.bust(blob).leftMap(LocalOpsError.wrapBinaryCodecError)
   }
 }
 

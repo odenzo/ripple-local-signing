@@ -1,0 +1,22 @@
+[
+    {
+    "TransactionType" : "AccountSet",
+    "Account" : "rpnXZAJ51JGFe2geVpuyq1tU5HM5nDJrXJ",
+    "SetFlag" : 8,
+    "ClearFlag" : null,
+    "Domain" : null,
+    "TransferRate" : null,
+    "Fee" : "12",
+    "LastLedgerSequence" : null,
+    "Memos" : null,
+    "Sequence" : 1,
+    "SigningPubKey" : "0334207F6F2F6D411EAFDA8E01498BC50A4387A7E671D813575661348BD57FFB86",
+    "Signers" : null,
+    "TxnSignature" : "3045022100B1865B40C2AD05201139213EDAD733E9F106E53B9AEC5188364FD222867CBA680220457B1FA2E515EB1063D0F8206D4A9E3184E006E54E6F4CBFD765E1C62CB14821",
+    "meta" : null,
+    "ledger_index" : null,
+    "date" : null,
+    "hash" : "E9A4705909A284BCDDB44C82195085F22AFDBA9FD2DD962A052DB69E2E40EE1E",
+    "validated" : null
+}
+]

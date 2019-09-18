@@ -20,13 +20,9 @@ trait OTestLogging extends ScribeLogUtils with Logging {
 
 object DefaultTestLogging extends ScribeLogUtils {
 
-  scribe.warn("DefaultTestLogging Object Initialized")
-
   /** Scala test should manuall control after this. Executed only once, lazy and memoized */
   val defaultSetup: Eval[Level] = Eval.later {
-    scribe.warn(s"DefaultTestLogging Setup in Progress... In CI: ${inCITesting}")
     val threshold = if (inCITesting) { // This should catch case when as a library in someone elses CI
-      scribe.warn("defaultSetup for logging IN CONTINUOUS_INTEGRATION")
       Warn
     } else {
       Debug
@@ -39,7 +35,6 @@ object DefaultTestLogging extends ScribeLogUtils {
       "com.odenzo.ripple.bincodec.reference",
       "com.odenzo.ripple.bincodec.utils"
     )
-    scribe.warn(s"Muting Packages:\n" + makeQuiet.mkString("\n"))
     applyFilter(excludePackageSelction(makeQuiet, Level.Warn, Priority.Highest))
 
     applyFilter(excludeByClass(classOf[OTestLogging], Level.Warn))

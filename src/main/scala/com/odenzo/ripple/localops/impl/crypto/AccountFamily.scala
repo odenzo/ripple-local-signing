@@ -11,9 +11,9 @@ import cats.implicits._
 import scribe.Logging
 import spire.math.UInt
 
+import com.odenzo.ripple.localops.LocalOpsError
 import com.odenzo.ripple.localops.impl.crypto.core.{HashOps, Secp256K1CryptoBC}
 import com.odenzo.ripple.localops.impl.utils.ByteUtils
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
 
 /**
   * For secp the basic idea if that a FamilyGenerator has a public and private key
@@ -30,7 +30,7 @@ trait AccountFamily extends Logging with ByteUtils with HashOps {
   protected val MAX_KEY             = BigInt(maxSecp)
 
   /** Rebuild Account Keys from Master Seed Hex (Always Secp) */
-  def rebuildAccountKeyPairFromSeedHex(mastSeedHex: String): Either[AppError, KeyPair] = {
+  def rebuildAccountKeyPairFromSeedHex(mastSeedHex: String): Either[LocalOpsError, KeyPair] = {
     for {
       bytes          <- hex2byteArray(mastSeedHex)
       accountKeyPair <- rebuildAccountKeyPairFromSeed(bytes)
@@ -39,8 +39,8 @@ trait AccountFamily extends Logging with ByteUtils with HashOps {
   }
 
   /** Rebuild Account Keys from Master Seed Binary */
-  def rebuildAccountKeyPairFromSeed(seed: IndexedSeq[Byte]): Either[AppError, KeyPair] = {
-    AppError.wrapPure("Building secp Account KeyPair from Seed") {
+  def rebuildAccountKeyPairFromSeed(seed: IndexedSeq[Byte]): Either[LocalOpsError, KeyPair] = {
+    LocalOpsError.wrapPure("Building secp Account KeyPair from Seed") {
       val generator      = seed2FamilyGenerator(seed)
       val d              = familygenerator2accountKeyPair(generator)
       val accountKeyPair = Secp256K1CryptoBC.dToKeyPair(d)

@@ -3,12 +3,15 @@ package com.odenzo.ripple.localops.testkit
 import java.security.{Provider, Security}
 
 import io.circe.{Decoder, Json, JsonObject}
+
+import cats._
+import cats.data._
+import cats.implicits._
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.scalatest.{BeforeAndAfterAll, EitherValues, FunSuiteLike, Matchers}
 import scribe.{Level, Logger, Logging, Priority}
 
 import com.odenzo.ripple.localops.impl.utils.ScribeLogUtils
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppErrorUtils
 
 trait OTestSpec
     extends FunSuiteLike
@@ -18,8 +21,6 @@ trait OTestSpec
     with Matchers
     with EitherValues
     with BeforeAndAfterAll {
-
-  // Well, it seems that each test is getting built/instanciated before runing.
 
   Security.addProvider(new BouncyCastleProvider)
   val provider: Provider = Security.getProvider("BC")
@@ -34,7 +35,7 @@ trait OTestSpec
     setTestLogLevel(Level.Warn)
   }
 
-  def findRequiredStringField(name: String, jobj: JsonObject): String = {
+  def findRequiredStringField(name: String, jobj: Json): String = {
     getOrLog(findField(name, jobj).flatMap(json2string))
   }
 
@@ -42,20 +43,21 @@ trait OTestSpec
     *
     * @return Json of field or logging of error and assertion failure
     */
-  def findRequiredField(name: String, json: JsonObject): Json = {
+  def findRequiredField(name: String, json: Json): Json = {
     getOrLog(findField(name, json))
   }
 
-  def findRequiredObject(name: String, jsonObject: JsonObject): JsonObject = {
-    val asObj = findObjectField(name, jsonObject)
+  def findRequiredObject(name: String, json: Json): JsonObject = {
+    val asObj = findFieldAsObject(name, json)
     getOrLog(asObj)
   }
 
   def getOrLog[T](ee: Either[Throwable, T], msg: String = "Error: ", myLog: Logger = logger): T = {
+    import com.odenzo.ripple.localops.LOpException._
     ee match {
       case Right(v) => v
       case Left(e) =>
-        AppErrorUtils.showThrowable.show(e)
+        logger.error(s"${e.show}")
         fail(s"getOrLog error ${e.getMessage}")
     }
   }

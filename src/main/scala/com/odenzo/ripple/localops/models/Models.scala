@@ -3,8 +3,6 @@ package com.odenzo.ripple.localops.models
 import java.security.KeyPair
 
 import cats.implicits._
-import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.{Decoder, Encoder}
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 
 /** Allows for precalculation of Signing Key in implementation dependant format
@@ -32,6 +30,7 @@ case class TxnSignature(hex: String)
 case class ResponseError(error: String, error_code: Option[Int], error_message: Option[String])
 
 object ResponseError {
+  val kNoAccount     = invalid("Missing field 'account'")
   val kNoTxJson      = invalid("Missing field 'tx_json'")
   val kNoSecret      = invalid("Missing field 'secret'.")
   val kNoCommand     = ResponseError("missingCommand", None, None)
@@ -43,4 +42,6 @@ object ResponseError {
   def apply(err: String, code: Int, msg: String): ResponseError = ResponseError(err, Some(code), Some(msg))
 
   def invalid(msg: String): ResponseError = ResponseError("invalidParams", 31, msg)
+
+  def internalErr(msg: String) = ResponseError("Internal Client System Error", 666.some, msg.some)
 }

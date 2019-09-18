@@ -1,21 +1,34 @@
 package com.odenzo.ripple.localops.impl.messagehandlers
 
-import cats.implicits._
 import io.circe.syntax._
 import io.circe.{Json, JsonObject}
+
+import cats.implicits._
 import scribe.Logging
 
-import com.odenzo.ripple.localops.SecretKeyOps
 import com.odenzo.ripple.localops.impl.crypto.RippleFormatConverters
-import com.odenzo.ripple.localops.impl.messagehandlers.SignForMsg.getFieldAsString
-import com.odenzo.ripple.localops.impl.utils.CirceUtils
-import com.odenzo.ripple.localops.impl.utils.caterrors.AppError
-import com.odenzo.ripple.localops.models.{KeyType, ResponseError, SECP256K1, SigningKey}
+import com.odenzo.ripple.localops.impl.utils.{CirceUtils, JsonUtils}
+import com.odenzo.ripple.localops.models.{ResponseError, SECP256K1, SigningKey}
+import com.odenzo.ripple.localops.{LocalOpsError, RippleLocalAPI}
 
-trait HandlerBase extends Logging with RippleFormatConverters {
+trait HandlerBase extends Logging with RippleFormatConverters with JsonUtils {
 
-  def buildFailureResponse(rq: Json, err: ResponseError): JsonObject = {
+  def validateAutofillFields(tx_json: Json): Either[ResponseError, Json] = {
+    val requiredFields = List("Sequence", "Fee")
+    requiredFields.forall(findField(_, tx_json).isRight) match {
+      case true  => tx_json.asRight
+      case false => ResponseError(s"Sequence and Fee must be present in tx_json", None, None).asLeft
+    }
+  }
 
+  def validateCommandCorrect(expCommand: String, rq: Json): Either[ResponseError, String] = {
+    for {
+      cmd     <- JsonUtils.findFieldAsString("command", rq).leftMap(_ => ResponseError.kNoCommand)
+      correct <- Either.cond(cmd === expCommand, cmd, ResponseError.kBadCommand)
+    } yield correct
+  }
+
+  def buildFailureResponse(rq: Json, err: ResponseError): Json = {
     JsonObject(
       "error"         := err.error,
       "error_code"    := err.error_code,
@@ -23,8 +36,7 @@ trait HandlerBase extends Logging with RippleFormatConverters {
       "request"       := rq, // Ripple sorts these, I don't here. At final point could when going to string
       "status"        := "error",
       "type"          := "response"
-    )
-
+    ).asJson
   }
 
   /**
@@ -34,73 +46,78 @@ trait HandlerBase extends Logging with RippleFormatConverters {
     *
     * @return
     */
-  def buildSuccessResponse(result: JsonObject, id: Option[Json] = None): JsonObject = {
+  def buildSuccessResponse(result: Json, id: Option[Json] = None): Json = {
 
-    val obj = JsonObject(
+    val done = JsonObject(
       "id"     := id,
-      "result" := result,
+      "result" := result.mapObject(JsonUtils.sortFieldsDroppingNulls),
       "status" := "success",
       "type"   := "response"
     )
+    CirceUtils.dropNullValues(done).asJson
+  }
 
-    CirceUtils.sortDeepFields(obj) // Put all fields in alphabetical order per object
+  def buildTxnSuccessResultField(txJson: Json, txBlob: String, hash: String): Json = {
+
+    val fulltx: Json = txJson.mapObject(_.add("hash", hash.asJson))
+
+    // TODO: Not sorted alphabetically yet
+    val sortedTx = fulltx.dropNullValues
+    JsonObject(
+      "tx_blob" := txBlob,
+      "tx_json" := sortedTx
+    ).asJson
 
   }
 
   /**
-    * SignRq and SignFor requests have same structure for the signing secreThis extracts
-    *
+    *   Get the key in whatever format from the Sign / SignFor message. Should be the same for multisign
     * @param json
-    *
     * @return
     */
-  def extractKey(json: JsonObject): Either[ResponseError, SigningKey] = {
-    // All the potential fields that are present as String
-    val params: Map[String, String] = List("secret", "key_type", "seed", "seed_hex", "passphrase")
-      .flatMap(getFieldAsString(_, json))
-      .toMap
+  def extractKey(json: Json): Either[ResponseError, SigningKey] = {
 
-    val fieldsPresent = params.keys
-    val keycount      = fieldsPresent.count(_ =!= "key_type")
-    if (fieldsPresent.count(f => f === "key_type" || f === "secret") > 1) ResponseError.kSecretAndType.asLeft
-    else
-      keycount match {
-        case 1 =>
-          // We know we have the correct # paremeter fields now, execept key_type maybe missing
-          params.get("secret").fold(explicitKey(params))(secretKey(_, params))
-
-        case 0     => ResponseError.kNoSecret.asLeft // Even if key_type is present
-        case other => ResponseError.kTooMany.asLeft
+    // There should be exactly one of these.
+    val exactOnce: List[(String, String)] = List("secret", "seed", "seed_hex", "passphrase")
+      .fproduct(v => findFieldAsString(v, json).toOption)
+      .collect {
+        case (name, Some(v)) => (name, v)
       }
+
+    val keyType                                       = findFieldAsString("key_type", json).toOption
+    val rec: List[((String, String), Option[String])] = exactOnce.tupleRight(keyType)
+
+    rec match {
+      case list if list.isEmpty    => ResponseError.kNoSecret.asLeft
+      case list if list.length > 1 => ResponseError.kTooMany.asLeft
+
+      case (("secret", _), Some(_)) :: Nil => ResponseError.kNoSecret.asLeft
+      case (("secret", v), None) :: Nil    => secretKey(v)
+
+      case ((_, _), None) :: Nil         => ResponseError.kNoSecret.asLeft
+      case ((fName, v), Some(kt)) :: Nil => explicitKey(fName, v, kt)
+    }
+
   }
 
   /** THis is when secret field is used in signing request, and only applicable for SECP256K1 keys */
-  protected def secretKey(secretB58: String, params: Map[String, String]): Either[ResponseError, SigningKey] = {
+  protected def secretKey(secretB58: String): Either[ResponseError, SigningKey] = {
     convertBase58Check2hex(secretB58)
-      .flatMap(SecretKeyOps.packSigningKey(_, SECP256K1))
+      .flatMap(RippleLocalAPI.packSigningKey(_, SECP256K1.txt))
       .leftMap(ae => ResponseError.kBadSecret)
   }
 
-  protected def explicitKey(params: Map[String, String]): Either[ResponseError, SigningKey] = {
+  protected def explicitKey(name: String, keyVal: String, keyType: String): Either[ResponseError, SigningKey] = {
 
-    val keyType = params.get("key_type") match {
-      case None     => ResponseError.kNoSecret.asLeft // Mimicing Ripple even if there are seed, seed_hex passphrase
-      case Some(kt) => KeyType.fromText(kt)
+    val asHex: Either[LocalOpsError, String] = name match {
+      case "passphrase" => convertPassword2hex(keyVal)
+      case "seed"       => convertBase58Check2hex(keyVal)
+      case "seed_hex"   => keyVal.asRight
+      case other        => LocalOpsError(s"Unexpected Key Parameters $other").asLeft
     }
 
-    keyType.flatMap { kt =>
-      logger.debug(s"Explicit Key Type $kt from $params")
-
-      val shouldBeOne: List[Either[AppError, String]] = List(
-        params.get("passphrase").map(convertPassword2hex),
-        params.get("seed").map(convertBase58Check2hex),
-        params.get("seed_hex").map(_.asRight[AppError])
-      ).flatten
-      val exactlyOne: Either[AppError, SigningKey] = shouldBeOne match { // Exactly one check
-        case first :: Nil => first.flatMap((v: String) => SecretKeyOps.packSigningKey(v, kt))
-        case other        => AppError("Not Exactly One passphrease,seed, seed_hex").asLeft[SigningKey]
-      }
-      exactlyOne.leftMap(e => ResponseError.kNoSecret) // Throwing away a potential useful error
-    }
+    asHex
+      .flatMap(v => RippleLocalAPI.packSigningKey(v, keyType))
+      .leftMap(_ => ResponseError(s"Internal Error Packing Key", None, None))
   }
 }
