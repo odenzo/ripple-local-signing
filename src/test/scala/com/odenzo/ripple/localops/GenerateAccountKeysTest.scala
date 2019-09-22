@@ -1,16 +1,18 @@
 package com.odenzo.ripple.localops
 
 import io.circe.Decoder.Result
+import io.circe.{Decoder, Json}
 import io.circe.syntax._
 
+import com.odenzo.ripple.localops.impl.utils.JsonUtils
 import com.odenzo.ripple.localops.models._
 import com.odenzo.ripple.localops.testkit.OTestSpec
 
 class GenerateAccountKeysTest extends OTestSpec with RippleLocalAPI {
 
   test("Generate Keys") {
-    val edReg    = getOrLog(super.generateAccountKeys(ED25519.txt))
-    val edMaster = getOrLog(super.generateAccountKeys(ED25519.txt))
+    val edReg: Json    = getOrLog(super.generateAccountKeys(ED25519.txt))
+    val edMaster: Json = getOrLog(super.generateAccountKeys(ED25519.txt))
 
     val secMaster  = getOrLog(generateAccountKeys(SECP256K1.txt))
     val secRegular = getOrLog(generateAccountKeys(SECP256K1.txt))
@@ -39,10 +41,13 @@ class GenerateAccountKeysTest extends OTestSpec with RippleLocalAPI {
 
   }
 
-  def doOneTest(wallet: WalletProposeResult): Either[LocalOpsError, SigningKey] = {
-    packSigningKey(wallet.master_seed_hex, wallet.key_type.txt)
-    packSigningKeyFromB58(wallet.master_seed, wallet.key_type.txt)
-    packSigningKeyFromRFC1751(wallet.master_key, wallet.key_type.txt)
+  def doOneTest(json: Json): Either[LocalOpsError, SigningKey] = {
+    for {
+      wallet <- JsonUtils.decode(json, Decoder[WalletProposeResult])
+      -      <- packSigningKey(wallet.master_seed_hex, wallet.key_type.txt)
+      _      <- packSigningKeyFromB58(wallet.master_seed, wallet.key_type.txt)
+      sk     <- packSigningKeyFromRFC1751(wallet.master_key, wallet.key_type.txt)
+    } yield sk
   }
 
 }

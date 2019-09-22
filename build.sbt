@@ -1,9 +1,9 @@
 import MyCompileOptions._
 import sbt.Keys.resolvers
 
-lazy val supportedScalaVersions = List("2.13.1", "2.12.9")
+lazy val supportedScalaVersions = List("2.13.1", "2.12.10")
 
-ThisBuild / scalaVersion := "2.13.0"
+ThisBuild / scalaVersion := supportedScalaVersions.head
 ThisBuild / organization := "com.odenzo"
 ThisBuild / name         := "ripple-local-signing"
 
@@ -18,7 +18,7 @@ resolvers ++= Seq(
   Resolver.jcenterRepo
 )
 
-val rippleBinaryCodecVersion = "0.1.2"
+val rippleBinaryCodecVersion = "0.1.3"
 val circeVersion             = "0.12.1"
 val catsVersion              = "2.0.0"
 val catsEffectVersion        = "2.0.0"

@@ -1,6 +1,7 @@
 package com.odenzo.ripple.localops
 
-import io.circe.{Json, ParsingFailure}
+import io.circe.Json
+import io.circe.syntax._
 
 import cats._
 import cats.data._
@@ -9,7 +10,7 @@ import cats.implicits._
 import com.odenzo.ripple.localops.impl.crypto.RippleFormatConverters
 import com.odenzo.ripple.localops.impl.utils.ByteUtils
 import com.odenzo.ripple.localops.impl.{Sign, SignFor, Verification, WalletGenerator}
-import com.odenzo.ripple.localops.models.{KeyType, SigningKey, WalletProposeResult}
+import com.odenzo.ripple.localops.models.{KeyType, SigningKey}
 
 /**
   * This is the simple API to use the Ripple Local Operations. See RippleLocalOps for a superset of this API
@@ -89,12 +90,12 @@ trait RippleLocalAPI {
     *
     * @return Master and Regular KeyPair based on random seed.
     */
-  def generateAccountKeys(key_type: String): Either[LocalOpsError, WalletProposeResult] = {
+  def generateAccountKeys(key_type: String): Either[LocalOpsError, Json] = {
 
     for {
       keyType <- KeyType.fromText(key_type).leftMap(e => LocalOpsError(e.error_message.getOrElse("Bad KeyType")))
       master  <- WalletGenerator.generateWallet(keyType)
-    } yield (master)
+    } yield (master.asJson)
   }
 
   /**

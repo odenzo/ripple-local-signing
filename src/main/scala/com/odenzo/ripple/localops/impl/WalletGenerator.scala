@@ -95,13 +95,13 @@ object WalletGenerator extends Logging with ByteUtils {
       addr      <- RippleFormatConverters.accountpubkey2address(pubBin)
       masterKey <- RFC1751Keys.bytesToEnglish(bytes.toArray)
     } yield WalletProposeResult(
-      account_id = addr.v,
-      key_type = ED25519,
-      master_key = masterKey,
-      master_seed = seedB58.v,
+      account_id      = addr.v,
+      key_type        = ED25519,
+      master_key      = masterKey,
+      master_seed     = seedB58.v,
       master_seed_hex = seedHex,
-      public_key = pubB58.v,
-      public_key_hex = pubHex
+      public_key      = pubB58.v,
+      public_key_hex  = pubHex
     )
   }
 
@@ -118,13 +118,13 @@ object WalletGenerator extends Logging with ByteUtils {
       addr      <- RippleFormatConverters.accountpubkey2address(pubBin)
       masterKey <- RFC1751Keys.bytesToEnglish(bytes.toArray)
     } yield WalletProposeResult(
-      account_id = addr.v,
-      key_type = SECP256K1,
-      master_key = masterKey,
-      master_seed = seedB58.v,
+      account_id      = addr.v,
+      key_type        = SECP256K1,
+      master_key      = masterKey,
+      master_seed     = seedB58.v,
       master_seed_hex = seedHex,
-      public_key = pubB58.v,
-      public_key_hex = pubHex
+      public_key      = pubB58.v,
+      public_key_hex  = pubHex
     )
   }
 

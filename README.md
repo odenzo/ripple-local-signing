@@ -1,5 +1,6 @@
 
 # ripple-local-signing
+ [![Download Latest](https://api.bintray.com/packages/odenzooss/maven/ripple-local-signing/images/download.svg)](https://bintray.com/odenzooss/maven/ripple-local-signing/_latestVersion)
 [![Build Status](https://travis-ci.com/odenzo/ripple-local-signing.svg?branch=master)](https://travis-ci.com/odenzo/ripple-local-signing)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/64c5333412184e23a22590db35f72181)](https://www.codacy.com/app/odenzo/ripple-local-signing?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=odenzo/ripple-local-signing&amp;utm_campaign=Badge_Grade)
 [![codecov](https://codecov.io/gh/odenzo/ripple-local-signing/branch/master/graph/badge.svg)](https://codecov.io/gh/odenzo/ripple-local-signing)
@@ -7,7 +8,7 @@
 
 
 # Overview
-
+                                                  
 A JVM implementation of Ripple (XRPL) local operations:
 * Local Signing of Transactions
 * Local Multisigning of Transactions, including merging of seperate mult-sign results
@@ -37,7 +38,8 @@ Drop in replacement for Ripple message processing in `MessageBasedAPI` and lower
 Published under BinTray, so in SBT: 
 
 ```
-   // Where version is the value in the badge above, e.g. "0.3.0" 
+   // Where version is the value in the badge above, e.g. "0.3.0"
+   // Note the badge is the latest version, not necessary the one corresponding to the version matching this README. 
    resolvers in ThisBuild += Resolver.bintrayRepo("odenzooss", "maven"),
    libraryDependencies += "com.odenzo" %% "ripple-local-signing" % version
 ```
