@@ -9,11 +9,10 @@ import org.scalatest.Assertion
 import scribe.{Level, Logging}
 
 import com.odenzo.ripple.bincodec.EncodedSTObject
-import com.odenzo.ripple.bincodec.testkit.JsonReqRes
 import com.odenzo.ripple.localops.impl.BinCodecProxy
 import com.odenzo.ripple.localops.impl.messagehandlers.SignForMsg
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
-import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
+import com.odenzo.ripple.localops.testkit.{FixtureUtils, JsonReqRes, OTestSpec}
 import com.odenzo.ripple.localops.{LocalOpsError, MessageBasedAPI, RippleLocalAPI}
 
 /**

@@ -2,16 +2,14 @@ package com.odenzo.ripple.localops.testkit
 
 import io.circe.optics.JsonPath
 import io.circe.{Json, JsonObject}
-import io.circe.syntax._
 
 import cats._
 import cats.data._
 import cats.implicits._
 
 import com.odenzo.ripple.bincodec.decoding.TxBlobBuster
-import com.odenzo.ripple.localops.ErrorHandling.ErrorOr
-import com.odenzo.ripple.localops.{LOpJsonErr, LocalOpsError}
 import com.odenzo.ripple.localops.impl.utils.JsonUtils
+import com.odenzo.ripple.localops.{LOpJsonErr, LocalOpsError}
 
 trait OTestUtils extends JsonUtils {
 
@@ -33,6 +31,11 @@ trait OTestUtils extends JsonUtils {
     }
   }
 
+  def removeWarning(rs: Json): Json = {
+    JsonPath.root.result.at("warning").set(None)(rs)
+
+  }
+
   def findResultInReply(rs: Json): Either[LOpJsonErr, Json] = {
     findField("result", rs)
   }
@@ -45,6 +48,10 @@ trait OTestUtils extends JsonUtils {
   /** At result field, get the TxBlob enclosed */
   def findTxBlobInReply(rs: Json): Either[LocalOpsError, String] = {
     findResultInReply(rs).flatMap(findFieldAsString("tx_blob", _))
+  }
+
+  def findTxJsonInReply(rs: Json): Either[LOpJsonErr, Json] = {
+    findResultInReply(rs).flatMap(findField("tx_json", _))
   }
 
   /** Check to see in the tx_blob field in result object of param is equal.

@@ -1,14 +1,10 @@
 package com.odenzo.ripple.localops.impl.crypto
 
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair
-import org.bouncycastle.crypto.params.{AsymmetricKeyParameter, Ed25519PublicKeyParameters}
 import org.scalatest.FunSuite
 
-import com.odenzo.ripple.localops.RippleLocalAPI
-import com.odenzo.ripple.localops.impl.BinCodecProxy
-import com.odenzo.ripple.localops.impl.crypto.core.{ED25519CryptoBC, HashOps}
-import com.odenzo.ripple.localops.impl.reference.HashPrefix
-import com.odenzo.ripple.localops.impl.utils.{ByteUtils, CirceUtils, JsonUtils}
+import com.odenzo.ripple.localops.impl.crypto.core.ED25519CryptoBC
+import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
 import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
 
 class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with JsonUtils with ByteUtils {
@@ -44,8 +40,8 @@ class ED25519CryptoBCTest extends FunSuite with OTestSpec with FixtureUtils with
       |
     """.stripMargin
 
-  val walletResult                       = CirceUtils.parseAsJson(wallet)
-  val txjsonResult                       = CirceUtils.parseAsJson(txjson)
+  val walletResult                       = JsonUtils.parseAsJson(wallet)
+  val txjsonResult                       = JsonUtils.parseAsJson(txjson)
   val secretkey                          = "ANTE TUFT MEG CHEN CRAB DUMB COW OWNS ROOF FRED EDDY FORD"
   val seedB58                            = "spqnjaMMxPSvtaD4nevqqdjj4kzie"
   val seedHex                            = "09A117434757F90BF0BED6B29F185E4D"

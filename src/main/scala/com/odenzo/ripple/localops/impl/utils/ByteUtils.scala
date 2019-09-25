@@ -19,51 +19,14 @@ case class Hex(v: String) extends BinaryValue
 
 trait ByteUtils extends Logging {
 
-  /**
-    * Java routine inputs need to go Java byte[], but outputs are wrapped to IndexedSeq instead of Array[Byte] to get
-    * immutable data structure. If the Array[Byte] has transient, then can use to immutable.ArraySeq.unsafeWrapArray to
-    * save the array copy since no one else has a handle
-    *
-    * In cases were the transient Array spans two functions we use this to avoid copying of Array.
-    * Note: It is the responsibility of the fna and fnb to ensure that the indexed sequence returned is safe, and
-    * underlying data is not shared by a mutable Array that some rougue may have a handle to.
-    *
-    * @param a
-    * @param b
-    *
-    * @return
-    */
-  def unsafeCompose(
-      a: Array[Byte] => IndexedSeq[Byte],
-      b: Array[Byte] => IndexedSeq[Byte]
-  ): Array[Byte] => IndexedSeq[Byte] = {
-    // Woops, more coffe.
-    // First a standard super safe copy until testing is done
-    // Then replace with ArraySeq.unsafe
-    a andThen indexedSequenceToArray andThen b
-  }
-
-  /** This will copy the data to a new array  */
-  def indexedSequenceToArray(is: IndexedSeq[Byte]): Array[Byte] = is.toArray
-
   /** This is used to signal intention for now, as not 2.12 backward compatable */
   def unsafeArrayToIndexedSequence(ar: Array[Byte]): IndexedSeq[Byte] = {
-
     // ArraySeq.unsafeWrapArray(ar)
     ar.toIndexedSeq
 
   }
 
   val bytezero: Byte = 0.toByte
-
-  def zeroPadLeft(v: String, len: Int): String = {
-    val maxPad: String = "000000000000000000000000000000000000000000000000000000000000000000"
-    len - v.length match {
-      case c if c > 0             => maxPad.take(c) + v
-      case c if c === 0           => v
-      case c if c > maxPad.length => zeroPadLeft(maxPad + v, len)
-    }
-  }
 
   def zeroEvenPadHex(hex: String): String = {
     hex.length % 2 match {
@@ -72,9 +35,13 @@ trait ByteUtils extends Logging {
     }
   }
 
-  def ensureMaxLength[T](l: List[T], len: Int): Either[LocalOpsError, List[T]] = {
-    if (l.length > len) LocalOpsError(s"List too long.. ${l.length} > $len").asLeft
-    else l.asRight
+  def hex2byte(hex: Char): Either[IllegalArgumentException, Int] = {
+    if ('0' <= hex && hex <= '9') (hex - '0').asRight
+    else if ('A' <= hex && hex <= 'F') (hex - 'A' + 10).asRight
+    else if ('a' <= hex && hex <= 'f') (hex - 'a' + 10).asRight
+    else new IllegalArgumentException(s"Illegal Hex Char $hex").asLeft
+
+    //((Character.digit(input.charAt(i), 16) << 4) + Character.digit(input.charAt(i + 1), 16)).toByte
   }
 
   def hex2bytes(hex: String): Either[LocalOpsError, List[Byte]] = {
@@ -107,27 +74,21 @@ trait ByteUtils extends Logging {
   @inline
   final def byte2hex(byte: Byte): String = "%02X".format(byte)
 
-  def bytes2hex(bytes: Iterable[Byte]): String = bytes.map(byte2hex).mkString
+  def bytes2hex(bytes: Iterable[Byte]): String = {
+    bytes.map(byte2hex).mkString
+  }
 
   /**
     * @return Formats unsigned byte as two hex characters, padding on left as needed (lowercase btw)
     */
   def ubyte2hex(v: UByte): String = "%02X".format(v.toByte)
 
-  def byte2ubyte(b: Byte): UByte = UByte(b)
-
-  def ubytes2hex(v: Seq[UByte]): String = v.map(ubyte2hex).mkString
-
   /**
     * Takes an arbitrary length string and returns an listed of unsigned bytes
     * If the number of hex digits is odd, is padded with zero on left.
     */
   def hex2ubytes(v: String): Either[LocalOpsError, List[UByte]] = {
-    val padded: String = v.length % 2 match {
-      case 0 => v
-      case 1 => '0' +: v
-    }
-    padded.grouped(2).map(hex2ubyte).toList.sequence
+    zeroEvenPadHex(v).grouped(2).map(hex2ubyte).toList.sequence
   }
 
   /**
@@ -146,7 +107,7 @@ trait ByteUtils extends Logging {
   }
 
   /**
-    * Note for speed
+    * Not for speed
     *
     * @param v Must be a one or two character hex string not enforced
     *

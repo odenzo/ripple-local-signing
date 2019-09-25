@@ -18,7 +18,6 @@ case class SigningKeySecp256(kp: KeyPair, signPubKey: String)                 ex
 
 /// Private below here, or not exported as part of standard interoperable stuff.
 
-case class Base58(v: String)
 case class Base58Check(v: String)
 case class TxnSignature(hex: String)
 

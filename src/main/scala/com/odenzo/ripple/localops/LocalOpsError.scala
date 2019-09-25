@@ -26,8 +26,9 @@ sealed trait LocalOpsError extends Throwable {
 
 case class LOpErr(msg: String = "No Message", cause: Option[LocalOpsError] = None) extends LocalOpsError
 
-case class WrappedBinCodecErr(msg: String, err: BinCodecLibError) extends LocalOpsError {
-  val cause = LOpException(s"BinCodec Err: $msg", err).some
+case class WrappedBinCodecErr(err: BinCodecLibError) extends LocalOpsError {
+  val cause = LOpException(s"BinCodec Err: ${err.msg}", err).some
+  val msg   = err.msg
 }
 
 /**
@@ -134,7 +135,7 @@ trait ErrorUtils {
     * @param ce
     * @return
     */
-  def wrapBinaryCodecError(ce: BinCodecLibError): LocalOpsError = WrappedBinCodecErr("BinaryCodecError", ce)
+  def wrapBinaryCodecError(ce: BinCodecLibError): LocalOpsError = WrappedBinCodecErr(ce)
 
   /** Catches thrown (non-fatal) exceptions from wrapped function */
   def wrap[A](msg: String)(fn: => Either[LocalOpsError, A]): Either[LocalOpsError, A] = {

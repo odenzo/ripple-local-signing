@@ -4,9 +4,10 @@ import cats._
 import cats.data._
 import cats.implicits._
 
-import com.odenzo.ripple.localops.LocalOpsError
+import com.odenzo.ripple.bincodec.utils.RippleBase58
+import com.odenzo.ripple.localops.{LocalOpsError, WrappedBinCodecErr}
 import com.odenzo.ripple.localops.impl.crypto.AccountFamily.{ripemd160, sha256, sha512}
-import com.odenzo.ripple.localops.impl.utils.{ByteUtils, Hex, RippleBase58}
+import com.odenzo.ripple.localops.impl.utils.{ByteUtils, Hex}
 import com.odenzo.ripple.localops.models.Base58Check
 
 trait RippleFormatConverters {
@@ -72,7 +73,7 @@ trait RippleFormatConverters {
   def convertBase58Check2bytes(rippleB58: String): Either[LocalOpsError, List[Byte]] = {
     LocalOpsError.wrap(s"Converting Base58Check $rippleB58 to Plain Bytes") {
       for {
-        bytes <- RippleBase58.decode(rippleB58)
+        bytes <- RippleBase58.decode(rippleB58).leftMap(WrappedBinCodecErr(_))
         trimmed = bytes.toList.drop(1).dropRight(4)
       } yield trimmed
     }

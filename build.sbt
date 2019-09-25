@@ -18,7 +18,7 @@ resolvers ++= Seq(
   Resolver.jcenterRepo
 )
 
-val rippleBinaryCodecVersion = "0.1.3"
+val rippleBinaryCodecVersion = "0.1.4-SNAPSHOT"
 val circeVersion             = "0.12.1"
 val catsVersion              = "2.0.0"
 val catsEffectVersion        = "2.0.0"

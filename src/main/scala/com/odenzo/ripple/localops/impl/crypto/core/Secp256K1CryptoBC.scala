@@ -42,10 +42,7 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
     new ECDomainParameters(params.getCurve, params.getG, params.getN, params.getH)
   private val ecSpec: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpec(curveName)
 
-  /** G is generator for secp256k1 curve. A constant
-    * Compress is: G = 02 79BE667E F9DCBBAC 55A06295 CE870B07 029BFCDB 2DCE28D9 59F2815B 16F81798
-    * Uncompresssed: 04 79BE667E F9DCBBAC 55A06295 CE870B07 029BFCDB 2DCE28D9 59F2815B 16F81798 483ADA77 26A3C465 5DA4FBFC 0E1108A8 FD17B448 A6855419 9C47D08F FB10D4B8
-    *
+  /** G is generator for secp256k1 curve.
     * @return
     */
   val secp256k1Generator: ECPoint = params.getG
@@ -71,7 +68,7 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
     }
   }
 
-  /** Currently using this, slightly painful to extract D, from the ripple-lib Java */
+  /** extract D, from the ripple-lib Java */
   def sign(hash: Array[Byte], secret: KeyPair): Either[LocalOpsError, DERSignature] = {
     LocalOpsError.wrap("SECP SIGN") {
 
@@ -92,7 +89,6 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
   }
 
   /**
-    * Used in some tests -- exclude from coverage
     *
     * @return Generates a JCA KeyPair for secp256k1 in its own packaging
     */
@@ -147,8 +143,6 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
     * Public Keys with X only are compressed with added 0x02 or 0x03 as first byte and 32 byte X
     * Uncompressed Public Keys have 0x04 and 32 byte X and 32 byte Y
     *
-    * Might as well take the hex as the use-case is loading SigningPubKey from json.
-    *
     * @param compressKey The public key, how these bytes are am not sure. uncompressed with 02 or 03?
     *
     * @return
@@ -163,12 +157,8 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
   }
 
   /**
-    * Gives the raw bytes of the public key, which are normally preceeded by 02 in encoded form.
+    * @return Gives the raw bytes of the public key, which are  preceeded by 02 or 03 in encoded form.
     * This is for sepck key only now.
-    *
-    * @param pub
-    *
-    * @return
     */
   def compressPublicKey(pub: PublicKey): IndexedSeq[Byte] = {
     pub match {
@@ -177,9 +167,7 @@ object Secp256K1CryptoBC extends Logging with ByteUtils {
     }
   }
 
-  def publicKey2hex(pub: PublicKey): String = {
-    bytes2hex(compressPublicKey(pub))
-  }
+  def publicKey2hex(pub: PublicKey): String = bytes2hex(compressPublicKey(pub))
 
   /**
     * Extract D value from private key.

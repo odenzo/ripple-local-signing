@@ -8,7 +8,7 @@ import cats.data._
 import cats.implicits._
 import scribe.Level
 
-import com.odenzo.ripple.localops.impl.utils.CirceUtils
+import com.odenzo.ripple.localops.impl.utils.JsonUtils
 import com.odenzo.ripple.localops.testkit.OTestSpec
 import com.odenzo.ripple.localops.{LocalOpsError, RippleLocalAPI}
 
@@ -49,7 +49,7 @@ class LedgerTxnFixture extends OTestSpec {
   def prepare(resourcePath: String): Either[LocalOpsError, List[Json]] = {
     for {
       json   <- loadJsonResource(resourcePath)
-      nonull <- CirceUtils.pruneNullFields(json)
+      nonull <- JsonUtils.pruneNullFields(json)
       jobjs  <- decode(nonull, Decoder[List[JsonObject]])
       cleaned = jobjs.map(_.remove("metaData").asJson)
 

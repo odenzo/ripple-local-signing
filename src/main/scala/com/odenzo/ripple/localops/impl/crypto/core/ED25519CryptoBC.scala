@@ -31,7 +31,7 @@ object ED25519CryptoBC extends Logging with ByteUtils {
 
   private val curve: X9ECParameters = CustomNamedCurves.getByName("curve25519")
 
-  val order: BigInteger = curve.getCurve.getOrder
+  private val order: BigInteger = curve.getCurve.getOrder
 
   //  private val domainParams: ECDomainParameters =
   //    new ECDomainParameters(curve.getCurve, curve.getG, curve.getN, curve.getH)
@@ -47,7 +47,13 @@ object ED25519CryptoBC extends Logging with ByteUtils {
     }
   }
 
-  // 64 byte signatures are compressed versions, 64 bytes are output
+  /** 64 byte signatures are compressed versions, 64 bytes are output
+    *
+    * @param payload  Bytes to verfiy
+    * @param sig The TxnSignature as bytes in Ripple context
+    * @param pubKey The SigningPubKey in native format.
+    * @return
+    */
   def verify(
       payload: Array[Byte],
       sig: Array[Byte],
@@ -113,6 +119,8 @@ object ED25519CryptoBC extends Logging with ByteUtils {
     }
   }
 
+  /** Use to convert SigningPubKey to ed25519 internal parameter format.
+    **/
   def signingPubKey2KeyParameter(pubKeyHex: String): Either[LocalOpsError, Ed25519PublicKeyParameters] = {
     hex2bytes(pubKeyHex.drop(2)).map(b => new Ed25519PublicKeyParameters(b.toArray, 0))
   }

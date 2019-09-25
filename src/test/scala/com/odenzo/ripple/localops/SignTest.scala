@@ -1,16 +1,15 @@
 package com.odenzo.ripple.localops
 
-import io.circe.{Json, JsonObject}
+import io.circe.Json
 
 import spire.math.UByte
 
-import com.odenzo.ripple.bincodec.testkit.AccountKeys
 import com.odenzo.ripple.localops.impl.Sign.bytes2hex
 import com.odenzo.ripple.localops.impl.crypto.core.HashOps
 import com.odenzo.ripple.localops.impl.reference.HashPrefix
-import com.odenzo.ripple.localops.impl.utils.{ByteUtils, CirceUtils, JsonUtils}
+import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
 import com.odenzo.ripple.localops.impl.{BinCodecProxy, Sign}
-import com.odenzo.ripple.localops.testkit.OTestSpec
+import com.odenzo.ripple.localops.testkit.{AccountKeys, OTestSpec}
 
 class SignTest extends OTestSpec {
 
@@ -55,9 +54,9 @@ class SignTest extends OTestSpec {
   }
   """.stripMargin
 
-  val keysJson: Json        = getOrLog(CirceUtils.parseAsJson(secp256k1_key), "Parsing Keys")
-  val acctKeys: AccountKeys = getOrLog(CirceUtils.decode(keysJson, AccountKeys.decoder), "AccountKeys")
-  val txjson: Json          = getOrLog(CirceUtils.parseAsJson(tx_json))
+  val keysJson: Json        = getOrLog(JsonUtils.parseAsJson(secp256k1_key), "Parsing Keys")
+  val acctKeys: AccountKeys = getOrLog(JsonUtils.decode(keysJson, AccountKeys.decoder), "AccountKeys")
+  val txjson: Json          = getOrLog(JsonUtils.parseAsJson(tx_json))
 
   // Need some complete messages
   test("Top Level txnscenarios") {
