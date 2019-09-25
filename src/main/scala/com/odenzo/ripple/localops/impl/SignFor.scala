@@ -10,11 +10,12 @@ import cats.implicits._
 import monocle.{Optional, Traversal}
 
 import com.odenzo.ripple.bincodec.RippleCodecAPI
+import com.odenzo.ripple.bincodec.utils.RippleBase58
 import com.odenzo.ripple.localops.impl.Sign.binarySerializeForSigning
 import com.odenzo.ripple.localops.impl.reference.HashPrefix
-import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils, RippleBase58}
+import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
 import com.odenzo.ripple.localops.models.{SigningKey, TxnSignature}
-import com.odenzo.ripple.localops.{LOpException, LocalOpsError}
+import com.odenzo.ripple.localops.{LOpException, LocalOpsError, WrappedBinCodecErr}
 
 /**
   * Multisigning functions. signForSignerOnly does the actual work.
@@ -42,7 +43,7 @@ trait SignFor extends JsonUtils {
     * @param signAddrB58Check
     * @return updated tx_json  with new Signer, the hash is not updated
     */
-  def signFor(tx_json: Json, key: SigningKey, signAddrB58Check: String) = {
+  def signFor(tx_json: Json, key: SigningKey, signAddrB58Check: String): Either[Throwable, Json] = {
     val root = txjsonPubKeyAdd(tx_json)
     for {
 
@@ -129,7 +130,7 @@ trait SignFor extends JsonUtils {
     val path: Optional[Json, String] = JsonPath.root.Signer.Account.string
     for {
       acct   <- lensGetOpt(path)(enclosingObj)
-      binary <- RippleBase58.decode(acct)
+      binary <- RippleBase58.decode(acct).leftMap(WrappedBinCodecErr(_))
     } yield ByteUtils.bytes2hex(binary)
   }
 

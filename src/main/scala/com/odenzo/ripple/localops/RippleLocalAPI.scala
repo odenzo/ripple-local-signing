@@ -140,6 +140,10 @@ trait RippleLocalAPI {
     packSigningKeyFromB58(master_seed, key_type)
   }
 
+}
+
+object RippleLocalAPI extends RippleLocalAPI {
+
   /**
     *
     * @param json Well formed Json
@@ -152,7 +156,4 @@ trait RippleLocalAPI {
       case Left(err) => throw err
     }
   }
-
 }
-
-object RippleLocalAPI extends RippleLocalAPI

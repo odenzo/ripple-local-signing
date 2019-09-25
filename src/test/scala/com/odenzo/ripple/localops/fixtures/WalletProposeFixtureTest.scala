@@ -1,19 +1,18 @@
 package com.odenzo.ripple.localops.fixtures
 
 import io.circe.Json
+
 import cats._
 import cats.data._
 import cats.implicits._
-
 import org.scalatest.FunSuite
 import scribe.Level
 
-import com.odenzo.ripple.bincodec.testkit.JsonReqRes
-import com.odenzo.ripple.localops.{LocalOpsError, MessageBasedAPI}
 import com.odenzo.ripple.localops.impl.crypto.RippleFormatConverters
 import com.odenzo.ripple.localops.impl.crypto.core.ED25519CryptoBC
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
-import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
+import com.odenzo.ripple.localops.testkit.{FixtureUtils, JsonReqRes, OTestSpec}
+import com.odenzo.ripple.localops.{LocalOpsError, MessageBasedAPI}
 
 /**
   *  Need more than non-trivial requests. This exercises some internals plus the Public Message API
@@ -71,8 +70,9 @@ class WalletProposeFixtureTest
 
     val rs = MessageBasedAPI.walletPropose(rr.rq)
     logger.debug(s"In Request: ${rs.spaces4}")
+    val cleanrs = removeWarning(removeDeprecated(rr.rs))
     if (seedCount > 0) {
-      rs shouldEqual removeDeprecated(rr.rs)
+      rs shouldEqual cleanrs
     } else {
       // Can only check it succeeded.
       findFieldAsString("status", rs) shouldEqual Right("success")
@@ -89,6 +89,10 @@ class WalletProposeFixtureTest
     }
   }
 
+  test("Do With Seeds") {
+    setTestLogLevel(Level.Debug)
+    getOrLog(doWalletFixture("/test/myTestData/wallets/wallet_propose_rqrs.json"))
+  }
   test("SECP Fixture") {
     setTestLogLevel(Level.Debug)
     getOrLog(doWalletFixture("/test/myTestData/wallets/secp256k1_wallets.json"))

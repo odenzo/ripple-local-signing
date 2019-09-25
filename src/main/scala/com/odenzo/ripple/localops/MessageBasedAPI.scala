@@ -10,8 +10,9 @@ import com.odenzo.ripple.localops.impl.messagehandlers.{SignForMsg, SignMsg, Wal
 
 /** These API are more or less drop-in replacements for calling the rippled server for signing and multisigning.
   * API is designed with minimal dependancies.
-  * Currently just JsonObject from Circe but thinking of
-  *  adding String based requests also.
+  * Currently just JsonObject from Circe but thinking of adding String based requests also.
+  * Want something Java/Javascript/Scala friendly.    See JavaAPI for String/Throwable based
+  * YOu should be able to call that from Scala too of course.
   */
 object MessageBasedAPI extends Logging {
 
@@ -41,4 +42,7 @@ object MessageBasedAPI extends Logging {
   def walletPropose(walletProposeRq: Json): Json = {
     WalletProposeMsg.propose(walletProposeRq).fold(identity, identity)
   }
+
+  /** Can be called from Java for ease */
+  def instance: MessageBasedAPI.type = this
 }

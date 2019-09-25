@@ -6,9 +6,8 @@ import cats._
 import cats.data._
 import cats.implicits._
 
-import com.odenzo.ripple.bincodec.testkit.AccountKeys
-import com.odenzo.ripple.localops.impl.utils.{ByteUtils, CirceUtils, Hex}
-import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
+import com.odenzo.ripple.localops.impl.utils.{ByteUtils, Hex, JsonUtils}
+import com.odenzo.ripple.localops.testkit.{AccountKeys, FixtureUtils, OTestSpec}
 
 class RippleFormatConvertersTest extends OTestSpec with FixtureUtils with ByteUtils with RippleFormatConverters {
 
@@ -38,8 +37,8 @@ class RippleFormatConvertersTest extends OTestSpec with FixtureUtils with ByteUt
 
   test("PublkeyKey2Address") {
 
-    val json: Json              = getOrLog(CirceUtils.parseAsJson(jsonTxt))
-    val keys: List[AccountKeys] = getOrLog(CirceUtils.decode(json, Decoder[List[AccountKeys]]))
+    val json: Json              = getOrLog(JsonUtils.parseAsJson(jsonTxt))
+    val keys: List[AccountKeys] = getOrLog(JsonUtils.decode(json, Decoder[List[AccountKeys]]))
 
     keys.foreach(testKey)
 

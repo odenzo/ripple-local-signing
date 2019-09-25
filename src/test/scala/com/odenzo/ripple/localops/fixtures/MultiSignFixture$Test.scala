@@ -9,13 +9,9 @@ import cats.implicits._
 import monocle.Optional
 import scribe.{Level, Logging}
 
-import com.odenzo.ripple.bincodec.EncodedSTObject
-import com.odenzo.ripple.bincodec.testkit.JsonReqRes
-import com.odenzo.ripple.localops.impl.BinCodecProxy
-import com.odenzo.ripple.localops.impl.messagehandlers.SignForMsg
 import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
-import com.odenzo.ripple.localops.testkit.{FixtureUtils, OTestSpec}
-import com.odenzo.ripple.localops.{LOpJsonErr, LocalOpsError, MessageBasedAPI, RippleLocalAPI}
+import com.odenzo.ripple.localops.testkit.{FixtureUtils, JsonReqRes, OTestSpec}
+import com.odenzo.ripple.localops.{MessageBasedAPI, RippleLocalAPI}
 
 /**
   * Tests the RippleLocalAPI and fixtures of SignRq / SignRs

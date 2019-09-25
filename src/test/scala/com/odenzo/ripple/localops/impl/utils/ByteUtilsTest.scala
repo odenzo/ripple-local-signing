@@ -16,8 +16,6 @@ class ByteUtilsTest extends OTestSpec with ByteUtils {
 
   import ByteUtils._
 
-  customLogLevel = Level.Debug
-
   test("Equals") {
     val mine: Byte     = 0.toByte
     val constant: Byte = ByteUtils.bytezero

@@ -36,7 +36,7 @@ trait Verification extends Logging with JsonUtils with ByteUtils {
       pubkeyraw <- findField("SigningPubKey", txjson).flatMap(json2string)
       signature <- findField("TxnSignature", txjson).flatMap(json2string)
 
-      ans <- verifyOneSigner(pubkeyraw, signature, payload)
+      ans <- verifyOneSigner(pubkeyraw, signature, payload.toIndexedSeq)
     } yield ans
     verified
   }

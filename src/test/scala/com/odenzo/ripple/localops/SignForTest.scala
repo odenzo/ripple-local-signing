@@ -9,14 +9,12 @@ import io.circe.{Decoder, Json, JsonObject}
 import cats._
 import cats.data._
 import cats.implicits._
-import monocle.{Optional, PSetter, Traversal}
 import scribe.Level
 
-import com.odenzo.ripple.bincodec.testkit.{FKP, MultiSignTrace, Signer, Signers}
 import com.odenzo.ripple.localops.impl.SignFor
 import com.odenzo.ripple.localops.impl.messagehandlers.SignForMsg
-import com.odenzo.ripple.localops.impl.utils.{ByteUtils, CirceUtils, ScribeLogUtils}
-import com.odenzo.ripple.localops.testkit.OTestSpec
+import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
+import com.odenzo.ripple.localops.testkit.{FKP, MultiSignTrace, OTestSpec, Signer, Signers}
 
 class SignForTest extends OTestSpec with ByteUtils with SignFor {
 
@@ -148,7 +146,7 @@ class SignForTest extends OTestSpec with ByteUtils with SignFor {
   /** Incremental Dev Tests */
   test("signFor TDP") {
     //OTestLogging.setTestLogLevel(Level.Debug)
-    val trace: MultiSignTrace = getOrLog(CirceUtils.parseAndDecode(tracer, MultiSignTrace.decoder))
+    val trace: MultiSignTrace = getOrLog(JsonUtils.parseAndDecode(tracer, MultiSignTrace.decoder))
 
     val firstRq  = trace.signFors.head.rq
     val firstRs  = trace.signFors.head.rs
@@ -303,7 +301,7 @@ class SignForTest extends OTestSpec with ByteUtils with SignFor {
     val baseToRs: JsonTraversalPath = JsonPath.root.signFors.each.rs
     val rsToTx: JsonPath            = JsonPath.root.result.tx_json
     val rsLens: List[JsonObject]    = JsonPath.root.signFor.each.rs.result.tx_json.Signers.each.obj.getAll(json)
-    ScribeLogUtils.setLogLevel(Level.Debug)
+    setTestLogLevel(Level.Debug)
     val repeated: List[JsonObject] = rsLens ::: rsLens ::: rsLens
     logger.info(s"\n${rsLens.asJson.spaces4} \n ${repeated.asJson.spaces4}")
 

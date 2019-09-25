@@ -4,7 +4,7 @@ import io.circe.{Decoder, Json}
 
 import scribe.Level
 
-import com.odenzo.ripple.localops.impl.utils.{ByteUtils, CirceUtils}
+import com.odenzo.ripple.localops.impl.utils.{ByteUtils, JsonUtils}
 import com.odenzo.ripple.localops.impl.{BinCodecProxy, Sign}
 import com.odenzo.ripple.localops.models.TxnSignature
 import com.odenzo.ripple.localops.testkit.OTestSpec
@@ -50,8 +50,8 @@ class ShakeDownTest extends OTestSpec with ByteUtils {
       |
     """.stripMargin
 
-  val walletResult: Json = getOrLog(CirceUtils.parseAsJson(wallet))
-  val txjson             = getOrLog(CirceUtils.parseAsJson(txjsonStr))
+  val walletResult: Json = getOrLog(JsonUtils.parseAsJson(wallet))
+  val txjson             = getOrLog(JsonUtils.parseAsJson(txjsonStr))
   val walletMap          = decode(walletResult, Decoder[Map[String, String]])
   val kTxnSig: String    = getOrLog(findFieldAsString("TxnSignature", txjson))
   val kHash              = getOrLog(findFieldAsString("hash", txjson))

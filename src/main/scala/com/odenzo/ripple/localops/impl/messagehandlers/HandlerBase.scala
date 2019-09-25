@@ -7,7 +7,7 @@ import cats.implicits._
 import scribe.Logging
 
 import com.odenzo.ripple.localops.impl.crypto.RippleFormatConverters
-import com.odenzo.ripple.localops.impl.utils.{CirceUtils, JsonUtils}
+import com.odenzo.ripple.localops.impl.utils.JsonUtils
 import com.odenzo.ripple.localops.models.{ResponseError, SECP256K1, SigningKey}
 import com.odenzo.ripple.localops.{LocalOpsError, RippleLocalAPI}
 
@@ -54,7 +54,7 @@ trait HandlerBase extends Logging with RippleFormatConverters with JsonUtils {
       "status" := "success",
       "type"   := "response"
     )
-    CirceUtils.dropNullValues(done).asJson
+    JsonUtils.dropNullValues(done).asJson
   }
 
   def buildTxnSuccessResultField(txJson: Json, txBlob: String, hash: String): Json = {

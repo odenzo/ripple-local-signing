@@ -4,17 +4,16 @@ import java.net.URL
 import scala.io.{BufferedSource, Source}
 
 import io.circe.syntax._
-import io.circe.{Decoder, Json, JsonObject}
+import io.circe.{Decoder, Json}
 
 import cats._
 import cats.data._
 import cats.effect.{IO, Resource}
 import cats.implicits._
 
-import com.odenzo.ripple.bincodec.testkit.{AccountKeys, FKP, JsonReqRes}
 import com.odenzo.ripple.localops.ErrorHandling.ErrorOr
 import com.odenzo.ripple.localops.LocalOpsError
-import com.odenzo.ripple.localops.impl.utils.{CirceUtils, JsonUtils}
+import com.odenzo.ripple.localops.impl.utils.JsonUtils
 
 /** Fixture utils that help load or create fixture files.
   * These should not depend on being in ScalaTest context.
@@ -26,7 +25,7 @@ trait FixtureUtils extends JsonUtils {
       val resource: URL          = getClass.getResource(path)
       val source: BufferedSource = Source.fromURL(resource)
       val data: String           = source.getLines().mkString("\n")
-      CirceUtils.parseAsJson(data)
+      JsonUtils.parseAsJson(data)
     }
   }
 
@@ -40,7 +39,7 @@ trait FixtureUtils extends JsonUtils {
     val resource = Resource.fromAutoCloseable(acquire)
 
     val json = resource.use { src =>
-      IO(CirceUtils.parseAsJson(src.mkString))
+      IO(JsonUtils.parseAsJson(src.mkString))
     }
 
     json.unsafeRunSync()
@@ -57,7 +56,7 @@ trait FixtureUtils extends JsonUtils {
   def loadRqRsResource(resource: String): Either[LocalOpsError, List[JsonReqRes]] = {
     for {
       json <- loadJsonResource(resource)
-      objs <- CirceUtils.decode(json, Decoder[List[JsonReqRes]])
+      objs <- JsonUtils.decode(json, Decoder[List[JsonReqRes]])
     } yield objs
   }
 
@@ -67,7 +66,7 @@ trait FixtureUtils extends JsonUtils {
   def loadKeysResource(resource: String): Either[LocalOpsError, List[FKP]] = {
     for {
       json <- loadJsonResource(resource)
-      objs <- CirceUtils.decode(json, Decoder[List[FKP]])
+      objs <- JsonUtils.decode(json, Decoder[List[FKP]])
     } yield objs
   }
 
@@ -82,7 +81,7 @@ trait FixtureUtils extends JsonUtils {
 
     for {
       rr     <- loadRqRsResource(resource)
-      rqKeys <- rr.traverse(v => CirceUtils.decode(v.rs, AccountKeys.decoder).tupleLeft(v.rq))
+      rqKeys <- rr.traverse(v => JsonUtils.decode(v.rs, AccountKeys.decoder).tupleLeft(v.rq))
     } yield rqKeys
   }
 

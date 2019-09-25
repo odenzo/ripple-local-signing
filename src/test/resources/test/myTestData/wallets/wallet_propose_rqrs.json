@@ -1,0 +1,228 @@
+[
+  {
+    "rq": {
+      "command": "wallet_propose",
+      "seed": null,
+      "seed_hex": null,
+      "passphrase": "humpydumptysatonawall",
+      "key_type": "ed25519",
+      "id": "<No MsgId>",
+      "ledger_index": "validated",
+      "ledger_hash": null,
+      "limit": null,
+      "marker": null
+    },
+    "rs": {
+      "id": "<No MsgId>",
+      "result": {
+        "account_id": "r9URiF2C8kjhTyo2rqZCXLjuXy62Zv1Lx9",
+        "key_type": "ed25519",
+        "master_key": "GALT MARK JIM DAVE INTO TOO KERR AWRY LED IRE LEFT BAD",
+        "master_seed": "spip33xCpJ3psyb5FBT512iGw5PKi",
+        "master_seed_hex": "0ACA3A8F8E042AA683EA193881F0F688",
+        "public_key": "aKENvvZWXmbMMcuvvaeP4Pg66QunxSTdVmK4tZbzQ1C7qKeoRgrP",
+        "public_key_hex": "ED3E6BD2D59DCCACFD62D12C33864D4A2024B31D2A07E1002ABB4CF46B939D41F0",
+        "warning": "This wallet was generated using a user-supplied passphrase that has low entropy and is vulnerable to brute-force attacks."
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "rq": {
+      "command": "wallet_propose",
+      "seed": "spip33xCpJ3psyb5FBT512iGw5PKi",
+      "seed_hex": null,
+      "passphrase": null,
+      "key_type": "ed25519",
+      "id": "<No MsgId>",
+      "ledger_index": "validated",
+      "ledger_hash": null,
+      "limit": null,
+      "marker": null
+    },
+    "rs": {
+      "id": "<No MsgId>",
+      "result": {
+        "account_id": "r9URiF2C8kjhTyo2rqZCXLjuXy62Zv1Lx9",
+        "key_type": "ed25519",
+        "master_key": "GALT MARK JIM DAVE INTO TOO KERR AWRY LED IRE LEFT BAD",
+        "master_seed": "spip33xCpJ3psyb5FBT512iGw5PKi",
+        "master_seed_hex": "0ACA3A8F8E042AA683EA193881F0F688",
+        "public_key": "aKENvvZWXmbMMcuvvaeP4Pg66QunxSTdVmK4tZbzQ1C7qKeoRgrP",
+        "public_key_hex": "ED3E6BD2D59DCCACFD62D12C33864D4A2024B31D2A07E1002ABB4CF46B939D41F0"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "rq": {
+      "command": "wallet_propose",
+      "seed": null,
+      "seed_hex": "0ACA3A8F8E042AA683EA193881F0F688",
+      "passphrase": null,
+      "key_type": "ed25519",
+      "id": "<No MsgId>",
+      "ledger_index": "validated",
+      "ledger_hash": null,
+      "limit": null,
+      "marker": null
+    },
+    "rs": {
+      "id": "<No MsgId>",
+      "result": {
+        "account_id": "r9URiF2C8kjhTyo2rqZCXLjuXy62Zv1Lx9",
+        "key_type": "ed25519",
+        "master_key": "GALT MARK JIM DAVE INTO TOO KERR AWRY LED IRE LEFT BAD",
+        "master_seed": "spip33xCpJ3psyb5FBT512iGw5PKi",
+        "master_seed_hex": "0ACA3A8F8E042AA683EA193881F0F688",
+        "public_key": "aKENvvZWXmbMMcuvvaeP4Pg66QunxSTdVmK4tZbzQ1C7qKeoRgrP",
+        "public_key_hex": "ED3E6BD2D59DCCACFD62D12C33864D4A2024B31D2A07E1002ABB4CF46B939D41F0"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "rq": {
+      "command": "wallet_propose",
+      "seed": null,
+      "seed_hex": null,
+      "passphrase": "GALT MARK JIM DAVE INTO TOO KERR AWRY LED IRE LEFT BAD",
+      "key_type": "ed25519",
+      "id": "<No MsgId>",
+      "ledger_index": "validated",
+      "ledger_hash": null,
+      "limit": null,
+      "marker": null
+    },
+    "rs": {
+      "id": "<No MsgId>",
+      "result": {
+        "account_id": "r9URiF2C8kjhTyo2rqZCXLjuXy62Zv1Lx9",
+        "key_type": "ed25519",
+        "master_key": "GALT MARK JIM DAVE INTO TOO KERR AWRY LED IRE LEFT BAD",
+        "master_seed": "spip33xCpJ3psyb5FBT512iGw5PKi",
+        "master_seed_hex": "0ACA3A8F8E042AA683EA193881F0F688",
+        "public_key": "aKENvvZWXmbMMcuvvaeP4Pg66QunxSTdVmK4tZbzQ1C7qKeoRgrP",
+        "public_key_hex": "ED3E6BD2D59DCCACFD62D12C33864D4A2024B31D2A07E1002ABB4CF46B939D41F0"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "rq": {
+      "command": "wallet_propose",
+      "seed": null,
+      "seed_hex": null,
+      "passphrase": "humpydumptysatonawall",
+      "key_type": "secp256k1",
+      "id": "<No MsgId>",
+      "ledger_index": "validated",
+      "ledger_hash": null,
+      "limit": null,
+      "marker": null
+    },
+    "rs": {
+      "id": "<No MsgId>",
+      "result": {
+        "account_id": "rstxnUDW4tW4WuAk2tiNasSqnfw5Q3vJNL",
+        "key_type": "secp256k1",
+        "master_key": "GALT MARK JIM DAVE INTO TOO KERR AWRY LED IRE LEFT BAD",
+        "master_seed": "spip33xCpJ3psyb5FBT512iGw5PKi",
+        "master_seed_hex": "0ACA3A8F8E042AA683EA193881F0F688",
+        "public_key": "aBQS5RLfH1T2AKZoknRv8488RtWiDrRnmZFaai6uWj2phzcYWN12",
+        "public_key_hex": "034774AD6399C77A04D32B61D21C8D71B4777F2CA593D6D9FF86489F8D0DE044CE",
+        "warning": "This wallet was generated using a user-supplied passphrase that has low entropy and is vulnerable to brute-force attacks."
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "rq": {
+      "command": "wallet_propose",
+      "seed": "spip33xCpJ3psyb5FBT512iGw5PKi",
+      "seed_hex": null,
+      "passphrase": null,
+      "key_type": "secp256k1",
+      "id": "<No MsgId>",
+      "ledger_index": "validated",
+      "ledger_hash": null,
+      "limit": null,
+      "marker": null
+    },
+    "rs": {
+      "id": "<No MsgId>",
+      "result": {
+        "account_id": "rstxnUDW4tW4WuAk2tiNasSqnfw5Q3vJNL",
+        "key_type": "secp256k1",
+        "master_key": "GALT MARK JIM DAVE INTO TOO KERR AWRY LED IRE LEFT BAD",
+        "master_seed": "spip33xCpJ3psyb5FBT512iGw5PKi",
+        "master_seed_hex": "0ACA3A8F8E042AA683EA193881F0F688",
+        "public_key": "aBQS5RLfH1T2AKZoknRv8488RtWiDrRnmZFaai6uWj2phzcYWN12",
+        "public_key_hex": "034774AD6399C77A04D32B61D21C8D71B4777F2CA593D6D9FF86489F8D0DE044CE"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "rq": {
+      "command": "wallet_propose",
+      "seed": null,
+      "seed_hex": "0ACA3A8F8E042AA683EA193881F0F688",
+      "passphrase": null,
+      "key_type": "secp256k1",
+      "id": "<No MsgId>",
+      "ledger_index": "validated",
+      "ledger_hash": null,
+      "limit": null,
+      "marker": null
+    },
+    "rs": {
+      "id": "<No MsgId>",
+      "result": {
+        "account_id": "rstxnUDW4tW4WuAk2tiNasSqnfw5Q3vJNL",
+        "key_type": "secp256k1",
+        "master_key": "GALT MARK JIM DAVE INTO TOO KERR AWRY LED IRE LEFT BAD",
+        "master_seed": "spip33xCpJ3psyb5FBT512iGw5PKi",
+        "master_seed_hex": "0ACA3A8F8E042AA683EA193881F0F688",
+        "public_key": "aBQS5RLfH1T2AKZoknRv8488RtWiDrRnmZFaai6uWj2phzcYWN12",
+        "public_key_hex": "034774AD6399C77A04D32B61D21C8D71B4777F2CA593D6D9FF86489F8D0DE044CE"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  },
+  {
+    "rq": {
+      "command": "wallet_propose",
+      "seed": null,
+      "seed_hex": null,
+      "passphrase": "GALT MARK JIM DAVE INTO TOO KERR AWRY LED IRE LEFT BAD",
+      "key_type": "secp256k1",
+      "id": "<No MsgId>",
+      "ledger_index": "validated",
+      "ledger_hash": null,
+      "limit": null,
+      "marker": null
+    },
+    "rs": {
+      "id": "<No MsgId>",
+      "result": {
+        "account_id": "rstxnUDW4tW4WuAk2tiNasSqnfw5Q3vJNL",
+        "key_type": "secp256k1",
+        "master_key": "GALT MARK JIM DAVE INTO TOO KERR AWRY LED IRE LEFT BAD",
+        "master_seed": "spip33xCpJ3psyb5FBT512iGw5PKi",
+        "master_seed_hex": "0ACA3A8F8E042AA683EA193881F0F688",
+        "public_key": "aBQS5RLfH1T2AKZoknRv8488RtWiDrRnmZFaai6uWj2phzcYWN12",
+        "public_key_hex": "034774AD6399C77A04D32B61D21C8D71B4777F2CA593D6D9FF86489F8D0DE044CE"
+      },
+      "status": "success",
+      "type": "response"
+    }
+  }
+]
