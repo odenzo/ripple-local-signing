@@ -18,14 +18,14 @@ resolvers ++= Seq(
   Resolver.jcenterRepo
 )
 
-val rippleBinaryCodecVersion = "0.1.4-SNAPSHOT"
+val rippleBinaryCodecVersion = "0.1.4"
 val circeVersion             = "0.12.1"
 val catsVersion              = "2.0.0"
 val catsEffectVersion        = "2.0.0"
 val spireVersion             = "0.17.0-M1"
 val scribeVersion            = "2.7.10"
 val scalaTestVersion         = "3.0.8"
-val scalaCheckVersion        = "1.14.1"
+val scalaCheckVersion        = "1.14.2"
 
 lazy val root = (project in file("."))
   .aggregate(signing)
