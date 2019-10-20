@@ -6,6 +6,7 @@ import cats._
 import cats.data._
 import cats.implicits._
 
+/** old fashioned enumeration */
 sealed trait KeyType {
   val txt: String
 
@@ -21,8 +22,6 @@ case object ED25519 extends KeyType {
 object KeyType {
   implicit val decoder: Decoder[KeyType] = Decoder[String].emap(s => fromText(s).leftMap(_.error))
   implicit val encoded: Encoder[KeyType] = Encoder[String].contramap[KeyType](kt => kt.txt)
-  //implicit val edEncoded: Encoder[KeyType]   = Encoder[String].contramap[KeyType](v => v.txt)
-  //implicit val secpEncoded: Encoder[KeyType] = Encoder[String].contramap[KeyType](v => v.txt)
 
   def fromText(s: String): Either[ResponseError, KeyType] = {
     s.toLowerCase() match {

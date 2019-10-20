@@ -50,7 +50,24 @@ All other needed dependancies will be pulled in.
 The basic message api are straightforward :
 
 ```scala                        
-  val mySignRq:String = """{ "id" = 1 , "tx_json"=...  }"""
+  val mySignRq:String = """{
+  "id": 2,
+  "command": "sign",
+  "tx_json" : {
+      "TransactionType" : "Payment",
+      "Account" : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+      "Destination" : "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
+      "Amount" : {
+         "currency" : "USD",
+         "value" : "1",
+         "issuer" : "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn"
+      }
+   },
+   "secret" : "s████████████████████████████",
+   "offline": false,
+   "fee_mult_max": 1000
+}
+"""
 
   val json   = RippleLocalAPI.parseJsonUNSAFE(mySignRq)
   val signRs =  MessageBasedAPI.sign(json)   
@@ -68,7 +85,8 @@ This is production ready; it doesn't do any auto-filling or extensive validation
 ### Bugs/Issues
 * Tested underlying functionality pretty extensively, and all *seems* to work. Let me know if an issue and will fix.
 * Not really optimized, but majority of time is doing the cryptographic operations. Using the fine grained APIs can
- precompute/convert Ripple secret keys to reduce some time when making multiple calls using the same secret keys.
+ precompute/convert Ripple secret keys to reduce some time when making multiple calls using the same secret keys
+  (especialy secp keys)
 
 
 ## License 

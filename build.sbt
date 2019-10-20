@@ -19,7 +19,7 @@ resolvers ++= Seq(
 )
 
 val rippleBinaryCodecVersion = "0.1.4"
-val circeVersion             = "0.12.1"
+val circeVersion             = "0.12.2"
 val catsVersion              = "2.0.0"
 val catsEffectVersion        = "2.0.0"
 val spireVersion             = "0.17.0-M1"
@@ -64,7 +64,7 @@ val xlibs = Seq(
 
 // Java Only Crypto Library
 val lib_bouncycastle = {
-  val version = "1.63"
+  val version = "1.64"
   Seq(
     "org.bouncycastle" % "bcprov-jdk15on" % version
   )
